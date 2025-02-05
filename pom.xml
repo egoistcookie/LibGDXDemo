@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 组织或公司的标识，一般用反向域名 -->
+    <groupId>com.lf</groupId>
+    <!-- 项目的唯一标识符 -->
+    <artifactId>LibGDXDemo</artifactId>
+    <!-- 项目版本 -->
+    <version>1.0</version>
+    <!-- 项目打包类型，如 jar、war 等 -->
+    <packaging>jar</packaging>
+
+    <properties>
+        <libgdx.version>1.12.1</libgdx.version> <!-- 使用最新的 LibGDX 版本 -->
+        <lwjgl.version>3.3.4</lwjgl.version> <!-- 使用 LWJGL 3.3.4 -->
+    </properties>
+
+    <dependencies><!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- LibGDX core -->
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx</artifactId>
+            <version>${libgdx.version}</version>
+        </dependency>
+        <!-- Box2D physics -->
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-box2d</artifactId>
+            <version>${libgdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-box2d-platform</artifactId>
+            <version>${libgdx.version}</version>
+            <classifier>natives-desktop</classifier>
+        </dependency>
+        <!-- VisUI UI library -->
+        <dependency>
+            <groupId>com.kotcrab.vis</groupId>
+            <artifactId>vis-ui</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- LWJGL backend for desktop -->
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-backend-lwjgl3</artifactId>
+            <version>${libgdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-platform</artifactId>
+            <version>${libgdx.version}</version> <!-- 替换为你的 LibGDX 版本 -->
+            <classifier>natives-desktop</classifier>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>sonatype-releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/assets</directory>
+            </resource>
+        </resources>
+    </build>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+</project>
