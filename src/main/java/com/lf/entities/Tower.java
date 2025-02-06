@@ -27,15 +27,8 @@ public class Tower {
 
     private World world;
     private Texture arrowTexture;
-    private float arrowDamage;
     private float timeSinceLastFire; // 距离上次发射的时间
     private float fireRate; // 发射频率
-
-    public Tower(World world, Texture arrowTexture, float arrowDamage) {
-        this.world = world;
-        this.arrowTexture = arrowTexture;
-        this.arrowDamage = arrowDamage;
-    }
     // 构造函数，用于创建防御塔实例
     public Tower(World world, float x, float y, Texture texture, Texture arrowTexture) {
         // 创建刚体定义
