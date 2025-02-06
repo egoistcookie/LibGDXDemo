@@ -1,21 +1,14 @@
 package com.lf.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Timer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 // Tower类表示游戏中的防御塔实体
-public class Tower {
+public class TowerByLineAttack {
     // 防御塔的物理刚体，用于处理物理相关行为
     private Body body;
-    private Vector2 position; // 防御塔的位置
     // 防御塔的精灵，用于图形渲染
     private Sprite sprite;
     // 防御塔的攻击范围
@@ -25,18 +18,14 @@ public class Tower {
     // 是否第一次更新
     private boolean firstUpdate = true;
 
-    private float attackInterval = 2f; // 攻击间隔，2秒一次
-    private List<Arrow> arrows; // 箭矢列表，用于存储发射的箭矢
-
     // 构造函数，用于创建防御塔实例
-    public Tower(World world, float x, float y, Texture texture) {
+    public TowerByLineAttack(World world, float x, float y, Texture texture) {
         // 创建刚体定义
         BodyDef bodyDef = new BodyDef();
         // 设置为静态刚体，因为防御塔通常不会自行移动
         bodyDef.type = BodyDef.BodyType.StaticBody;
         // 设置刚体的初始位置
         bodyDef.position.set(x, y);
-        this.position = new Vector2(x, y); // 初始化防御塔的位置
 
         // 在物理世界中创建刚体
         body = world.createBody(bodyDef);
@@ -66,24 +55,19 @@ public class Tower {
         sprite.setOriginCenter();
         // 设置精灵的位置
         sprite.setPosition(x - sprite.getWidth() / 2f, y - sprite.getHeight() / 2f);
-        // 初始化攻击的重点（即敌人位置）
+        // 初始化激光终点
         laserEndPoint = new Vector2();
-
-        this.arrows = new ArrayList<>(); // 初始化箭矢列表
-
-        // 启动定时器，每隔 attackInterval 秒执行一次攻击逻辑
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                attack(); // 执行攻击逻辑
-            }
-        }, attackInterval, attackInterval);
 
         body.setUserData(this);
     }
 
     // 更新方法，用于检查敌人是否在攻击范围内并进行攻击
     public void update(Enemy enemy) {
+        //防止初始化时出现激光
+        if (firstUpdate) {
+            firstUpdate = false;
+            return;
+        }
         // 获取防御塔的位置
         Vector2 towerPosition = body.getPosition();
         // 获取敌人的位置
@@ -97,28 +81,6 @@ public class Tower {
             // 当攻击时，更新激光终点为敌人位置
             laserEndPoint.set(enemyPosition);
         }
-        Iterator<Arrow> iterator = arrows.iterator();
-        while (iterator.hasNext()) {
-            Arrow arrow = iterator.next();
-            if (arrow.isOutOfBounds()) {
-                iterator.remove(); // 使用迭代器的 remove 方法安全删除元素
-            }
-        }
-    }
-
-    // 渲染防御塔和箭矢
-    public void render(SpriteBatch batch) {
-        sprite.draw(batch); // 绘制防御塔
-        for (Arrow arrow : arrows) {
-            arrow.render(batch); // 绘制箭矢
-        }
-    }
-
-    // 攻击方法，用于创建并发射箭矢
-    private void attack() {
-        Texture arrowTexture = new Texture(Gdx.files.internal("arrow.png")); // 加载箭矢的纹理
-        Arrow arrow = new Arrow(arrowTexture, position.x, position.y); // 创建箭矢对象
-        arrows.add(arrow); // 将箭矢添加到箭矢列表中
     }
 
     // 获取防御塔的精灵
@@ -134,12 +96,5 @@ public class Tower {
     // 新增方法，获取攻击范围
     public float getAttackRange() {
         return attackRange;
-    }
-
-    // 释放资源，主要是释放箭矢的纹理资源
-    public void dispose() {
-        for (Arrow arrow : arrows) {
-            arrow.dispose(); // 释放箭矢的纹理资源
-        }
     }
 }

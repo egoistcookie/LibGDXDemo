@@ -10,7 +10,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.Enemy;
@@ -18,7 +19,7 @@ import com.lf.entities.Tower;
 import com.lf.ui.GameUI;
 
 // TowerDefenseGame类是游戏的核心类，管理游戏的主要逻辑和渲染
-public class TowerDefenseGame extends ApplicationAdapter {
+public class TowerDefenseGameByLineAttack extends ApplicationAdapter {
     // 正交相机，用于定义游戏的视图范围
     private OrthographicCamera camera;
     // 物理世界，用于管理游戏中的物理对象和模拟
@@ -108,9 +109,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
             enemy.getSprite().draw(batch);
         }
         // 绘制防御塔的精灵
-        //tower.getSprite().draw(batch);
-        // 渲染防御塔和箭矢
-        tower.render(batch);
+        tower.getSprite().draw(batch);
 
         // 结束精灵批处理
         batch.end();
@@ -146,15 +145,15 @@ public class TowerDefenseGame extends ApplicationAdapter {
             // 只有敌人在攻击范围内才绘制激光
             if (distance <= attackRange) {
                 // 设置形状渲染器的投影矩阵为相机的投影矩阵
-//                shapeRenderer.setProjectionMatrix(camera.combined);
-//                // 开始形状渲染
-//                shapeRenderer.begin();
-//                // 设置激光的颜色为红色
-//                shapeRenderer.setColor(Color.RED);
-//                // 绘制从防御塔到敌人的直线（激光）
-//                shapeRenderer.line(towerPosition.x, towerPosition.y, laserEndPoint.x, laserEndPoint.y);
-//                // 结束形状渲染
-//                shapeRenderer.end();
+                shapeRenderer.setProjectionMatrix(camera.combined);
+                // 开始形状渲染
+                shapeRenderer.begin();
+                // 设置激光的颜色为红色
+                shapeRenderer.setColor(Color.RED);
+                // 绘制从防御塔到敌人的直线（激光）
+                shapeRenderer.line(towerPosition.x, towerPosition.y, laserEndPoint.x, laserEndPoint.y);
+                // 结束形状渲染
+                shapeRenderer.end();
             }
         }
 
@@ -194,8 +193,6 @@ public class TowerDefenseGame extends ApplicationAdapter {
         batch.dispose();
         // 释放敌人纹理的资源
         enemyTexture.dispose();
-        // 释放防御塔资源，主要是释放箭矢的纹理资源
-        tower.dispose();
         // 释放防御塔纹理的资源
         towerTexture.dispose();
         // 释放形状渲染器的资源

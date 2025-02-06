@@ -73,4 +73,10 @@ public class Enemy {
     public Body getBody() {
         return body;
     }
+
+    // 处理敌人受到伤害的方法
+    public void takeDamage(float damage) {
+        // 这里可以添加具体的伤害处理逻辑，例如减少敌人的生命值等
+        System.out.println("Enemy took " + damage + " damage.");
+    }
 }
