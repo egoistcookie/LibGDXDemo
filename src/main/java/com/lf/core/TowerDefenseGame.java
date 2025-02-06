@@ -13,9 +13,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
+import com.lf.entities.Arrow;
 import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
 import com.lf.ui.GameUI;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // TowerDefenseGame类是游戏的核心类，管理游戏的主要逻辑和渲染
 public class TowerDefenseGame extends ApplicationAdapter {
@@ -37,8 +41,12 @@ public class TowerDefenseGame extends ApplicationAdapter {
     private Tower tower;
     // 防御塔的纹理，用于绘制防御塔的图形
     private Texture towerTexture;
+    // 箭矢的纹理，用于绘制箭矢的图形
+    private Texture arrowTexture;
     // 新增：用于绘制形状（激光）的渲染器
     private ShapeRenderer shapeRenderer;
+    private List<Enemy> enemies; // 敌人列表
+    private List<Arrow> arrows; // 箭的列表
 
     // 创建方法，在游戏启动时调用，用于初始化游戏资源和对象
     @Override
@@ -61,15 +69,27 @@ public class TowerDefenseGame extends ApplicationAdapter {
 
         // 加载敌人的纹理
         enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
-        // 创建敌人对象，初始位置为(100, 100)
+
+
+        // 创建敌人列表
+        enemies = new ArrayList<>();
+
+        // 创建敌人对象
         enemy = new Enemy(world, 100, 100, enemyTexture);
+        enemies.add(enemy);
+
         // 设置敌人的移动速度
         enemy.move(new Vector2(1, 0));
 
         // 加载防御塔的纹理
         towerTexture = new Texture(Gdx.files.internal("tower.png"));
+
+        // 加载箭的纹理
+        arrowTexture = new Texture(Gdx.files.internal("arrow.png"));
         // 创建防御塔对象，初始位置为(200, 150)
-        tower = new Tower(world, 200, 150, towerTexture);
+        tower = new Tower(world, 200, 150, towerTexture,arrowTexture);
+        // 创建箭的列表
+        arrows = new ArrayList<>();
 
         // 初始化形状渲染器
         shapeRenderer = new ShapeRenderer();
@@ -80,6 +100,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
     // 渲染方法，在每一帧调用，用于更新游戏状态和绘制图形
     @Override
     public void render() {
+        float deltaTime = Gdx.graphics.getDeltaTime();
         // 清除屏幕，设置背景颜色为黑色
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -91,12 +112,17 @@ public class TowerDefenseGame extends ApplicationAdapter {
         camera.update();
 
         // 如果敌人存在，则更新敌人的状态
-        if (enemy!= null) {
-            enemy.update();
-            // 更新防御塔的状态，检查是否攻击敌人
-            tower.update(enemy);
+
+        // 更新敌人的位置和旋转角度
+        for (Enemy enemy : enemies) {
+            if (enemy!= null) {
+                enemy.update();
+                // 更新防御塔的状态，检查是否攻击敌人
+            }
         }
 
+        // 更新塔的逻辑
+        tower.update(enemies,deltaTime);
 
         // 设置精灵批处理的投影矩阵为相机的投影矩阵
         batch.setProjectionMatrix(camera.combined);
@@ -104,13 +130,16 @@ public class TowerDefenseGame extends ApplicationAdapter {
         batch.begin();
 
         // 如果敌人存在，则绘制敌人的精灵
-        if (enemy!= null) {
+        // 渲染敌人
+        for (Enemy enemy : enemies) {
             enemy.getSprite().draw(batch);
         }
-        // 绘制防御塔的精灵
-        //tower.getSprite().draw(batch);
-        // 渲染防御塔和箭矢
-        tower.render(batch);
+        // 渲染塔
+        tower.getSprite().draw(batch);
+        // 渲染箭
+        for (Arrow arrow : tower.arrows) {
+            arrow.getSprite().draw(batch);
+        }
 
         // 结束精灵批处理
         batch.end();
@@ -132,41 +161,15 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 渲染游戏用户界面
         gameUI.render();
 
-        // 如果敌人存在且未死亡，则绘制激光
-        if (enemy!= null &&!enemy.isDead()) {
-            // 获取防御塔精灵的中心位置
-            Sprite towerSprite = tower.getSprite();
-            Vector2 towerPosition = new Vector2(towerSprite.getX() + towerSprite.getWidth() / 2,
-                    towerSprite.getY() + towerSprite.getHeight() / 2);
-            // 获取激光的终点位置（敌人位置）
-            Vector2 laserEndPoint = tower.getLaserEndPoint();
-            float attackRange = tower.getAttackRange();
-            // 计算防御塔与敌人的距离
-            float distance = towerPosition.dst(laserEndPoint);
-            // 只有敌人在攻击范围内才绘制激光
-            if (distance <= attackRange) {
-                // 设置形状渲染器的投影矩阵为相机的投影矩阵
-//                shapeRenderer.setProjectionMatrix(camera.combined);
-//                // 开始形状渲染
-//                shapeRenderer.begin();
-//                // 设置激光的颜色为红色
-//                shapeRenderer.setColor(Color.RED);
-//                // 绘制从防御塔到敌人的直线（激光）
-//                shapeRenderer.line(towerPosition.x, towerPosition.y, laserEndPoint.x, laserEndPoint.y);
-//                // 结束形状渲染
-//                shapeRenderer.end();
-            }
-        }
-
         // 如果敌人存在且已死亡，则处理敌人死亡逻辑，例如移除敌人
-        if (enemy!= null && enemy.isDead()) {
-            world.destroyBody(enemy.getBody()); // 假设Enemy类有getBody方法返回刚体
-            enemy = null;
-            // 重新初始化敌人
-            enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
-            enemy = new Enemy(world, 100, 100, enemyTexture);
-            enemy.move(new Vector2(1, 0));
-        }
+//        if (enemy!= null && enemy.isDead()) {
+//            world.destroyBody(enemy.getBody()); // 假设Enemy类有getBody方法返回刚体
+//            enemy = null;
+//            // 重新初始化敌人
+//            enemy = new Enemy(world, 100, 100, enemyTexture);
+//            enemy.setHealth(5);
+//            enemy.move(new Vector2(1, 0));
+//        }
     }
 
     // 调整大小方法，在窗口大小改变时调用
@@ -194,8 +197,6 @@ public class TowerDefenseGame extends ApplicationAdapter {
         batch.dispose();
         // 释放敌人纹理的资源
         enemyTexture.dispose();
-        // 释放防御塔资源，主要是释放箭矢的纹理资源
-        tower.dispose();
         // 释放防御塔纹理的资源
         towerTexture.dispose();
         // 释放形状渲染器的资源

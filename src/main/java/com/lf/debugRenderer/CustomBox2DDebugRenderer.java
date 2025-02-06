@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Shape.Type;
 import com.badlogic.gdx.physics.box2d.joints.PulleyJoint;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.lf.entities.Arrow;
 import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
 
@@ -86,7 +87,8 @@ public class CustomBox2DDebugRenderer implements Disposable {
 
             for (Body body : bodies) {
                 Object userData = body.getUserData();
-                if (userData instanceof Tower || userData instanceof Enemy) {
+                //箭矢、防御塔、敌人的刚体无需显示 20250207-lf
+                if (userData instanceof Arrow || userData instanceof Tower || userData instanceof Enemy) {
                     continue;
                 }
                 if (body.isActive() || this.drawInactiveBodies) {
