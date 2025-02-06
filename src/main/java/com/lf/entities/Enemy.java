@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.*;
 public class Enemy {
     private Body body; // 敌人的物理刚体
     private Sprite sprite; // 敌人的精灵，用于渲染
+    private int health = 10; // 敌人的血量，初始为10
 
     public Enemy(World world, float x, float y, Texture texture) {
         // 创建刚体定义
@@ -37,6 +38,8 @@ public class Enemy {
         sprite = new Sprite(texture);
         sprite.setSize(texture.getWidth(), texture.getHeight()); // 设置精灵大小
         sprite.setOriginCenter(); // 设置精灵的原点为中心
+        //设置用户数据
+        body.setUserData(this);
     }
 
     public void move(Vector2 velocity) {
@@ -51,5 +54,23 @@ public class Enemy {
 
     public Sprite getSprite() {
         return sprite; // 获取精灵对象
+    }
+
+    public Vector2 getPosition() {
+        return body.getPosition();
+    }
+
+    public void takeDamage() {
+        if (health > 0) {
+            health--;
+        }
+    }
+
+    public boolean isDead() {
+        return health <= 0;
+    }
+
+    public Body getBody() {
+        return body;
     }
 }
