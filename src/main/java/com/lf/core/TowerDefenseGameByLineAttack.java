@@ -68,7 +68,7 @@
 //        enemy.move(new Vector2(1, 0));
 //
 //        // 加载防御塔的纹理
-//        towerTexture = new Texture(Gdx.files.internal("tower.png"));
+//        towerTexture = new Texture(Gdx.files.internal("tower1.png"));
 //        // 创建防御塔对象，初始位置为(200, 150)
 //        tower = new Tower(world, 200, 150, towerTexture);
 //

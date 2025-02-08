@@ -1,4 +1,3 @@
-// FILEPATH: LibGDXDemo/src/main/java/com/lf/entities/Arrow.java
 package com.lf.entities;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -56,12 +55,31 @@ public class Arrow {
             Vector2 direction = target.getBody().getPosition().sub(body.getPosition());
             direction.nor(); // 归一化方向向量
 
+            // 计算箭矢需要转向的目标角度
+//            float targetAngle = (float) Math.atan2(direction.y, direction.x);
+//            // 计算当前角度与目标角度的差值
+//            float angleDiff = targetAngle - body.getAngle();
+//            // 定义一个小的阈值，例如 0.01f，表示当角度差小于该值时，认为已经对准目标
+//            float threshold = 0.1f;
+//
+//            if (Math.abs(angleDiff) > threshold) {
+//                // 逐步转向目标角度，这里可以调整转向速度，例如 0.1f
+//                body.setAngularVelocity(angleDiff * 0.1f);
+//            } else {
+//                // 当角度差小于阈值时，停止转动
+//                body.setAngularVelocity(0);
+//            }
+
             // 设置箭的速度，使其缓缓射向敌人
-            body.setLinearVelocity(direction.scl(5));
+            body.setLinearVelocity(direction.scl(10));
 
             // 更新精灵的位置和旋转角度，使其与刚体同步
             sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f, body.getPosition().y - sprite.getHeight() / 2f);
-            sprite.setRotation((float) Math.toDegrees(body.getAngle()));
+
+            // 计算箭矢需要旋转的角度：箭矢位置与敌人位置的夹角，加上135度（因为arrow图片本身是一张45度倾斜的箭矢贴图）
+            double angle = Math.atan2(direction.y, direction.x) + 3 * Math.PI / 4; // 加上 135 度（3 * Math.PI / 4 弧度）
+            sprite.setRotation((float) Math.toDegrees(angle));
+//            sprite.setRotation((float) Math.toDegrees(body.getAngle()));
 
             // 检查箭是否击中敌人
             if (body.getPosition().dst(target.getBody().getPosition()) < 0.5f) {

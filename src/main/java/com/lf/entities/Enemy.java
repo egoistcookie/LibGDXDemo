@@ -85,11 +85,11 @@ public class Enemy {
             // 敌人死亡，处理死亡逻辑
             //body.setActive(false); // 使刚体失效
             // 敌人死亡，重新生成
-            respawn();
+            respawn(initialPosition);
         }
     }
 
-    private void respawn() {
+    private void respawn(Vector2 initialPosition) {
         // 销毁当前刚体
         body.getWorld().destroyBody(body);
 
@@ -116,7 +116,6 @@ public class Enemy {
         this.health = 5;
         //设置用户数据，以便CustomBox2DDebugRenderer能隐藏其刚体
         body.setUserData(this);
-
         // 设置相同的速度
         body.setLinearVelocity(velocity);
     }

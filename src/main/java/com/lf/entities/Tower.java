@@ -76,14 +76,6 @@ public class Tower {
 
         this.arrows = new ArrayList<>(); // 初始化箭矢列表
 
-        // 启动定时器，每隔 attackInterval 秒执行一次攻击逻辑
-//        Timer.schedule(new Timer.Task() {
-//            @Override
-//            public void run() {
-//                attack(); // 执行攻击逻辑
-//            }
-//        }, attackInterval, attackInterval);
-
         //设置用户数据，以便CustomBox2DDebugRenderer能隐藏其刚体
         body.setUserData(this);
         this.timeSinceLastFire = 0;
@@ -94,17 +86,6 @@ public class Tower {
     public void update(List<Enemy> enemies, float deltaTime) {
         // 获取防御塔的位置
         Vector2 towerPosition = body.getPosition();
-        // 获取敌人的位置
-//        Vector2 enemyPosition = enemy.getPosition();
-//        // 计算防御塔与敌人之间的距离
-//        float distance = towerPosition.dst(enemyPosition);
-//        // 如果敌人在攻击范围内
-//        if (distance <= attackRange) {
-//            // 让敌人受到伤害
-//            enemy.takeDamage();
-//            // 当攻击时，更新激光终点为敌人位置
-//            laserEndPoint.set(enemyPosition);
-//        }
         // 遍历敌人列表，检查是否有敌人进入攻击范围
         for (Enemy enemy : enemies) {
             if (body.getPosition().dst(enemy.getBody().getPosition()) < attackRange) {
@@ -128,29 +109,7 @@ public class Tower {
                 i--; // 调整索引
             }
         }
-//        Iterator<Arrow> iterator = arrows.iterator();
-//        while (iterator.hasNext()) {
-//            Arrow arrow = iterator.next();
-//            if (arrow.isOutOfBounds()) {
-//                iterator.remove(); // 使用迭代器的 remove 方法安全删除元素
-//            }
-//        }
     }
-
-    // 渲染防御塔和箭矢
-//    public void render(SpriteBatch batch) {
-//        sprite.draw(batch); // 绘制防御塔
-//        for (Arrow arrow : arrows) {
-//            arrow.render(batch); // 绘制箭矢
-//        }
-//    }
-
-    // 攻击方法，用于创建并发射箭矢
-//    private void attack() {
-//        Texture arrowTexture = new Texture(Gdx.files.internal("arrow.png")); // 加载箭矢的纹理
-//        Arrow arrow = new Arrow(arrowTexture, position.x, position.y); // 创建箭矢对象
-//        arrows.add(arrow); // 将箭矢添加到箭矢列表中
-//    }
 
     // 获取防御塔的精灵
     public Sprite getSprite() {
@@ -167,4 +126,6 @@ public class Tower {
         return attackRange;
     }
 
+    public void dispose() {
+    }
 }

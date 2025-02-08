@@ -2,7 +2,7 @@ package com.lf.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,10 +12,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.Arrow;
 import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
+import com.lf.entities.TowerSelectionBox;
 import com.lf.ui.GameUI;
 
 import java.util.ArrayList;
@@ -33,12 +35,13 @@ public class TowerDefenseGame extends ApplicationAdapter {
     private GameUI gameUI;
     // 精灵批处理，用于高效地渲染精灵
     private SpriteBatch batch;
-    // 游戏中的敌人对象
-    private Enemy enemy;
     // 敌人的纹理，用于绘制敌人的图形
     private Texture enemyTexture;
     // 游戏中的防御塔对象
     private Tower tower;
+    private TowerSelectionBox towerSelectionBox;
+    private List<Tower> towers;
+    private Vector2 clickPosition;
     // 防御塔的纹理，用于绘制防御塔的图形
     private Texture towerTexture;
     // 箭矢的纹理，用于绘制箭矢的图形
@@ -46,7 +49,13 @@ public class TowerDefenseGame extends ApplicationAdapter {
     // 新增：用于绘制形状（激光）的渲染器
     private ShapeRenderer shapeRenderer;
     private List<Enemy> enemies; // 敌人列表
-    private List<Arrow> arrows; // 箭的列表
+    private Texture backgroundTexture;
+    private Sprite backgroundSprite;
+    // 适配视口，用于根据窗口大小调整相机的视图
+    private FitViewport viewport;
+
+    float showTowerX = 0;
+    float showTowerY = 0;
 
     // 创建方法，在游戏启动时调用，用于初始化游戏资源和对象
     @Override
@@ -55,6 +64,8 @@ public class TowerDefenseGame extends ApplicationAdapter {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
 
+        // 创建适配视口，初始视口大小为800x600
+        viewport = new FitViewport(800, 600, camera);
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), false);
 
@@ -70,26 +81,41 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 加载敌人的纹理
         enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
 
-
         // 创建敌人列表
         enemies = new ArrayList<>();
 
         // 创建敌人对象
-        enemy = new Enemy(world, 100, 100, enemyTexture);
-        enemies.add(enemy);
+        // 游戏中的敌人对象
+        Enemy enemy1 = new Enemy(world, 100, 100, enemyTexture);
+        enemies.add(enemy1);
+        Enemy enemy2 = new Enemy(world, 125, 100, enemyTexture);
+        enemies.add(enemy2);
+        Enemy enemy3 = new Enemy(world, 150, 100, enemyTexture);
+        enemies.add(enemy3);
 
         // 设置敌人的移动速度
-        enemy.move(new Vector2(1, 0));
+        enemy1.move(new Vector2(2, 0));
+        enemy2.move(new Vector2(2.5f, 0));
+        enemy3.move(new Vector2(2.6f, 0));
+
+        backgroundTexture = new Texture(Gdx.files.internal("background.png"));
+        backgroundSprite = new Sprite(backgroundTexture);
+        backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
 
         // 加载防御塔的纹理
-        towerTexture = new Texture(Gdx.files.internal("tower.png"));
+//        towerTexture = new Texture(Gdx.files.internal("tower1.png"));
 
         // 加载箭的纹理
-        arrowTexture = new Texture(Gdx.files.internal("arrow.png"));
+        arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
         // 创建防御塔对象，初始位置为(200, 150)
-        tower = new Tower(world, 200, 150, towerTexture,arrowTexture);
-        // 创建箭的列表
-        arrows = new ArrayList<>();
+//        tower = new Tower(world, 200, 150, towerTexture, arrowTexture);
+
+        // 创建防御塔选择框对象
+        towerSelectionBox = new TowerSelectionBox();
+        // 初始化防御塔列表
+        towers = new ArrayList<>();
+        // 初始化鼠标点击位置向量
+        clickPosition = new Vector2();
 
         // 初始化形状渲染器
         shapeRenderer = new ShapeRenderer();
@@ -102,16 +128,15 @@ public class TowerDefenseGame extends ApplicationAdapter {
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         // 清除屏幕，设置背景颜色为黑色
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // 推进物理世界的模拟，步长为1/60秒，速度迭代次数为6，位置迭代次数为2
         world.step(1 / 60f, 6, 2);
-
+        // 处理用户输入
+        handleInput();
         // 更新相机
         camera.update();
-
-        // 如果敌人存在，则更新敌人的状态
 
         // 更新敌人的位置和旋转角度
         for (Enemy enemy : enemies) {
@@ -121,30 +146,36 @@ public class TowerDefenseGame extends ApplicationAdapter {
             }
         }
 
-        // 更新塔的逻辑
-        tower.update(enemies,deltaTime);
-
         // 设置精灵批处理的投影矩阵为相机的投影矩阵
         batch.setProjectionMatrix(camera.combined);
         // 开始精灵批处理
         batch.begin();
+
+        backgroundSprite.draw(batch);
+
+        // 渲染防御塔选择框
+        towerSelectionBox.render(batch);
+        // 遍历防御塔列表，渲染每个防御塔的精灵
+        for (Tower tower : towers) {
+            // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
+            tower.update(enemies,deltaTime);
+            // 渲染塔
+            tower.getSprite().draw(batch);
+            // 渲染箭
+            for (Arrow arrow : tower.arrows) {
+                arrow.getSprite().draw(batch);
+            }
+        }
 
         // 如果敌人存在，则绘制敌人的精灵
         // 渲染敌人
         for (Enemy enemy : enemies) {
             enemy.getSprite().draw(batch);
         }
-        // 渲染塔
-        tower.getSprite().draw(batch);
-        // 渲染箭
-        for (Arrow arrow : tower.arrows) {
-            arrow.getSprite().draw(batch);
-        }
 
         // 结束精灵批处理
         batch.end();
 
-        // 在debugRenderer.render之前过滤掉防御塔刚体
         // 创建一个Array<Body>对象
         Array<Body> bodiesArray = new Array<>();
         // 调用getBodies方法，将世界中的刚体添加到bodiesArray中
@@ -161,17 +192,48 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 渲染游戏用户界面
         gameUI.render();
 
-        // 如果敌人存在且已死亡，则处理敌人死亡逻辑，例如移除敌人
-//        if (enemy!= null && enemy.isDead()) {
-//            world.destroyBody(enemy.getBody()); // 假设Enemy类有getBody方法返回刚体
-//            enemy = null;
-//            // 重新初始化敌人
-//            enemy = new Enemy(world, 100, 100, enemyTexture);
-//            enemy.setHealth(5);
-//            enemy.move(new Vector2(1, 0));
-//        }
     }
 
+    // handleInput方法用于处理用户的输入事件
+    private void handleInput() {
+        // 检查鼠标左键是否刚刚被按下
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            // 设置点击位置为鼠标当前的屏幕坐标
+            clickPosition.set(Gdx.input.getX(), Gdx.input.getY());
+            // 将屏幕坐标转换为世界坐标
+            viewport.unproject(clickPosition);
+
+            // 如果防御塔选择框不可见
+            if (!towerSelectionBox.isVisible()) {
+                // 显示防御塔选择框，并设置其位置为点击位置
+                towerSelectionBox.show(clickPosition);
+                // 显示防御塔的位置，应该为第一次点击空白位置的位置
+                showTowerX = clickPosition.x;
+                showTowerY = clickPosition.y;
+            } else {
+                // 处理防御塔选择框的输入事件
+                towerSelectionBox.handleInput(clickPosition);
+                // 获取选择的防御塔索引
+                int selectedIndex = towerSelectionBox.getSelectedIndex();
+                // 如果选择的索引不为-1，表示选择了一个防御塔
+                if (selectedIndex != -1) {
+                    // 获取选择的防御塔纹理
+                    Texture towerTexture = towerSelectionBox.getTowerTextures().get(selectedIndex);
+                    // 加载箭的纹理
+                    Texture arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
+                    // 创建一个新的防御塔对象，位置为点击位置
+                    Tower tower = new Tower(world, showTowerX, showTowerY, towerTexture, arrowTexture);
+                    // 将新的防御塔添加到防御塔列表中
+                    towers.add(tower);
+                    // 重置防御塔选择框的选择索引
+                    towerSelectionBox.resetSelectedIndex();
+                }else{
+                    //如果点了其他位置，选择框应消失
+                    towerSelectionBox.hide();
+                }
+            }
+        }
+    }
     // 调整大小方法，在窗口大小改变时调用
     @Override
     public void resize(int width, int height) {
@@ -180,8 +242,12 @@ public class TowerDefenseGame extends ApplicationAdapter {
         camera.viewportHeight = height;
         camera.update();
 
+        backgroundSprite.setSize(width, height);
+
         // 更新游戏用户界面的视口大小
         gameUI.resize(width, height);
+        // 更新视口的大小
+        viewport.update(width, height);
     }
 
     // 释放资源方法，在游戏结束时调用，用于释放所有资源
@@ -198,8 +264,16 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 释放敌人纹理的资源
         enemyTexture.dispose();
         // 释放防御塔纹理的资源
-        towerTexture.dispose();
+//        towerTexture.dispose();
         // 释放形状渲染器的资源
         shapeRenderer.dispose();
+        // 释放背景图的资源
+        backgroundTexture.dispose();
+        // 释放防御塔选择框的资源
+        towerSelectionBox.dispose();
+        // 遍历防御塔列表，释放每个防御塔的资源
+        for (Tower tower : towers) {
+            tower.dispose();
+        }
     }
 }
