@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
@@ -22,6 +24,10 @@ import com.lf.ui.GameUI;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
 
 // TowerDefenseGame类是游戏的核心类，管理游戏的主要逻辑和渲染
 public class TowerDefenseGame extends ApplicationAdapter {
@@ -53,6 +59,8 @@ public class TowerDefenseGame extends ApplicationAdapter {
     private Sprite backgroundSprite;
     // 适配视口，用于根据窗口大小调整相机的视图
     private FitViewport viewport;
+    private TiledMap map;
+    private List<Vector2> pathPoints; // 使用 Vector2 存储点的坐标
 
     float showTowerX = 0;
     float showTowerY = 0;
@@ -69,6 +77,9 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), false);
 
+        // 加载地图
+        // 解析地图中的路径数据
+        parseMapPath();
         // 创建调试渲染器
         debugRenderer = new CustomBox2DDebugRenderer();
 
@@ -86,19 +97,25 @@ public class TowerDefenseGame extends ApplicationAdapter {
 
         // 创建敌人对象
         // 游戏中的敌人对象
-        Enemy enemy1 = new Enemy(world, 100, 100, enemyTexture);
+        Enemy enemy1 = new Enemy(world, 550, 550, enemyTexture, pathPoints);
         enemies.add(enemy1);
-        Enemy enemy2 = new Enemy(world, 125, 100, enemyTexture);
+        Enemy enemy2 = new Enemy(world, 540, 560, enemyTexture, pathPoints);
         enemies.add(enemy2);
-        Enemy enemy3 = new Enemy(world, 150, 100, enemyTexture);
+        Enemy enemy3 = new Enemy(world, 555, 570, enemyTexture, pathPoints);
         enemies.add(enemy3);
 
         // 设置敌人的移动速度
-        enemy1.move(new Vector2(2, 0));
-        enemy2.move(new Vector2(2.5f, 0));
-        enemy3.move(new Vector2(2.6f, 0));
+        enemy1.move();
+        enemy2.move();
+        enemy3.move();
+        // 设置敌人的目标位置
+//        enemy1.setTargetPosition(new Vector2(500, 300));
+//        // 设置敌人的目标位置
+//        enemy2.setTargetPosition(new Vector2(600, 200));
+//        // 设置敌人的目标位置
+//        enemy3.setTargetPosition(new Vector2(700, 400));
 
-        backgroundTexture = new Texture(Gdx.files.internal("background.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("map1.png"));
         backgroundSprite = new Sprite(backgroundTexture);
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
 
@@ -183,7 +200,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 可以在这里对bodiesArray进行操作，例如遍历
         for (Body body : bodiesArray) {
             // 这里可以执行对每个刚体的操作，如打印位置等
-            System.out.println("Body position: " + body.getUserData());
+//            System.out.println("Body position: " + body.getUserData());
         }
 
         // 渲染物理世界的调试信息
@@ -274,6 +291,58 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 遍历防御塔列表，释放每个防御塔的资源
         for (Tower tower : towers) {
             tower.dispose();
+        }
+    }
+    public static void main(String[] args) {
+        // 创建游戏实例
+        new TowerDefenseGame().parseMapPath();
+    }
+    private void parseMapPath() {
+        // 加载 TMX 地图文件
+        map = new TmxMapLoader().load("冰天雪地.tmx");
+
+        // 初始化路径点列表
+        pathPoints = new ArrayList<>();
+
+        // 获取名为 "path" 的对象层
+        MapLayer pathLayer = map.getLayers().get("path");
+
+        // 获取对象层中的所有对象
+        MapObjects objects = pathLayer.getObjects();
+
+        // 遍历对象层中的每个对象
+        for (MapObject object : objects) {
+            // 检查对象是否包含自定义属性 "order"
+            if (object.getProperties().containsKey("order")) {
+                // 获取点的 x 和 y 坐标
+                float x = object.getProperties().get("x", Float.class);
+                float y = object.getProperties().get("y", Float.class);
+
+                // 获取自定义属性 "order" 的值
+                String order = object.getProperties().get("order", String.class);
+
+                // 将点的坐标和 order 值存储到 Vector2 中
+                Vector2 point = new Vector2(x, y);
+//                point.set(Float.parseFloat(order), Float.parseFloat(order)); // 使用 Vector2 的 set 方法存储 order 值（可选）
+
+                // 将点添加到列表中
+                pathPoints.add(point);
+            }
+        }
+
+        // 根据 "order" 属性对点进行排序
+//        Collections.sort(pathPoints, new Comparator<Vector2>() {
+//            @Override
+//            public int compare(Vector2 p1, Vector2 p2) {
+//                // 比较两个点的 order 值
+//                return Float.compare(p1.x, p2.x); // 假设 order 值存储在 x 中
+//            }
+//        });
+
+        // 现在 pathPoints 列表中的点已经按照 "order" 属性从小到大排序
+        // 你可以将这些点用于你的塔防游戏逻辑
+        for (Vector2 point : pathPoints) {
+            System.out.println("Point: (" + point.x + ", " + point.y + "), Order: " + point.x);
         }
     }
 }

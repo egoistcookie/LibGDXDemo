@@ -71,7 +71,7 @@ public class Arrow {
 //            }
 
             // 设置箭的速度，使其缓缓射向敌人
-            body.setLinearVelocity(direction.scl(10));
+            body.setLinearVelocity(direction.scl(15));
 
             // 更新精灵的位置和旋转角度，使其与刚体同步
             sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f, body.getPosition().y - sprite.getHeight() / 2f);
