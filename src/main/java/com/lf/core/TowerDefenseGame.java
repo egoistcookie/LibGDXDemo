@@ -144,7 +144,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
 //        tower = new Tower(world, 200, 150, towerTexture, arrowTexture);
 
         // 创建防御塔选择框对象
-        towerSelectionBox = new TowerSelectionBox(gameUI);
+        towerSelectionBox = new TowerSelectionBox();
         // 初始化防御塔列表
         towers = new ArrayList<>();
         // 初始化鼠标点击位置向量
@@ -164,9 +164,9 @@ public class TowerDefenseGame extends ApplicationAdapter {
 
         // 加载自定义字体
         FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-        fontParameter.fontFileName = "zh-cn.ttf"; // 字体文件路径
+        fontParameter.fontFileName = "fonts/songti.fnt"; // 字体文件路径
         fontParameter.fontParameters.size = 24; // 字体大小
-        assetManager.load("zh-cn.ttf", BitmapFont.class, fontParameter);
+        assetManager.load("fonts/songti.fnt", BitmapFont.class);
         // 等待字体加载完成
         assetManager.finishLoading();
         // 获取加载的字体
@@ -273,8 +273,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
                     if(this.gameUI.getGold() < 100){
 
                         // 获取加载的字体
-                        BitmapFont customFont = assetManager.get("zh-cn.ttf", BitmapFont.class);
-                        BitmapFont chineseFont = assetManager.get("zh-cn.ttf", BitmapFont.class);
+                        BitmapFont customFont = assetManager.get("fonts/songti.fnt", BitmapFont.class);
                         this.gameUI.getSkin().add("default",customFont);
                         Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
                         // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
