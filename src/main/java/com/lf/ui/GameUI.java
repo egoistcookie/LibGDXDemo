@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.VisLabel;
 
 /**
  * GameUI类用于管理游戏的用户界面。
@@ -15,6 +16,10 @@ public class GameUI {
     private Stage stage;
     // 皮肤对象，用于存储和管理界面元素的样式
     private Skin skin;
+    // 金币数量标签
+    private VisLabel goldLabel;
+    // 新增：金币数量
+    private int gold;
 
     /**
      * 构造函数，用于初始化GameUI对象。
@@ -35,6 +40,11 @@ public class GameUI {
         table.setFillParent(true);
         // 将Table添加到Stage中，使其成为舞台的一部分
         stage.addActor(table);
+        //金币初始为100
+        gold = 100;
+        goldLabel = new VisLabel("Gold: " + gold);
+        // 创建金币数量标签
+        table.add(goldLabel).top().right().pad(10); // 将标签放置在右上角并添加一些内边距
     }
 
     /**
@@ -70,5 +80,18 @@ public class GameUI {
         stage.dispose();
         // 调用VisUI的dispose方法，释放VisUI库所占用的资源
         VisUI.dispose();
+    }
+
+    public void setGold(int gold) {
+        goldLabel.setText("Gold: " + gold);
+    }
+
+    /**
+     * 增加金币
+     * @param addGold
+     */
+    public void addGold(int addGold) {
+        this.gold += addGold;
+        goldLabel.setText("Gold: " + this.gold);
     }
 }

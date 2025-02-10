@@ -97,11 +97,11 @@ public class TowerDefenseGame extends ApplicationAdapter {
 
         // 创建敌人对象
         // 游戏中的敌人对象
-        Enemy enemy1 = new Enemy(world, 550, 550, enemyTexture, pathPoints);
+        Enemy enemy1 = new Enemy(world, 550, 550, enemyTexture, pathPoints, gameUI);
         enemies.add(enemy1);
-        Enemy enemy2 = new Enemy(world, 540, 560, enemyTexture, pathPoints);
+        Enemy enemy2 = new Enemy(world, 540, 560, enemyTexture, pathPoints, gameUI);
         enemies.add(enemy2);
-        Enemy enemy3 = new Enemy(world, 555, 570, enemyTexture, pathPoints);
+        Enemy enemy3 = new Enemy(world, 555, 570, enemyTexture, pathPoints, gameUI);
         enemies.add(enemy3);
 
         // 设置敌人的移动速度

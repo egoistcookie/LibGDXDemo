@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.lf.ui.GameUI;
 
 import java.util.List;
 
@@ -17,12 +18,14 @@ public class Enemy {
     private boolean isMoving; // 标记敌人是否正在移动
     private List<Vector2> pathPoints;
     private int currentPathIndex = 0;
+    // 游戏用户界面
+    private GameUI gameUI;
 
     public void setPathPoints(){
         this.pathPoints = pathPoints;
     }
 
-    public Enemy(World world, float x, float y, Texture texture, List<Vector2> pathPoints) {
+    public Enemy(World world, float x, float y, Texture texture, List<Vector2> pathPoints, GameUI gameUI) {
         this.initialPosition = new Vector2(x, y); // 记录初始位置
         this.targetPosition = null; // 初始化目标位置为null
         this.isMoving = false; // 初始化移动状态为false
@@ -59,6 +62,8 @@ public class Enemy {
         sprite.setOriginCenter(); // 设置精灵的原点为中心
         // 设置用户数据
         body.setUserData(this);
+
+        this.gameUI = gameUI;
     }
 
     /**
@@ -177,5 +182,7 @@ public class Enemy {
         body.setLinearVelocity(velocity);
         // 从最初位置开始移动
         currentPathIndex = 0;
+        // 敌人死后，为界面增加10个金币
+        gameUI.addGold(10);
     }
 }
