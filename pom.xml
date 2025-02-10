@@ -59,6 +59,17 @@
             <version>${libgdx.version}</version> <!-- 替换为你的 LibGDX 版本 -->
             <classifier>natives-desktop</classifier>
         </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype</artifactId>
+            <version>${libgdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype-platform</artifactId>
+            <version>1.12.0</version>
+            <classifier>natives-desktop</classifier>
+        </dependency>
     </dependencies>
 
     <repositories>

@@ -1,5 +1,6 @@
 package com.lf.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -12,14 +13,23 @@ import com.kotcrab.vis.ui.widget.VisLabel;
  * 它负责创建和管理舞台（Stage）、皮肤（Skin）以及处理渲染、调整大小和资源释放等操作。
  */
 public class GameUI {
+
     // 舞台对象，用于管理和渲染游戏界面中的所有演员（Actors）
     private Stage stage;
     // 皮肤对象，用于存储和管理界面元素的样式
     private Skin skin;
     // 金币数量标签
-    private VisLabel goldLabel;
+    private final VisLabel goldLabel;
     // 新增：金币数量
     private int gold;
+
+    public Skin getSkin() {
+        return skin;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
+    }
 
     /**
      * 构造函数，用于初始化GameUI对象。
@@ -43,8 +53,12 @@ public class GameUI {
         //金币初始为100
         gold = 100;
         goldLabel = new VisLabel("Gold: " + gold);
+        // 直接设置 goldLabel 的位置
+        goldLabel.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - 10,
+                Gdx.graphics.getHeight() - goldLabel.getHeight() - 10);
+        stage.addActor(goldLabel);
         // 创建金币数量标签
-        table.add(goldLabel).top().right().pad(10); // 将标签放置在右上角并添加一些内边距
+//        table.add(goldLabel).top().right().pad(10); // 将标签放置在右上角并添加一些内边距
     }
 
     /**
@@ -53,7 +67,7 @@ public class GameUI {
      */
     public void render() {
         // 调用stage的act方法，更新舞台中所有演员的状态，例如处理输入、动画等
-        stage.act();
+        stage.act(Gdx.graphics.getDeltaTime());
         // 调用stage的draw方法，绘制舞台中的所有演员
         stage.draw();
     }
@@ -86,6 +100,10 @@ public class GameUI {
         goldLabel.setText("Gold: " + gold);
     }
 
+    public int getGold() {
+        return this.gold;
+    }
+
     /**
      * 增加金币
      * @param addGold
@@ -94,4 +112,21 @@ public class GameUI {
         this.gold += addGold;
         goldLabel.setText("Gold: " + this.gold);
     }
+    /**
+     * 减少金币
+     * @param subGold
+     */
+    public void subGold(int subGold) {
+        this.gold -= subGold;
+        goldLabel.setText("Gold: " + this.gold);
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
 }

@@ -3,17 +3,27 @@ package com.lf.core;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+//import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.Arrow;
@@ -21,6 +31,8 @@ import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
 import com.lf.entities.TowerSelectionBox;
 import com.lf.ui.GameUI;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +73,10 @@ public class TowerDefenseGame extends ApplicationAdapter {
     private FitViewport viewport;
     private TiledMap map;
     private List<Vector2> pathPoints; // 使用 Vector2 存储点的坐标
+    //字体加载管理工具
+    private AssetManager assetManager;
+    //字体加载器
+    private FreetypeFontLoader freeTypeFontLoader;
 
     float showTowerX = 0;
     float showTowerY = 0;
@@ -128,7 +144,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
 //        tower = new Tower(world, 200, 150, towerTexture, arrowTexture);
 
         // 创建防御塔选择框对象
-        towerSelectionBox = new TowerSelectionBox();
+        towerSelectionBox = new TowerSelectionBox(gameUI);
         // 初始化防御塔列表
         towers = new ArrayList<>();
         // 初始化鼠标点击位置向量
@@ -138,6 +154,22 @@ public class TowerDefenseGame extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
         // 设置形状渲染器自动选择形状类型
         shapeRenderer.setAutoShapeType(true);
+
+        assetManager = new AssetManager();
+        // 设置 FreeTypeFontGenerator 的加载器
+        FileHandleResolver resolver = new InternalFileHandleResolver();
+        assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+        // 设置 BitmapFont 的加载器
+        assetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
+
+        // 加载自定义字体
+        FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+        fontParameter.fontFileName = "zh-cn.ttf"; // 字体文件路径
+        fontParameter.fontParameters.size = 24; // 字体大小
+        assetManager.load("zh-cn.ttf", BitmapFont.class, fontParameter);
+        // 等待字体加载完成
+        assetManager.finishLoading();
+        // 获取加载的字体
     }
 
     // 渲染方法，在每一帧调用，用于更新游戏状态和绘制图形
@@ -238,12 +270,39 @@ public class TowerDefenseGame extends ApplicationAdapter {
                     Texture towerTexture = towerSelectionBox.getTowerTextures().get(selectedIndex);
                     // 加载箭的纹理
                     Texture arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
-                    // 创建一个新的防御塔对象，位置为点击位置
-                    Tower tower = new Tower(world, showTowerX, showTowerY, towerTexture, arrowTexture);
-                    // 将新的防御塔添加到防御塔列表中
-                    towers.add(tower);
-                    // 重置防御塔选择框的选择索引
-                    towerSelectionBox.resetSelectedIndex();
+                    if(this.gameUI.getGold() < 100){
+
+                        // 获取加载的字体
+                        BitmapFont customFont = assetManager.get("zh-cn.ttf", BitmapFont.class);
+                        BitmapFont chineseFont = assetManager.get("zh-cn.ttf", BitmapFont.class);
+                        this.gameUI.getSkin().add("default",customFont);
+                        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
+                        // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
+                        Label hintLabel = new Label("您的金币不足.", labelStyle);
+                        // 创建提示标签
+//                        VisLabel label = new VisLabel("您的金币不足");
+//                        label.setSize(100, 10);
+                        // 直接设置 label 的位置
+                        hintLabel.setPosition((float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2,
+                                (float) Gdx.graphics.getHeight() / 2 - hintLabel.getHeight() / 2);
+                        // 将窗口添加到舞台
+                        this.gameUI.getStage().addActor(hintLabel);
+                        // 使用Timer在1秒后移除提示窗口
+                        Timer.schedule(new Timer.Task() {
+                            @Override
+                            public void run() {
+                                hintLabel.remove();
+                            }
+                        }, 1f);
+                    }else{
+                        this.gameUI.subGold(100);
+                        // 创建一个新的防御塔对象，位置为点击位置
+                        Tower tower = new Tower(world, showTowerX, showTowerY, towerTexture, arrowTexture);
+                        // 将新的防御塔添加到防御塔列表中
+                        towers.add(tower);
+                        // 重置防御塔选择框的选择索引
+                        towerSelectionBox.resetSelectedIndex();
+                    }
                 }else{
                     //如果点了其他位置，选择框应消失
                     towerSelectionBox.hide();
