@@ -1,5 +1,7 @@
 package com.lf.entities;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -10,6 +12,7 @@ public class Arrow {
     private Sprite sprite; // 箭的精灵，用于渲染
     private Enemy target; // 箭的目标敌人
     private boolean isHit; // 标记箭是否已经击中敌人
+    private Sound arrowSound; // 箭矢射出的音效
 
     public Arrow(World world, float x, float y, Texture texture, Enemy target) {
         // 创建刚体定义
@@ -47,6 +50,11 @@ public class Arrow {
         this.isHit = false; // 初始化箭未击中敌人
         //设置用户数据，以便CustomBox2DDebugRenderer能隐藏其刚体
         body.setUserData(this);
+
+        // 加载音效
+        this.arrowSound = Gdx.audio.newSound(Gdx.files.internal("wav/arror_start.wav")); // 加载箭矢出现的音效文件
+        // 播放音效
+        this.arrowSound.play(0.5f); //表示以 50% 的音量播放音效
     }
 
     public void update() {
@@ -85,6 +93,8 @@ public class Arrow {
             if (body.getPosition().dst(target.getBody().getPosition()) < 0.5f) {
                 target.takeDamage(1); // 敌人受到一点伤害
                 isHit = true; // 标记箭已击中敌人
+                // 释放音效资源，避免内存泄漏
+                this.arrowSound.dispose(); // 释放音效资源
             }
         }
     }

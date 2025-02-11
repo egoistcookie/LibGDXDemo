@@ -17,8 +17,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -73,6 +75,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
     private FitViewport viewport;
     private TiledMap map;
     private List<Vector2> pathPoints; // 使用 Vector2 存储点的坐标
+    private List<PolygonMapObject> towerRanges; // 防御塔可以摆放的位置，可能有多个多边形
     //字体加载管理工具
     private AssetManager assetManager;
     //字体加载器
@@ -106,42 +109,34 @@ public class TowerDefenseGame extends ApplicationAdapter {
         batch = new SpriteBatch();
 
         // 加载敌人的纹理
-        enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
+//        enemyTexture = new Texture(Gdx.files.internal("enemy1.png"));// 设置纹理过滤方式为线性过滤
+//        enemyTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // 创建敌人列表
         enemies = new ArrayList<>();
 
         // 创建敌人对象
+        Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")
+                , new Texture("enemy13.png"), new Texture("enemy14.png")};
         // 游戏中的敌人对象
-        Enemy enemy1 = new Enemy(world, 550, 550, enemyTexture, pathPoints, gameUI);
+        Enemy enemy1 = new Enemy(world, 550, 550, enemyFrames, pathPoints, gameUI);
         enemies.add(enemy1);
-        Enemy enemy2 = new Enemy(world, 540, 560, enemyTexture, pathPoints, gameUI);
+        Enemy enemy2 = new Enemy(world, 540, 560, enemyFrames, pathPoints, gameUI);
         enemies.add(enemy2);
-        Enemy enemy3 = new Enemy(world, 555, 570, enemyTexture, pathPoints, gameUI);
+        Enemy enemy3 = new Enemy(world, 555, 570, enemyFrames, pathPoints, gameUI);
         enemies.add(enemy3);
 
         // 设置敌人的移动速度
         enemy1.move();
         enemy2.move();
         enemy3.move();
-        // 设置敌人的目标位置
-//        enemy1.setTargetPosition(new Vector2(500, 300));
-//        // 设置敌人的目标位置
-//        enemy2.setTargetPosition(new Vector2(600, 200));
-//        // 设置敌人的目标位置
-//        enemy3.setTargetPosition(new Vector2(700, 400));
 
-        backgroundTexture = new Texture(Gdx.files.internal("map1.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
 
-        // 加载防御塔的纹理
-//        towerTexture = new Texture(Gdx.files.internal("tower1.png"));
-
         // 加载箭的纹理
         arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
-        // 创建防御塔对象，初始位置为(200, 150)
-//        tower = new Tower(world, 200, 150, towerTexture, arrowTexture);
 
         // 创建防御塔选择框对象
         towerSelectionBox = new TowerSelectionBox();
@@ -155,21 +150,20 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 设置形状渲染器自动选择形状类型
         shapeRenderer.setAutoShapeType(true);
 
+        // 字体管理工具的初始化
         assetManager = new AssetManager();
         // 设置 FreeTypeFontGenerator 的加载器
         FileHandleResolver resolver = new InternalFileHandleResolver();
         assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         // 设置 BitmapFont 的加载器
         assetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
-
         // 加载自定义字体
         FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-        fontParameter.fontFileName = "fonts/songti.fnt"; // 字体文件路径
-        fontParameter.fontParameters.size = 24; // 字体大小
-        assetManager.load("fonts/songti.fnt", BitmapFont.class);
+        fontParameter.fontFileName = "fonts/xinsongti.fnt"; // 字体文件路径下，需要有fnt和png两文件，都是通过Hiero工具生成
+//        fontParameter.fontParameters.size = 12; // 字体大小
+        assetManager.load("fonts/xinsongti.fnt", BitmapFont.class);
         // 等待字体加载完成
         assetManager.finishLoading();
-        // 获取加载的字体
     }
 
     // 渲染方法，在每一帧调用，用于更新游戏状态和绘制图形
@@ -190,7 +184,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 更新敌人的位置和旋转角度
         for (Enemy enemy : enemies) {
             if (enemy!= null) {
-                enemy.update();
+                enemy.update(deltaTime);
                 // 更新防御塔的状态，检查是否攻击敌人
             }
         }
@@ -271,36 +265,25 @@ public class TowerDefenseGame extends ApplicationAdapter {
                     // 加载箭的纹理
                     Texture arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
                     if(this.gameUI.getGold() < 100){
-
-                        // 获取加载的字体
-                        BitmapFont customFont = assetManager.get("fonts/songti.fnt", BitmapFont.class);
-                        this.gameUI.getSkin().add("default",customFont);
-                        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
-                        // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
-                        Label hintLabel = new Label("您的金币不足.", labelStyle);
-                        // 创建提示标签
-//                        VisLabel label = new VisLabel("您的金币不足");
-//                        label.setSize(100, 10);
-                        // 直接设置 label 的位置
-                        hintLabel.setPosition((float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2,
-                                (float) Gdx.graphics.getHeight() / 2 - hintLabel.getHeight() / 2);
-                        // 将窗口添加到舞台
-                        this.gameUI.getStage().addActor(hintLabel);
-                        // 使用Timer在1秒后移除提示窗口
-                        Timer.schedule(new Timer.Task() {
-                            @Override
-                            public void run() {
-                                hintLabel.remove();
-                            }
-                        }, 1f);
+                        showAlertInfo("您的金币不足.",0,0);
                     }else{
-                        this.gameUI.subGold(100);
-                        // 创建一个新的防御塔对象，位置为点击位置
-                        Tower tower = new Tower(world, showTowerX, showTowerY, towerTexture, arrowTexture);
-                        // 将新的防御塔添加到防御塔列表中
-                        towers.add(tower);
-                        // 重置防御塔选择框的选择索引
-                        towerSelectionBox.resetSelectedIndex();
+                        boolean inRange = false;
+                        for(PolygonMapObject polygonMapObject : this.towerRanges ){
+                            //只要x和y坐标有位于其中一个防御塔允许摆放的多边形中，就可以创建新的防御塔对象
+                            if(isPointInPolygon(showTowerX,showTowerY,polygonMapObject.getPolygon())){
+                                inRange = true;
+                                this.gameUI.subGold(100);
+                                // 创建一个新的防御塔对象，位置为点击位置
+                                Tower tower = new Tower(world, showTowerX, showTowerY, towerTexture, arrowTexture);
+                                // 将新的防御塔添加到防御塔列表中
+                                towers.add(tower);
+                                // 重置防御塔选择框的选择索引
+                                towerSelectionBox.resetSelectedIndex();
+                            }
+                        }
+                        if(!inRange){
+                            showAlertInfo("防御塔不能建在此处.",0,0);
+                        }
                     }
                 }else{
                     //如果点了其他位置，选择框应消失
@@ -309,6 +292,42 @@ public class TowerDefenseGame extends ApplicationAdapter {
             }
         }
     }
+
+    /**
+     * 提示弹窗
+     * @param alertInfo 提示信息
+     * @param x X轴位置
+     * @param y Y轴位置
+     */
+    private void showAlertInfo(String alertInfo, float x, float y) {
+        // 获取加载的字体
+        BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+        // 字体大小倍率（以Hiero中生成的字体大小为基准）
+        customFont.getData().setScale(0.8f);
+        this.gameUI.getSkin().add("default",customFont);
+        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
+        // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
+        Label hintLabel = new Label(alertInfo, labelStyle);
+        if(x == 0){
+            x = (float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2;
+        }
+        if(y == 0){
+            y = (float) Gdx.graphics.getHeight() / 2 - hintLabel.getHeight() / 2;
+        }
+        // 直接设置 label 的位置
+        hintLabel.setPosition(x , y);
+        // 将窗口添加到舞台
+        this.gameUI.getStage().addActor(hintLabel);
+        // 使用Timer在1秒后移除提示窗口
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                hintLabel.remove();
+            }
+        }, 1f);
+
+    }
+
     // 调整大小方法，在窗口大小改变时调用
     @Override
     public void resize(int width, int height) {
@@ -337,7 +356,9 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 释放精灵批处理的资源
         batch.dispose();
         // 释放敌人纹理的资源
-        enemyTexture.dispose();
+        for (Enemy enemy : enemies) {
+            enemy.dispose();
+        }
         // 释放防御塔纹理的资源
 //        towerTexture.dispose();
         // 释放形状渲染器的资源
@@ -351,16 +372,27 @@ public class TowerDefenseGame extends ApplicationAdapter {
             tower.dispose();
         }
     }
+    public static String generateChineseCharacters() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0x4E00; i <= 0x9FA5; i++) {
+            sb.append((char) i);
+        }
+        return sb.toString();
+    }
     public static void main(String[] args) {
-        // 创建游戏实例
-        new TowerDefenseGame().parseMapPath();
+            String chineseCharacters = generateChineseCharacters();
+            System.out.println(chineseCharacters);
+
     }
     private void parseMapPath() {
         // 加载 TMX 地图文件
-        map = new TmxMapLoader().load("冰天雪地.tmx");
+        map = new TmxMapLoader().load("冰天雪地1.tmx");
 
         // 初始化路径点列表
         pathPoints = new ArrayList<>();
+
+        // 初始化防御塔摆放范围
+        towerRanges = new ArrayList<>();
 
         // 获取名为 "path" 的对象层
         MapLayer pathLayer = map.getLayers().get("path");
@@ -375,32 +407,49 @@ public class TowerDefenseGame extends ApplicationAdapter {
                 // 获取点的 x 和 y 坐标
                 float x = object.getProperties().get("x", Float.class);
                 float y = object.getProperties().get("y", Float.class);
-
-                // 获取自定义属性 "order" 的值
-                String order = object.getProperties().get("order", String.class);
-
                 // 将点的坐标和 order 值存储到 Vector2 中
                 Vector2 point = new Vector2(x, y);
-//                point.set(Float.parseFloat(order), Float.parseFloat(order)); // 使用 Vector2 的 set 方法存储 order 值（可选）
-
                 // 将点添加到列表中
                 pathPoints.add(point);
             }
-        }
-
-        // 根据 "order" 属性对点进行排序
-//        Collections.sort(pathPoints, new Comparator<Vector2>() {
-//            @Override
-//            public int compare(Vector2 p1, Vector2 p2) {
-//                // 比较两个点的 order 值
-//                return Float.compare(p1.x, p2.x); // 假设 order 值存储在 x 中
-//            }
-//        });
-
-        // 现在 pathPoints 列表中的点已经按照 "order" 属性从小到大排序
-        // 你可以将这些点用于你的塔防游戏逻辑
-        for (Vector2 point : pathPoints) {
-            System.out.println("Point: (" + point.x + ", " + point.y + "), Order: " + point.x);
+            // 获取towerRange1和towerRange2的多边形对象，保存进防御塔允许摆放的范围list
+            if (object instanceof PolygonMapObject) {
+                if ("towerRange".equals(object.getName())) {
+                    towerRanges.add((PolygonMapObject) object);
+                }
+            }
         }
     }
+    // 检查点是否在多边形内
+    private boolean isPointInPolygon(float x, float y, Polygon polygon) {
+        // 将世界坐标转换为多边形的本地坐标，获取多边形经过变换后的顶点数组
+        float[] vertices = polygon.getTransformedVertices();
+        // 计算多边形的顶点数量，由于顶点数组是二维坐标（x,y）交替存储，所以顶点数量为数组长度的一半
+        int numVertices = vertices.length / 2;
+        // 用于标记点是否在多边形内，初始化为 false
+        boolean inside = false;
+        // 遍历多边形的所有边，i 表示当前顶点的索引，j 表示前一个顶点的索引
+        for (int i = 0, j = numVertices - 1; i < numVertices; j = i++) {
+            // 获取当前顶点的 x 坐标，i * 2 是因为顶点数组是二维坐标交替存储
+            float xi = vertices[i * 2];
+            // 获取当前顶点的 y 坐标
+            float yi = vertices[i * 2 + 1];
+            // 获取前一个顶点的 x 坐标
+            float xj = vertices[j * 2];
+            // 获取前一个顶点的 y 坐标
+            float yj = vertices[j * 2 + 1];
+            // 判断从点 (x,y) 水平向右的射线是否与当前边相交
+            // (yi > y) != (yj > y) 表示边的两个端点在射线的两侧
+            // x < (xj - xi) * (y - yi) / (yj - yi) + xi 表示点 (x,y) 在边的左侧
+            boolean intersect = ((yi > y) != (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            // 如果射线与当前边相交，则将 inside 取反
+            if (intersect) {
+                inside = !inside;
+            }
+        }
+        // 返回点是否在多边形内的结果
+        return inside;
+    }
+
 }

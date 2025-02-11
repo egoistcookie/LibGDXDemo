@@ -21,11 +21,21 @@ public class Enemy {
     // 游戏用户界面
     private GameUI gameUI;
 
+    // 新增：存储动画帧的纹理数组
+    private Texture[] animationFrames;
+    // 新增：当前动画帧索引
+    private int currentFrameIndex = 0;
+    // 新增：动画计时器
+    private float animationTimer = 0f;
+    // 新增：动画帧切换时间间隔
+    private float frameDuration = 0.2f;
+
     public void setPathPoints(){
         this.pathPoints = pathPoints;
     }
 
-    public Enemy(World world, float x, float y, Texture texture, List<Vector2> pathPoints, GameUI gameUI) {
+    public Enemy(World world, float x, float y, Texture[] animationFrames, List<Vector2> pathPoints, GameUI gameUI) {
+        this.animationFrames = animationFrames;
         this.initialPosition = new Vector2(x, y); // 记录初始位置
         this.targetPosition = null; // 初始化目标位置为null
         this.isMoving = false; // 初始化移动状态为false
@@ -41,7 +51,7 @@ public class Enemy {
 
         // 创建圆形形状
         CircleShape shape = new CircleShape();
-        shape.setRadius(texture.getWidth() / 2f); // 以纹理宽度的一半作为半径
+        shape.setRadius(animationFrames[0].getWidth() / 2f); // 以纹理宽度的一半作为半径
 
         // 创建夹具定义
         FixtureDef fixtureDef = new FixtureDef();
@@ -57,8 +67,9 @@ public class Enemy {
         shape.dispose();
 
         // 创建精灵
-        sprite = new Sprite(texture);
-        sprite.setSize(texture.getWidth(), texture.getHeight()); // 设置精灵大小
+        sprite = new Sprite(animationFrames[0]);
+        sprite.setSize(animationFrames[0].getWidth()/4f, animationFrames[0].getHeight()/5f); // 设置精灵大小
+        sprite.flip(false, true);//水平翻转
         sprite.setOriginCenter(); // 设置精灵的原点为中心
         // 设置用户数据
         body.setUserData(this);
@@ -92,33 +103,36 @@ public class Enemy {
             // 敌人到达终点
             body.setLinearVelocity(Vector2.Zero);
         }
-        //敌人朝固定位置移动的逻辑
-//        if (isMoving && targetPosition != null) { // 如果敌人正在移动且目标位置不为空
-//            Vector2 currentPosition = body.getPosition(); // 获取敌人当前位置
-//            Vector2 direction = targetPosition.cpy().sub(currentPosition); // 计算敌人到目标位置的方向向量
-//            float distance = direction.len(); // 计算敌人到目标位置的距离
-//
-//            if (distance > 0.1f) { // 如果距离大于0.1f（可根据需要调整）
-//                direction.nor(); // 归一化方向向量
-//                velocity = direction.scl(2f); // 设置移动速度（可根据需要调整速度值）
-//                body.setLinearVelocity(velocity); // 设置刚体的线性速度
-//            } else {
-//                isMoving = false; // 到达目标位置，停止移动
-//                targetPosition = null; // 清空目标位置
-//                body.setLinearVelocity(Vector2.Zero); // 停止刚体的移动
-//            }
-//        }
     }
 
     /**
      * 更新敌人的状态
      */
-    public void update() {
+    public void update(float deltaTime) {
         move(); // 调用移动逻辑
-
+        // 更新动画计时器
+        animationTimer += deltaTime;
+        if (animationTimer >= frameDuration) {
+            // 切换到下一帧
+            currentFrameIndex = (currentFrameIndex + 1) % animationFrames.length;
+            // 更新精灵的纹理
+            sprite.setTexture(animationFrames[currentFrameIndex]);
+            // 重置计时器
+            animationTimer = 0f;
+        }
         // 更新精灵的位置和旋转角度，使其与刚体同步
         sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f, body.getPosition().y - sprite.getHeight() / 2f);
-        sprite.setRotation((float) Math.toDegrees(body.getAngle()));
+
+        // 计算箭矢需要旋转的角度：箭矢位置与敌人位置的夹角，加上135度（因为arrow图片本身是一张45度倾斜的箭矢贴图）
+        Vector2 targetPoint = pathPoints.get(currentPathIndex);
+        Vector2 currentPosition = body.getPosition();
+        // 针对有明显朝向的敌人，如果目标x坐标大于当前x坐标，则水平翻转一下(只有第一次才需要翻转 待改)
+        if(targetPoint.x > currentPosition.x){
+            sprite.flip(true, false);//水平翻转
+        }
+        double angle = Math.atan2(targetPoint.y, targetPoint.x) + 4 * Math.PI / 4; // 加上 180 度（4 * Math.PI / 4 弧度）
+        sprite.setRotation((float) Math.toDegrees(angle));
+//        sprite.setRotation((float) Math.toDegrees(body.getAngle()));
     }
 
     public Sprite getSprite() {
@@ -184,5 +198,12 @@ public class Enemy {
         currentPathIndex = 0;
         // 敌人死后，为界面增加10个金币
         gameUI.addGold(10);
+    }
+
+    public void dispose() {
+        // 纹理要释放
+        for(Texture texture :animationFrames){
+            texture.dispose();
+        }
     }
 }
