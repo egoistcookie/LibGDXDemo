@@ -10,20 +10,24 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-//import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -37,15 +41,9 @@ import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
 import com.lf.entities.TowerSelectionBox;
 import com.lf.ui.GameUI;
-import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
-import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
 
 // TowerDefenseGame类是游戏的核心类，管理游戏的主要逻辑和渲染
 public class TowerDefenseGame extends ApplicationAdapter {
@@ -100,14 +98,32 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), false);
 
+        // 资源管理工具的初始化
+        assetManager = new AssetManager();
+        // 设置 FreeTypeFontGenerator 的加载器
+        FileHandleResolver resolver = new InternalFileHandleResolver();
+        assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+        // 设置 BitmapFont 的加载器
+        assetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
+        // 加载自定义字体
+        FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+        fontParameter.fontFileName = "fonts/xinsongti.fnt"; // 字体文件路径下，需要有fnt和png两文件，都是通过Hiero工具生成
+//        fontParameter.fontParameters.size = 12; // 字体大小
+        assetManager.load("fonts/xinsongti.fnt", BitmapFont.class);
+        // 加载提示框的背景图片
+        assetManager.load("alertTitle.png", Texture.class);
+        // 加载金币的背景图片
+        assetManager.load("gold.png", Texture.class);
+        // 等待字体加载完成
+        assetManager.finishLoading();
+
+        // 创建游戏用户界面
+        gameUI = new GameUI(assetManager);
         // 加载地图
         // 解析地图中的路径数据
         parseMapPath();
         // 创建调试渲染器
         debugRenderer = new CustomBox2DDebugRenderer();
-
-        // 创建游戏用户界面
-        gameUI = new GameUI();
 
         // 创建精灵批处理
         batch = new SpriteBatch();
@@ -152,23 +168,6 @@ public class TowerDefenseGame extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
         // 设置形状渲染器自动选择形状类型
         shapeRenderer.setAutoShapeType(true);
-
-        // 字体管理工具的初始化
-        assetManager = new AssetManager();
-        // 设置 FreeTypeFontGenerator 的加载器
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        // 设置 BitmapFont 的加载器
-        assetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
-        // 加载自定义字体
-        FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-        fontParameter.fontFileName = "fonts/xinsongti.fnt"; // 字体文件路径下，需要有fnt和png两文件，都是通过Hiero工具生成
-//        fontParameter.fontParameters.size = 12; // 字体大小
-        assetManager.load("fonts/xinsongti.fnt", BitmapFont.class);
-        // 加载提示框的背景图片
-        assetManager.load("alertTitle.png", Texture.class);
-        // 等待字体加载完成
-        assetManager.finishLoading();
     }
 
     // 渲染方法，在每一帧调用，用于更新游戏状态和绘制图形
@@ -308,7 +307,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 获取加载的字体
         BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
         // 字体大小倍率（以Hiero中生成的字体大小为基准）
-        customFont.getData().setScale(0.8f);
+        customFont.getData().setScale(0.5f);
         this.gameUI.getSkin().add("default",customFont);
         Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
         // 创建一个Label对象，用于显示提示文本，初始文本为空字符串

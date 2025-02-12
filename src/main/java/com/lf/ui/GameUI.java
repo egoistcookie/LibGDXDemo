@@ -1,6 +1,8 @@
 package com.lf.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -35,7 +37,7 @@ public class GameUI {
      * 构造函数，用于初始化GameUI对象。
      * 在构造函数中，会创建舞台、加载VisUI库、获取皮肤，并创建一个填充父容器的表格添加到舞台中。
      */
-    public GameUI() {
+    public GameUI(AssetManager assetManager) {
         // 创建一个新的Stage对象，并使用ScreenViewport作为视口
         // ScreenViewport会根据屏幕大小自动调整舞台的大小
         stage = new Stage(new ScreenViewport());
@@ -51,12 +53,26 @@ public class GameUI {
         // 将Table添加到Stage中，使其成为舞台的一部分
         stage.addActor(table);
         //金币初始为100
-        gold = 1000;
-        goldLabel = new VisLabel("Gold: " + gold);
+        gold = 1000;// 加载背景图片
+        goldLabel = new VisLabel("" + gold);
+
+//        Texture goldIconTexture = assetManager.get("gold.png", Texture.class);
+        // 加载金币图标纹理
+        Texture goldIconTexture = new Texture(Gdx.files.internal("gold.png"));
+        // 新增：创建金币图标
+        com.badlogic.gdx.scenes.scene2d.ui.Image goldIcon = new com.badlogic.gdx.scenes.scene2d.ui.Image(goldIconTexture);
         // 直接设置 goldLabel 的位置
         goldLabel.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - 10,
                 Gdx.graphics.getHeight() - goldLabel.getHeight() - 10);
         stage.addActor(goldLabel);
+        // 新增：设置金币图标的位置
+        goldIcon.setPosition(goldLabel.getX() - goldIcon.getWidth() - 5, goldLabel.getY());
+        stage.addActor(goldIcon);
+
+        // 直接设置 goldLabel 的位置
+//        goldLabel.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - 10,
+//                Gdx.graphics.getHeight() - goldLabel.getHeight() - 10);
+//        stage.addActor(goldLabel);
         // 创建金币数量标签
 //        table.add(goldLabel).top().right().pad(10); // 将标签放置在右上角并添加一些内边距
     }
@@ -97,7 +113,7 @@ public class GameUI {
     }
 
     public void setGold(int gold) {
-        goldLabel.setText("Gold: " + gold);
+        goldLabel.setText("" + gold);
     }
 
     public int getGold() {
@@ -110,7 +126,7 @@ public class GameUI {
      */
     public void addGold(int addGold) {
         this.gold += addGold;
-        goldLabel.setText("Gold: " + this.gold);
+        goldLabel.setText("" + this.gold);
     }
     /**
      * 减少金币
@@ -118,7 +134,7 @@ public class GameUI {
      */
     public void subGold(int subGold) {
         this.gold -= subGold;
-        goldLabel.setText("Gold: " + this.gold);
+        goldLabel.setText("" + this.gold);
     }
 
     public Stage getStage() {
