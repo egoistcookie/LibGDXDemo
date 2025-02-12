@@ -51,7 +51,7 @@ public class GameUI {
         // 将Table添加到Stage中，使其成为舞台的一部分
         stage.addActor(table);
         //金币初始为100
-        gold = 100;
+        gold = 1000;
         goldLabel = new VisLabel("Gold: " + gold);
         // 直接设置 goldLabel 的位置
         goldLabel.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - 10,

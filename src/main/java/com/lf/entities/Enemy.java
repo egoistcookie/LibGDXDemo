@@ -124,15 +124,17 @@ public class Enemy {
         sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f, body.getPosition().y - sprite.getHeight() / 2f);
 
         // 计算箭矢需要旋转的角度：箭矢位置与敌人位置的夹角，加上135度（因为arrow图片本身是一张45度倾斜的箭矢贴图）
-        Vector2 targetPoint = pathPoints.get(currentPathIndex);
-        Vector2 currentPosition = body.getPosition();
-        // 针对有明显朝向的敌人，如果目标x坐标大于当前x坐标，则水平翻转一下(只有第一次才需要翻转 待改)
-        if(targetPoint.x > currentPosition.x){
-            sprite.flip(true, false);//水平翻转
-        }
-        double angle = Math.atan2(targetPoint.y, targetPoint.x) + 4 * Math.PI / 4; // 加上 180 度（4 * Math.PI / 4 弧度）
-        sprite.setRotation((float) Math.toDegrees(angle));
+        if(currentPathIndex < pathPoints.size()){
+            Vector2 targetPoint = pathPoints.get(currentPathIndex);
+//            Vector2 currentPosition = body.getPosition();
+            // 针对有明显朝向的敌人，如果目标x坐标大于当前x坐标，则水平翻转一下(只有第一次才需要翻转 待改)
+//        if(targetPoint.x > currentPosition.x){
+//            sprite.flip(true, false);//水平翻转
+//        }
+            double angle = Math.atan2(targetPoint.y, targetPoint.x) + 4 * Math.PI / 4; // 加上 180 度（4 * Math.PI / 4 弧度）
+            sprite.setRotation((float) Math.toDegrees(angle));
 //        sprite.setRotation((float) Math.toDegrees(body.getAngle()));
+        }
     }
 
     public Sprite getSprite() {

@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -23,7 +24,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -116,8 +120,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
         enemies = new ArrayList<>();
 
         // 创建敌人对象
-        Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")
-                , new Texture("enemy13.png"), new Texture("enemy14.png")};
+        Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")};
         // 游戏中的敌人对象
         Enemy enemy1 = new Enemy(world, 550, 550, enemyFrames, pathPoints, gameUI);
         enemies.add(enemy1);
@@ -162,6 +165,8 @@ public class TowerDefenseGame extends ApplicationAdapter {
         fontParameter.fontFileName = "fonts/xinsongti.fnt"; // 字体文件路径下，需要有fnt和png两文件，都是通过Hiero工具生成
 //        fontParameter.fontParameters.size = 12; // 字体大小
         assetManager.load("fonts/xinsongti.fnt", BitmapFont.class);
+        // 加载提示框的背景图片
+        assetManager.load("alertTitle.png", Texture.class);
         // 等待字体加载完成
         assetManager.finishLoading();
     }
@@ -308,6 +313,18 @@ public class TowerDefenseGame extends ApplicationAdapter {
         Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
         // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
         Label hintLabel = new Label(alertInfo, labelStyle);
+
+        // 加载背景图片
+        Texture backgroundTexture = assetManager.get("alertTitle.png", Texture.class);
+        TextureRegion backgroundRegion = new TextureRegion(backgroundTexture);
+        Image backgroundImage = new Image(backgroundRegion);
+        // 创建一个Table作为提示框容器
+        Table dialogTable = new Table();
+        dialogTable.setBackground(new TextureRegionDrawable(backgroundRegion));
+        dialogTable.add(hintLabel).pad(20); // 添加一些内边距
+        // 调整提示框的大小以适应文字长度
+        dialogTable.pack();
+
         if(x == 0){
             x = (float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2;
         }
@@ -315,14 +332,14 @@ public class TowerDefenseGame extends ApplicationAdapter {
             y = (float) Gdx.graphics.getHeight() / 2 - hintLabel.getHeight() / 2;
         }
         // 直接设置 label 的位置
-        hintLabel.setPosition(x , y);
+        dialogTable.setPosition(x , y);
         // 将窗口添加到舞台
-        this.gameUI.getStage().addActor(hintLabel);
+        this.gameUI.getStage().addActor(dialogTable);
         // 使用Timer在1秒后移除提示窗口
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                hintLabel.remove();
+                dialogTable.remove();
             }
         }, 1f);
 
