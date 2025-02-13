@@ -9,6 +9,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * 塔防游戏主程序：水墨风格塔防游戏
+ */
 @SpringBootApplication
 public class TowerDefenseApplication implements CommandLineRunner {
 

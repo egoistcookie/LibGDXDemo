@@ -8,6 +8,7 @@ import com.lf.ui.GameUI;
 
 import java.util.List;
 
+// Tower类表示游戏中的敌人实体
 public class Enemy {
     private Body body; // 敌人的物理刚体
     private Sprite sprite; // 敌人的精灵，用于渲染

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
+
+// Tower类表示游戏中的箭实体
 public class Arrow {
     private Body body; // 箭的物理刚体
     private Sprite sprite; // 箭的精灵，用于渲染
