@@ -32,9 +32,14 @@ public class MainMenuScreen implements Screen {
     private AssetManager assetManager;
 
 //    private Button startButton;
+    // 开始游戏按钮
     private ImageButton startButton;
-    // 点击事件监听器
+    // 开始游戏事件监听
     private ClickListener startButtonClickListener;
+    // 退出游戏按钮
+    private ImageButton exitButton;
+    // 退出游戏事件监听
+    private ClickListener exitButtonClickListener;
 
     // 构造函数，接收游戏对象作为参数
     public MainMenuScreen(Game game, AssetManager assetManager) {
@@ -98,9 +103,9 @@ public class MainMenuScreen implements Screen {
         // 加一个空行
         table.row();
         // 将按钮添加到表格中
-        ImageButton exitButton = new ImageButton(drawable);
+        exitButton = new ImageButton(drawable);
         // 为按钮添加点击事件监听器
-        exitButton.addListener(new ClickListener() {
+        exitButtonClickListener = new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // 释放资源
@@ -108,7 +113,8 @@ public class MainMenuScreen implements Screen {
                 // 点击按钮后退出游戏
                 Gdx.app.exit();
             }
-        });
+        };
+        exitButton.addListener(exitButtonClickListener);
         table.add(exitButton);
         Label exitLabel = new Label("退出游戏", labelStyle);
         table.add(exitLabel).pad(-exitButton.getHeight() / 2 + 70, -exitButton.getWidth() / 2 -120 , 0, 0);
@@ -143,7 +149,7 @@ public class MainMenuScreen implements Screen {
     private void removeAllListener() {
         // 移除startButton的事件监听器
         startButton.removeListener(startButtonClickListener);
-
+        exitButton.removeListener(exitButtonClickListener);
         // 切换到GameScreen的逻辑
         // 这里可以使用游戏的setScreen方法来切换屏幕
         // 例如：game.setScreen(new GameScreen());
