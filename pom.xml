@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <libgdx.version>1.12.0</libgdx.version> <!-- 使用最新的 LibGDX 版本 -->
+        <libgdx.version>1.12.1</libgdx.version> <!-- 使用最新的 LibGDX 版本 -->
         <lwjgl.version>3.3.4</lwjgl.version> <!-- 使用 LWJGL 3.3.4 -->
     </properties>
 
