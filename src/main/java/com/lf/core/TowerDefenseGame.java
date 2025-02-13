@@ -150,7 +150,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
         enemy2.move();
         enemy3.move();
 
-        backgroundTexture = new Texture(Gdx.files.internal("map3.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
 
@@ -230,7 +230,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
         // 可以在这里对bodiesArray进行操作，例如遍历
         for (Body body : bodiesArray) {
             // 这里可以执行对每个刚体的操作，如打印位置等
-//            System.out.println("Body position: " + body.getUserData());
+            System.out.println("Body position: " + body.getUserData());
         }
 
         // 渲染物理世界的调试信息
@@ -402,7 +402,7 @@ public class TowerDefenseGame extends ApplicationAdapter {
     }
     private void parseMapPath() {
         // 加载 TMX 地图文件
-        map = new TmxMapLoader().load("冰天雪地1.tmx");
+        map = new TmxMapLoader().load("map/冰天雪地1.tmx");
 
         // 初始化路径点列表
         pathPoints = new ArrayList<>();

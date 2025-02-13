@@ -42,7 +42,7 @@ public class GameUI {
         // ScreenViewport会根据屏幕大小自动调整舞台的大小
         stage = new Stage(new ScreenViewport());
         // 加载VisUI库，该库提供了一些预设的UI样式和组件
-        VisUI.load();
+//        VisUI.load();
         // 获取VisUI库的默认皮肤
         skin = VisUI.getSkin();
 
