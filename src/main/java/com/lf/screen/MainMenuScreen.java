@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
+import com.lf.core.MyDefenseGame;
 
 // 主菜单界面类，实现 Screen 接口
 public class MainMenuScreen implements Screen {
@@ -27,7 +28,7 @@ public class MainMenuScreen implements Screen {
     // 皮肤对象，用于管理界面元素的样式
     private Skin skin;
     // 游戏对象，用于切换屏幕
-    private Game game;
+    private MyDefenseGame game;
     // 资源管理工具
     private AssetManager assetManager;
 
@@ -42,7 +43,7 @@ public class MainMenuScreen implements Screen {
     private ClickListener exitButtonClickListener;
 
     // 构造函数，接收游戏对象作为参数
-    public MainMenuScreen(Game game, AssetManager assetManager) {
+    public MainMenuScreen(MyDefenseGame game, AssetManager assetManager) {
         this.game = game;
         this.assetManager = assetManager;
     }
@@ -51,8 +52,6 @@ public class MainMenuScreen implements Screen {
     public void show() {
         // 创建舞台，使用 ScreenViewport 作为视口
         stage = new Stage(new ScreenViewport());
-        // 加载 VisUI 库
-        VisUI.load();
         // 获取 VisUI 的默认皮肤
         skin = VisUI.getSkin();
         if (skin == null) {

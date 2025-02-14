@@ -31,6 +31,15 @@ public class Enemy {
     // 新增：动画帧切换时间间隔
     private float frameDuration = 0.2f;
 
+    private boolean isDead = false;
+
+    public void setDead(boolean dead) {
+        this.isDead = dead;
+    }
+    public boolean getDead() {
+        return this.isDead;
+    }
+
     public void setPathPoints(){
         this.pathPoints = pathPoints;
     }
@@ -102,7 +111,13 @@ public class Enemy {
             }
         } else {
             // 敌人到达终点
-            body.setLinearVelocity(Vector2.Zero);
+//            body.setLinearVelocity(Vector2.Zero);
+            // 血量值减少一点
+            gameUI.subHealth();
+            // 敌人模型消失
+//            body.getWorld().destroyBody(body);
+            this.isDead = true;
+            body.setActive(false);
         }
     }
 
@@ -110,7 +125,6 @@ public class Enemy {
      * 更新敌人的状态
      */
     public void update(float deltaTime) {
-        move(); // 调用移动逻辑
         // 更新动画计时器
         animationTimer += deltaTime;
         if (animationTimer >= frameDuration) {
@@ -126,6 +140,8 @@ public class Enemy {
         // 旋转一百八十度
         double angle = 4 * Math.PI / 4; // 加上 180 度（4 * Math.PI / 4 弧度）
         sprite.setRotation((float) Math.toDegrees(angle));
+        // 调用移动逻辑
+        move();
 
         // 计算敌人需要旋转的角度：箭矢位置与敌人位置的夹角，加上135度（因为arrow图片本身是一张45度倾斜的箭矢贴图）
 //        if(currentPathIndex < pathPoints.size()){

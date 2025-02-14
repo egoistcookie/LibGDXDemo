@@ -1,6 +1,7 @@
 package com.lf.core;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
@@ -9,7 +10,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
+import com.kotcrab.vis.ui.VisUI;
+import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
+import com.lf.ui.GameUI;
 
 /**
  * 游戏
@@ -17,9 +21,12 @@ import com.lf.screen.MainMenuScreen;
 public class MyDefenseGame extends Game {
     // 资源管理工具
     private AssetManager assetManager;
+    // 用于控制是否继续渲染的标志变量
+    private boolean isGameOver = false;
     @Override
     public void create() {
-
+        // 加载 VisUI 库
+        VisUI.load();
         // 资源管理工具的初始化
         assetManager = new AssetManager();
         // 设置 FreeTypeFontGenerator 的加载器
@@ -36,6 +43,8 @@ public class MyDefenseGame extends Game {
         assetManager.load("alertTitle.png", Texture.class);
         // 加载金币的背景图片
         assetManager.load("gold.png", Texture.class);
+        // 加载血量的背景图片
+        assetManager.load("health.png", Texture.class);
         // 加载箭矢的背景图片
         assetManager.load("arrow1.png", Texture.class);
         // 加载防御塔1的背景图片
@@ -52,5 +61,21 @@ public class MyDefenseGame extends Game {
         assetManager.finishLoading();
         // 设置当前屏幕为 MyScreen
         setScreen(new MainMenuScreen(this,assetManager));
+    }
+
+    public void render() {
+        if (this.screen != null) {
+//            if(this.screen instanceof GameScreen){
+//                GameUI gameUi = ((GameScreen) this.screen).getGameUI();
+//                if(gameUi.getHealth() > 0){
+//                    //判断游戏是否已经结束，已经结束则停止渲染
+//                    this.screen.render(Gdx.graphics.getDeltaTime());
+//                }else{
+//                    gameUi.dispose();
+//                }
+//            }else{
+                this.screen.render(Gdx.graphics.getDeltaTime());
+//            }
+        }
     }
 }

@@ -30,20 +30,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.VisUI;
+import com.lf.core.MyDefenseGame;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.Arrow;
 import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
 import com.lf.entities.TowerSelectionBox;
 import com.lf.ui.GameUI;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,11 @@ public class GameScreen implements Screen {
     private World world;
     // 调试渲染器，用于渲染物理世界的调试信息
     private CustomBox2DDebugRenderer debugRenderer;
+
+    public GameUI getGameUI() {
+        return gameUI;
+    }
+
     // 游戏用户界面
     private GameUI gameUI;
     // 精灵批处理，用于高效地渲染精灵
@@ -73,7 +79,11 @@ public class GameScreen implements Screen {
     private Texture arrowTexture;
     // 新增：用于绘制形状（激光）的渲染器
     private ShapeRenderer shapeRenderer;
+    // 暂停按钮
+    private Button pauseButton;
     private List<Enemy> enemies; // 敌人列表
+    // 皮肤对象，用于管理界面元素的样式
+    private Skin skin;
     // 背景纹理
     private Texture backgroundTexture;
     // 背景精灵
@@ -83,18 +93,30 @@ public class GameScreen implements Screen {
     private TiledMap map;
     private List<Vector2> pathPoints; // 使用 Vector2 存储点的坐标
     private List<PolygonMapObject> towerRanges; // 防御塔可以摆放的位置，可能有多个多边形
+    // 游戏对象，用于切换屏幕
+    private MyDefenseGame game;
     //字体加载器
     private FreetypeFontLoader freeTypeFontLoader;
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    // 用于控制是否继续渲染的标志变量
+    private static boolean isPaused = false;
+    // 用于控制是否继续渲染的标志变量
+    private static boolean isGameOver = false;
 
     float showTowerX = 0;
     float showTowerY = 0;
     // 舞台对象，用于管理和渲染游戏界面元素
     private Stage stage;
-    //字体加载管理工具
+    // 资源加载管理工具
     private AssetManager assetManager;
 
     // 构造函数，接收游戏对象作为参数
-    public GameScreen(Game game ,AssetManager assetManager) {
+    public GameScreen(MyDefenseGame game , AssetManager assetManager) {
+        this.game = game;
         this.assetManager = assetManager;
         // 创建舞台，使用 ScreenViewport 作为视口
         stage = new Stage(new ScreenViewport());
@@ -106,10 +128,10 @@ public class GameScreen implements Screen {
         // 创建适配视口，初始视口大小为800x600
         viewport = new FitViewport(800, 600, camera);
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
-        world = new World(new Vector2(0, 0), false);
+        world = new World(new Vector2(0, 0), true);
 
         // 创建游戏用户界面
-        gameUI = new GameUI(assetManager);
+        gameUI = new GameUI(this, assetManager, stage, game);
         // 加载地图
         // 解析地图中的路径数据
         parseMapPath();
@@ -137,9 +159,9 @@ public class GameScreen implements Screen {
         enemies.add(enemy3);
 
         // 设置敌人的移动速度
-        enemy1.move();
-        enemy2.move();
-        enemy3.move();
+//        enemy1.move();
+//        enemy2.move();
+//        enemy3.move();
 
         backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
@@ -159,80 +181,90 @@ public class GameScreen implements Screen {
         shapeRenderer = new ShapeRenderer();
         // 设置形状渲染器自动选择形状类型
         shapeRenderer.setAutoShapeType(true);
+        // 获取 VisUI 的默认皮肤
+        skin = VisUI.getSkin();
+        if (skin == null) {
+            System.out.println("皮肤加载失败");
+        }
     }
 
     @Override
     public void show() {
-        // 显示时不做处理
+        // 设置输入处理器为舞台
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        float deltaTime = Gdx.graphics.getDeltaTime();
-        // 清除屏幕，设置背景颜色为黑色
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(!isGameOver && !isPaused){
 
-        // 推进物理世界的模拟，步长为1/60秒，速度迭代次数为6，位置迭代次数为2
-        world.step(1 / 60f, 6, 2);
-        // 处理用户输入
-        handleInput();
-        // 更新相机
-        camera.update();
+            float deltaTime = Gdx.graphics.getDeltaTime();
+            // 清除屏幕，设置背景颜色为黑色
+            Gdx.gl.glClearColor(1, 1, 1, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // 更新敌人的位置和旋转角度
-        for (Enemy enemy : enemies) {
-            if (enemy!= null) {
-                enemy.update(deltaTime);
-                // 更新防御塔的状态，检查是否攻击敌人
+            // 推进物理世界的模拟，步长为1/60秒，速度迭代次数为6，位置迭代次数为2
+            world.step(1 / 60f, 6, 2);
+            // 处理用户输入
+            handleInput();
+            // 更新相机
+            camera.update();
+
+            // 更新敌人的位置和旋转角度
+            for (Enemy enemy : enemies) {
+                if (enemy!= null && !enemy.getDead()) {
+                    enemy.update(deltaTime);
+                    // 更新防御塔的状态，检查是否攻击敌人
+                }
             }
-        }
 
-        // 设置精灵批处理的投影矩阵为相机的投影矩阵
-        batch.setProjectionMatrix(camera.combined);
-        // 开始精灵批处理
-        batch.begin();
+            // 设置精灵批处理的投影矩阵为相机的投影矩阵
+            batch.setProjectionMatrix(camera.combined);
+            // 开始精灵批处理
+            batch.begin();
 
-        backgroundSprite.draw(batch);
+            backgroundSprite.draw(batch);
 
-        // 渲染防御塔选择框
-        towerSelectionBox.render(batch);
-        // 遍历防御塔列表，渲染每个防御塔的精灵
-        for (Tower tower : towers) {
-            // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
-            tower.update(enemies,deltaTime);
-            // 渲染塔
-            tower.getSprite().draw(batch);
-            // 渲染箭
-            for (Arrow arrow : tower.arrows) {
-                arrow.getSprite().draw(batch);
+            // 渲染防御塔选择框
+            towerSelectionBox.render(batch);
+            // 遍历防御塔列表，渲染每个防御塔的精灵
+            for (Tower tower : towers) {
+                // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
+                tower.update(enemies,deltaTime);
+                // 渲染塔
+                tower.getSprite().draw(batch);
+                // 渲染箭
+                for (Arrow arrow : tower.arrows) {
+                    arrow.getSprite().draw(batch);
+                }
             }
-        }
 
-        // 如果敌人存在，则绘制敌人的精灵
-        // 渲染敌人
-        for (Enemy enemy : enemies) {
-            enemy.getSprite().draw(batch);
-        }
+            // 如果敌人存在，则绘制敌人的精灵
+            // 渲染敌人
+            for (Enemy enemy : enemies) {
+                if(!enemy.getDead()){
+                    enemy.getSprite().draw(batch);
+                }
+            }
 
-        // 结束精灵批处理
-        batch.end();
+            // 结束精灵批处理
+            batch.end();
 
-        // 创建一个Array<Body>对象
-        Array<Body> bodiesArray = new Array<>();
-        // 调用getBodies方法，将世界中的刚体添加到bodiesArray中
-        world.getBodies(bodiesArray);
-        // 可以在这里对bodiesArray进行操作，例如遍历
-        for (Body body : bodiesArray) {
-            // 这里可以执行对每个刚体的操作，如打印位置等
+            // 创建一个Array<Body>对象
+            Array<Body> bodiesArray = new Array<>();
+            // 调用getBodies方法，将世界中的刚体添加到bodiesArray中
+            world.getBodies(bodiesArray);
+            // 可以在这里对bodiesArray进行操作，例如遍历
+            for (Body body : bodiesArray) {
+                // 这里可以执行对每个刚体的操作，如打印位置等
 //            System.out.println("Body position: " + body.getUserData());
+            }
+
+            // 渲染物理世界的调试信息
+            debugRenderer.render(world, camera.combined);
+            // 渲染游戏用户界面
+            gameUI.render();
         }
-
-        // 渲染物理世界的调试信息
-        debugRenderer.render(world, camera.combined);
-
-        // 渲染游戏用户界面
-        gameUI.render();
     }
 
     @Override
@@ -252,17 +284,50 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-        // 暂停时不做处理
+        // 延迟赋值，解决反复渲染最后两帧问题
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                // 游戏结束
+                isPaused = true;
+            }
+        }, 0.1f);
+        // 暂停游戏
+//        isPaused = true;
     }
 
     @Override
     public void resume() {
-        // 恢复时不做处理
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                // 恢复游戏
+                isPaused = false;
+            }
+        }, 0.1f);
+        // 恢复游戏
+//        isPaused = false;
     }
 
     @Override
     public void hide() {
         // 隐藏时不做处理
+    }
+
+    public void gameOver() {
+        // 游戏结束
+        // 延迟赋值，解决反复渲染最后两帧问题
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                // 游戏结束
+                isGameOver = true;
+            }
+        }, 1f);
+        // 释放敌人纹理的资源
+        for (Enemy enemy : enemies) {
+            enemy.dispose();
+        }
     }
 
 
@@ -329,7 +394,7 @@ public class GameScreen implements Screen {
      * @param y Y轴位置
      */
     private void showAlertInfo(String alertInfo, float x, float y) {
-        // 获取加载的字体
+        // 获取加载的中文字体
         BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
         // 字体大小倍率（以Hiero中生成的字体大小为基准）
         customFont.getData().setScale(0.5f);
@@ -341,7 +406,6 @@ public class GameScreen implements Screen {
         // 加载背景图片
         Texture backgroundTexture = assetManager.get("alertTitle.png", Texture.class);
         TextureRegion backgroundRegion = new TextureRegion(backgroundTexture);
-        Image backgroundImage = new Image(backgroundRegion);
         // 创建一个Table作为提示框容器
         Table dialogTable = new Table();
         dialogTable.setBackground(new TextureRegionDrawable(backgroundRegion));
@@ -448,7 +512,9 @@ public class GameScreen implements Screen {
         batch.dispose();
         // 释放敌人纹理的资源
         for (Enemy enemy : enemies) {
-            enemy.dispose();
+            if(!enemy.getDead()){
+                enemy.dispose();
+            }
         }
         // 释放防御塔纹理的资源
 //        towerTexture.dispose();
