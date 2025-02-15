@@ -45,7 +45,7 @@ public class TowerSelectionBox {
     // 私有方法，用于加载防御塔的纹理
     private void loadTowerTextures() {
         // 这里添加你的防御塔图片路径，将防御塔图片加载为纹理并添加到数组中
-        towerTextures.add(new Texture(Gdx.files.internal("tower1.png")));
+        towerTextures.add(new Texture(Gdx.files.internal("arrowTower.png")));
         towerTextures.add(new Texture(Gdx.files.internal("tower2.png")));
 
         // 初始化每个纹理对应的矩形区域

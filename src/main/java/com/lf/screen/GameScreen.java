@@ -163,7 +163,7 @@ public class GameScreen implements Screen {
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
 
         // 加载箭的纹理
-        arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
+        arrowTexture = new Texture(Gdx.files.internal("arrow2.png"));
 
         // 创建防御塔选择框对象
         towerSelectionBox = new TowerSelectionBox();
@@ -392,8 +392,15 @@ public class GameScreen implements Screen {
                 if (selectedIndex != -1) {
                     // 获取选择的防御塔纹理
                     Texture towerTexture = towerSelectionBox.getTowerTextures().get(selectedIndex);
-                    // 加载箭的纹理
-                    Texture arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
+                    // 加载箭的纹理 默认1号箭矢
+                    Texture arrowTexture = assetManager.get("arrow2.png", Texture.class);
+                    //生成一号防御塔
+                    if(selectedIndex == 0){
+                        arrowTexture = assetManager.get("arrow2.png", Texture.class);
+                    }else if (selectedIndex == 1){
+                        //生成二号防御塔
+                        arrowTexture = assetManager.get("arrow3.png", Texture.class);
+                    }
                     if(this.gameUI.getGold() < 100){
                         showAlertInfo("您的金币不足.",0,0);
                     }else{

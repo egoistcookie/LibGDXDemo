@@ -50,11 +50,15 @@ public class MyDefenseGame extends Game {
         // 加载血量的背景图片
         assetManager.load("health.png", Texture.class);
         // 加载箭矢的背景图片
-        assetManager.load("arrow1.png", Texture.class);
+        assetManager.load("arrow2.png", Texture.class);
+        // 加载箭矢的背景图片
+        assetManager.load("arrow3.png", Texture.class);
         // 加载防御塔1的背景图片
         assetManager.load("tower1.png", Texture.class);
-        // 加载箭矢的背景图片
-        assetManager.load("tower1.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower2.png", Texture.class);
+        // 加载一级箭塔的背景图片
+        assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片
         assetManager.load("map/map3.png", Texture.class);
         // 加载敌人的背景图片
