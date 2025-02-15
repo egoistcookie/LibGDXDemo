@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.lf.screen.GameScreen;
 
 
 // Tower类表示游戏中的箭实体
@@ -65,23 +66,8 @@ public class Arrow {
             Vector2 direction = target.getBody().getPosition().sub(body.getPosition());
             direction.nor(); // 归一化方向向量
 
-            // 计算箭矢需要转向的目标角度
-//            float targetAngle = (float) Math.atan2(direction.y, direction.x);
-//            // 计算当前角度与目标角度的差值
-//            float angleDiff = targetAngle - body.getAngle();
-//            // 定义一个小的阈值，例如 0.01f，表示当角度差小于该值时，认为已经对准目标
-//            float threshold = 0.1f;
-//
-//            if (Math.abs(angleDiff) > threshold) {
-//                // 逐步转向目标角度，这里可以调整转向速度，例如 0.1f
-//                body.setAngularVelocity(angleDiff * 0.1f);
-//            } else {
-//                // 当角度差小于阈值时，停止转动
-//                body.setAngularVelocity(0);
-//            }
-
             // 设置箭的速度，使其缓缓射向敌人
-            body.setLinearVelocity(direction.scl(15));
+            body.setLinearVelocity(direction.scl(30 * GameScreen.getSclRate()));
 
             // 更新精灵的位置和旋转角度，使其与刚体同步
             sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f, body.getPosition().y - sprite.getHeight() / 2f);

@@ -1,0 +1,26 @@
+# 敌人加载配置列表，每个元素代表一个敌人的加载配置
+enemyLoadConfigs:
+  - # 1
+    enemyType: "Enemy1" # 敌人类型，用于区分不同类型的敌人
+    loadTime: 2.0 # 加载时间，单位为秒
+  - # 2
+    enemyType: "Enemy2"
+    loadTime: 3.0
+  - # 3
+    enemyType: "Enemy3"
+    loadTime: 4.0
+  - # 4
+    enemyType: "Enemy4"
+    loadTime: 10.0
+  - # 5
+    enemyType: "Enemy5"
+    loadTime: 15.0
+  - # 6
+    enemyType: "Enemy6"
+    loadTime: 20.0
+  - # 7
+    enemyType: "Enemy7"
+    loadTime: 25.0
+  - # 8
+    enemyType: "Enemy8"
+    loadTime: 30.0

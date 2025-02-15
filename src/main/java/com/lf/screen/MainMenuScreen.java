@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.lf.core.MyDefenseGame;
+import com.lf.manager.EnemyLoadManager;
 
 // 主菜单界面类，实现 Screen 接口
 public class MainMenuScreen implements Screen {
@@ -40,11 +41,14 @@ public class MainMenuScreen implements Screen {
     private TextButton exitButton;
     // 退出游戏事件监听
     private ClickListener exitButtonClickListener;
+    // 敌人加载管理工具
+    private EnemyLoadManager enemyLoadManager;
 
     // 构造函数，接收游戏对象作为参数
-    public MainMenuScreen(MyDefenseGame game, AssetManager assetManager) {
+    public MainMenuScreen(MyDefenseGame game) {
         this.game = game;
-        this.assetManager = assetManager;
+        this.assetManager = game.getAssetManager();
+        this.enemyLoadManager = game.getEnemyLoadManager();
     }
 
     @Override
@@ -94,7 +98,7 @@ public class MainMenuScreen implements Screen {
                 // 处理点击事件，例如切换到GameScreen
                 removeAllListener();
                 // 点击按钮后切换到游戏界面
-                game.setScreen(new GameScreen(game,assetManager));
+                game.setScreen(new GameScreen(game));
             }
         };
         startButton.addListener(startButtonClickListener);

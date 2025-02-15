@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.kotcrab.vis.ui.VisUI;
+import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
 import com.lf.ui.GameUI;
@@ -19,8 +20,11 @@ import com.lf.ui.GameUI;
  * 游戏
  */
 public class MyDefenseGame extends Game {
+
     // 资源管理工具
     private AssetManager assetManager;
+    // 敌人加载管理器
+    private EnemyLoadManager enemyLoadManager;
     // 用于控制是否继续渲染的标志变量
     private boolean isGameOver = false;
     @Override
@@ -63,8 +67,12 @@ public class MyDefenseGame extends Game {
         assetManager.load("black.png", Texture.class);
         // 等待字体加载完成
         assetManager.finishLoading();
+
+        // 敌人管理工具的初始化
+        enemyLoadManager = new EnemyLoadManager();
+
         // 设置当前屏幕为 MyScreen
-        setScreen(new MainMenuScreen(this,assetManager));
+        setScreen(new MainMenuScreen(this));
     }
 
     public void render() {
@@ -81,5 +89,13 @@ public class MyDefenseGame extends Game {
                 this.screen.render(Gdx.graphics.getDeltaTime());
 //            }
         }
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
+    }
+
+    public EnemyLoadManager getEnemyLoadManager() {
+        return enemyLoadManager;
     }
 }

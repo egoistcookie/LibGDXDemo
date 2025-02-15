@@ -37,12 +37,14 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
+import com.lf.config.EnemyLoadConfig;
 import com.lf.core.MyDefenseGame;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.Arrow;
 import com.lf.entities.Enemy;
 import com.lf.entities.Tower;
 import com.lf.entities.TowerSelectionBox;
+import com.lf.manager.EnemyLoadManager;
 import com.lf.ui.GameUI;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
@@ -113,11 +115,23 @@ public class GameScreen implements Screen {
     private Stage stage;
     // 资源加载管理工具
     private AssetManager assetManager;
+    // 敌人加载管理工具
+    private EnemyLoadManager enemyLoadManager;
+    // 记录游戏进行的时间
+    private float elapsedTimeSeconds;
+
+    // 控制游戏进行倍速
+    private static float sclRate = 1f;
 
     // 构造函数，接收游戏对象作为参数
-    public GameScreen(MyDefenseGame game , AssetManager assetManager) {
+    public GameScreen(MyDefenseGame game) {
         this.game = game;
-        this.assetManager = assetManager;
+        this.assetManager = game.getAssetManager();
+        this.enemyLoadManager = game.getEnemyLoadManager();
+        // 在游戏屏幕初始化时记录开始时间
+        elapsedTimeSeconds = 0f;
+        // 初始化暂停标志
+        isPaused = false;
         // 创建舞台，使用 ScreenViewport 作为视口
         stage = new Stage(new ScreenViewport());
 
@@ -131,7 +145,7 @@ public class GameScreen implements Screen {
         world = new World(new Vector2(0, 0), true);
 
         // 创建游戏用户界面
-        gameUI = new GameUI(this, assetManager, stage, game);
+        gameUI = new GameUI(this, stage, game);
         // 加载地图
         // 解析地图中的路径数据
         parseMapPath();
@@ -141,27 +155,8 @@ public class GameScreen implements Screen {
         // 创建精灵批处理
         batch = new SpriteBatch();
 
-        // 加载敌人的纹理
-//        enemyTexture = new Texture(Gdx.files.internal("enemy1.png"));// 设置纹理过滤方式为线性过滤
-//        enemyTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
         // 创建敌人列表
         enemies = new ArrayList<>();
-
-        // 创建敌人对象
-        Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")};
-        // 游戏中的敌人对象
-        Enemy enemy1 = new Enemy(world, 550, 550, enemyFrames, pathPoints, gameUI);
-        enemies.add(enemy1);
-        Enemy enemy2 = new Enemy(world, 540, 560, enemyFrames, pathPoints, gameUI);
-        enemies.add(enemy2);
-        Enemy enemy3 = new Enemy(world, 555, 570, enemyFrames, pathPoints, gameUI);
-        enemies.add(enemy3);
-
-        // 设置敌人的移动速度
-//        enemy1.move();
-//        enemy2.move();
-//        enemy3.move();
 
         backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
@@ -197,6 +192,21 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         if(!isGameOver && !isPaused){
+            // 计算游戏已经进行的时间（单位：秒）
+            elapsedTimeSeconds += delta;
+            float seconds = elapsedTimeSeconds;
+//            System.out.println("游戏已经进行了 " + seconds + " 秒");
+
+            for (EnemyLoadConfig enemyLoadConfig : enemyLoadManager.getEnemyLoadConfigs()) {
+                float loadTime = (float) enemyLoadConfig.getLoadTime();
+                String enemyType = enemyLoadConfig.getEnemyType();
+                if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyType)) {
+                    // 生成敌人
+                    Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")};
+                    Enemy enemy = new Enemy(world, 555, 570, enemyFrames, pathPoints, gameUI, enemyType); // 假设Enemy类有相应的构造函数
+                    enemies.add(enemy);
+                }
+            }
 
             float deltaTime = Gdx.graphics.getDeltaTime();
             // 清除屏幕，设置背景颜色为黑色
@@ -262,9 +272,23 @@ public class GameScreen implements Screen {
 
             // 渲染物理世界的调试信息
             debugRenderer.render(world, camera.combined);
-            // 渲染游戏用户界面
-            gameUI.render();
         }
+        // 渲染游戏用户界面：按钮需要另外渲染，不可与游戏对象放在一起渲染
+        gameUI.render();
+    }
+
+    /**
+     * 判断该敌人是否已经生成过
+     * @param enemyName 敌人名称
+     * @return
+     */
+    private boolean isEnemyAlreadySpawned(String enemyName) {
+        for (Enemy enemy : enemies) {
+            if (enemy.getEnemyName()!=null && enemy.getEnemyName().equals(enemyName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -284,29 +308,32 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-        // 延迟赋值，解决反复渲染最后两帧问题
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                // 游戏结束
-                isPaused = true;
-            }
-        }, 0.1f);
-        // 暂停游戏
-//        isPaused = true;
+        isPaused = true;
     }
 
     @Override
     public void resume() {
+        isPaused = false;
+    }
+
+    public void quickly() {
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                // 恢复游戏
-                isPaused = false;
+            // 提高倍速
+            sclRate = 2f;
             }
         }, 0.1f);
-        // 恢复游戏
-//        isPaused = false;
+    }
+
+    public void slowly() {
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+            // 恢复倍速
+            sclRate = 1f;
+            }
+        }, 0.1f);
     }
 
     @Override
@@ -339,6 +366,15 @@ public class GameScreen implements Screen {
             clickPosition.set(Gdx.input.getX(), Gdx.input.getY());
             // 将屏幕坐标转换为世界坐标
             viewport.unproject(clickPosition);
+            System.out.println(clickPosition.x + "y:" +clickPosition.y);
+            //右下角为功能按钮位置，不可点击生成防御塔选择框
+            if(clickPosition.x > 370 && clickPosition.y < 45){
+                return;
+            }
+            //左下角为退出按钮位置，不可点击生成防御塔选择框
+            if(clickPosition.x < 200 && clickPosition.y < 45){
+                return;
+            }
 
             // 如果防御塔选择框不可见
             if (!towerSelectionBox.isVisible()) {
@@ -531,5 +567,10 @@ public class GameScreen implements Screen {
         for (Tower tower : towers) {
             tower.dispose();
         }
+    }
+
+    // 获取加速倍率
+    public static float getSclRate() {
+        return sclRate;
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.lf.screen.GameScreen;
 import com.lf.ui.GameUI;
 
 import java.util.List;
@@ -13,6 +14,9 @@ public class Enemy {
     private Body body; // 敌人的物理刚体
     private Sprite sprite; // 敌人的精灵，用于渲染
     private int health = 5; // 敌人的血量，初始为5
+
+    private String enemyName;
+    private String enemyType;
     private Vector2 initialPosition; // 敌人的初始位置
     private Vector2 velocity; // 敌人的移动速度
     private Vector2 targetPosition; // 敌人的目标位置，用于移动到指定地点
@@ -87,6 +91,11 @@ public class Enemy {
         this.gameUI = gameUI;
     }
 
+    public Enemy(World world, float x, float y, Texture[] animationFrames, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
+        this(world,x,y,animationFrames,pathPoints,gameUI);
+        this.enemyName = enemyName;
+    }
+
     /**
      * 设置敌人的目标位置，并开始移动
      * @param target 目标位置
@@ -104,7 +113,7 @@ public class Enemy {
             Vector2 targetPoint = pathPoints.get(currentPathIndex);
             Vector2 currentPosition = body.getPosition();
             Vector2 direction = targetPoint.cpy().sub(currentPosition).nor();
-            velocity = direction.scl(10f);
+            velocity = direction.scl(10f * GameScreen.getSclRate());
             body.setLinearVelocity(velocity); // 设置移动速度（可根据需要调整速度值）
             if (currentPosition.dst(targetPoint) < 1f) {
                 currentPathIndex++;
@@ -227,5 +236,21 @@ public class Enemy {
         for(Texture texture :animationFrames){
             texture.dispose();
         }
+    }
+
+    public String getEnemyType() {
+        return enemyType;
+    }
+
+    public void setEnemyType(String enemyType) {
+        this.enemyType = enemyType;
+    }
+
+    public String getEnemyName() {
+        return enemyName;
+    }
+
+    public void setEnemyName(String enemyName) {
+        this.enemyName = enemyName;
     }
 }

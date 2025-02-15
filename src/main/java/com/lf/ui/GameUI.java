@@ -5,7 +5,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -14,10 +16,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.core.MyDefenseGame;
+import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
 
@@ -28,7 +32,8 @@ import com.lf.screen.MainMenuScreen;
 public class GameUI {
 
     // 舞台对象，用于管理和渲染游戏界面中的所有演员（Actors）
-    private Stage stage;
+    private Stage stage;// 在某个类中，假设这里有一个SpriteBatch实例
+    private SpriteBatch batch;
     // 皮肤对象，用于存储和管理界面元素的样式
     private Skin skin;
     // 金币数量标签
@@ -52,8 +57,16 @@ public class GameUI {
     private Button pauseButton;
     // 恢复按钮
     private Button resumeButton;
-    private Table blockingTable; // 用于阻止页面其他部分点击的覆盖层
+    // 游戏主体对象，负责切换界面
     private MyDefenseGame game;
+    // 敌人对象管理器
+    private EnemyLoadManager enemyLoadManager;
+    // 新增：游戏对象区域
+    private Table gameObjectTable;
+    // 新增：按钮区域
+    private Table buttonTable;
+    // 用于控制是否继续渲染的标志变量
+    private boolean isGameOver;
 
     public Skin getSkin() {
         return skin;
@@ -67,17 +80,20 @@ public class GameUI {
      * 构造函数，用于初始化GameUI对象。
      * 在构造函数中，会创建舞台、加载VisUI库、获取皮肤，并创建一个填充父容器的表格添加到舞台中。
      */
-    public GameUI(GameScreen gameScreen, AssetManager assetManager, Stage stage, MyDefenseGame game) {
-        this.assetManager = assetManager;
+    public GameUI(GameScreen gameScreen, Stage stage, MyDefenseGame game) {
+        this.isGameOver = false;
+        this.assetManager = game.getAssetManager();
         this.gameScreen = gameScreen;
         this.game = game;
-        // 创建一个新的Stage对象，并使用ScreenViewport作为视口
-        // ScreenViewport会根据屏幕大小自动调整舞台的大小
+        this.enemyLoadManager = game.getEnemyLoadManager();
         this.stage = stage;
-        // 加载VisUI库，该库提供了一些预设的UI样式和组件
-//        VisUI.load();
         // 获取VisUI库的默认皮肤
         skin = VisUI.getSkin();
+        batch = new SpriteBatch();
+
+        // 初始化游戏对象区域和按钮区域
+        gameObjectTable = new Table();
+        buttonTable = new Table();
 
         //金币初始为100
         gold = 1000;
@@ -89,7 +105,7 @@ public class GameUI {
         // 直接设置 goldLabel 的位置
         goldLabel.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - 5,
                 Gdx.graphics.getHeight() - goldLabel.getHeight() - 10);
-        this.stage.addActor(goldLabel);
+        gameObjectTable.addActor(goldLabel);
 
         // 加载金币图标纹理
         Texture goldIconTexture = assetManager.get("gold.png", Texture.class);
@@ -98,12 +114,12 @@ public class GameUI {
         // 新增：设置金币图标的位置
         goldIcon.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - goldIcon.getWidth() - 10 ,
                 goldLabel.getY());
-        this.stage.addActor(goldIcon);
+        gameObjectTable.addActor(goldIcon);
 
         // 新增：设置血量标签的位置
         healthLabel.setPosition(Gdx.graphics.getWidth() - goldIcon.getWidth() - goldLabel.getWidth()  - healthLabel.getWidth() - 30,
                 goldLabel.getY());
-        this.stage.addActor(healthLabel);
+        gameObjectTable.addActor(healthLabel);
 
         // 加载血量图标纹理
         Texture healthIconTexture = assetManager.get("health.png", Texture.class);
@@ -112,7 +128,7 @@ public class GameUI {
         // 新增：设置金币图标的位置
         healthIcon.setPosition(Gdx.graphics.getWidth() - goldIcon.getWidth() - goldLabel.getWidth()  - healthLabel.getWidth() - healthIcon.getWidth() - 35,
                 goldLabel.getY());
-        this.stage.addActor(healthIcon);
+        gameObjectTable.addActor(healthIcon);
 
         // 创建暂停按钮
         pauseButton = new TextButton("Pause", skin);
@@ -130,13 +146,13 @@ public class GameUI {
                 gameScreen.pause();
             }
         });
-        this.stage.addActor(pauseButton);
+        buttonTable.addActor(pauseButton);
 
         // 创建恢复按钮
         resumeButton = new TextButton("Resume", skin);
         resumeButton.setSize(100, 30);
         // 计算按钮的位置，使其位于右下角
-        float resumeButtonX = screenWidth - pauseButton.getWidth() - 10 - pauseButton.getWidth();
+        float resumeButtonX = screenWidth - pauseButton.getWidth() - resumeButton.getWidth() - 10;
         float resumeButtonY = 10;
         resumeButton.setPosition(resumeButtonX, resumeButtonY);
         resumeButton.addListener(new ClickListener() {
@@ -145,17 +161,57 @@ public class GameUI {
                 gameScreen.resume();
             }
         });
-        this.stage.addActor(resumeButton);
+        buttonTable.addActor(resumeButton);
 
-        // 初始化覆盖层
-        blockingTable = new Table();
-        blockingTable.setFillParent(true);
-        blockingTable.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("white.png")))));
-        blockingTable.setColor(0, 0, 0, 0.5f); // 半透明黑色
-        blockingTable.setVisible(false);
-        blockingTable.setTouchable(Touchable.enabled);
-        this.stage.addActor(blockingTable);
+        // 创建加快按钮
+        TextButton quicklyButton = new TextButton("quickly", skin);
+        quicklyButton.setSize(100, 30);
+        // 计算按钮的位置，使其位于右下角
+        float buttonQx = screenWidth - pauseButton.getWidth() - resumeButton.getWidth() - quicklyButton.getWidth() - 15;
+        float buttonQy = 10;
+        quicklyButton.setPosition(buttonQx, buttonQy);
+        quicklyButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                gameScreen.quickly();
+            }
+        });
+        buttonTable.addActor(quicklyButton);
 
+        // 创建减慢按钮
+        TextButton slowlyButton = new TextButton("slowly", skin);
+        slowlyButton.setSize(100, 30);
+        // 计算按钮的位置，使其位于右下角
+        float buttonSx = screenWidth - slowlyButton.getWidth() - slowlyButton.getWidth() - quicklyButton.getWidth() - slowlyButton.getWidth() - 20;
+        float buttonSy = 10;
+        slowlyButton.setPosition(buttonSx, buttonSy);
+        slowlyButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                gameScreen.slowly();
+            }
+        });
+        buttonTable.addActor(slowlyButton);
+
+        // 创建退出按钮
+        TextButton returnButton = new TextButton("return", skin);
+        returnButton.setSize(100, 30);
+        // 计算按钮的位置，使其位于左下角
+        float buttonRx = 10;
+        float buttonRy = 10;
+        returnButton.setPosition(buttonRx, buttonRy);
+        returnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                // 弹出提示框，是否确定退出
+                showReturnConfirmationDialog();
+            }
+        });
+        buttonTable.addActor(returnButton);
+
+        // 将游戏对象区域和按钮区域添加到舞台
+        this.stage.addActor(gameObjectTable);
+        this.stage.addActor(buttonTable);
     }
 
     /**
@@ -163,19 +219,78 @@ public class GameUI {
      * 该方法通常在游戏的渲染循环中被调用。
      */
     public void render() {
+        // 开始绘制
+        batch.begin();
         // 调用stage的act方法，更新舞台中所有演员的状态，例如处理输入、动画等
         stage.act(Gdx.graphics.getDeltaTime());
         // 调用stage的draw方法，绘制舞台中的所有演员
         stage.draw();
-        if (health <= 0) {
+
+        // 分别更新游戏对象区域和按钮区域
+//        gameObjectTable.act(Gdx.graphics.getDeltaTime());
+//        this.buttonTable.act(Gdx.graphics.getDeltaTime());
+//
+//        // 分别绘制游戏对象区域和按钮区域
+//        gameObjectTable.draw(batch, 1f);
+//        this.buttonTable.draw(batch, 1f);
+
+        if (health <= 0 && !isGameOver) {
+            // 血量等于0之后，只需要进入一次即可，不要反复提示
+            isGameOver = true;
+            // 先提示
             gameScreen.showAlertInfo("Game over",0,0);
-            Timer.schedule(new Timer.Task() {
-                @Override
-                public void run() {
+            // 再出现按钮
+//            Timer.schedule(new Timer.Task() {
+//                @Override
+//                public void run() {
                     showGameOverDialog();
-                }
-            }, 2f);
+//                }
+//            }, 1.5f);
         }
+        // 结束绘制
+        batch.end();
+    }
+
+    /**
+     * 退出游戏的确认框
+     */
+    private void showReturnConfirmationDialog() {
+        // 游戏暂停
+        gameScreen.pause();
+        Dialog dialog = new Dialog("确认退出", skin) {
+            @Override
+            protected void result(Object object) {
+                if ("yes".equals(object)) {
+                    // 用户选择“是”，游戏返回主界面
+                    game.setScreen(new MainMenuScreen(game));
+                }else{
+                    // 用户选择“否”，对话框会自动关闭
+                    gameScreen.resume();
+                }
+            }
+        };
+        // 加载自定义字体
+        BitmapFont customFont = this.assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+        // 字体大小倍率（以Hiero中生成的字体大小为基准）
+        customFont.getData().setScale(0.5f);
+        // 创建文本标签样式，使用自定义字体
+        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
+        // 设置对话框内容，并应用自定义字体样式
+        dialog.text("你是否确定要退出？", labelStyle);
+        // 创建按钮样式，使用自定义字体
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = customFont;
+        buttonStyle.fontColor = Color.BLACK;
+        // 添加“是”和“否”按钮
+        dialog.button("是", "yes", buttonStyle);
+        dialog.button("否", "no", buttonStyle);
+        dialog.toFront();
+        float buttonRx = 300;
+        float buttonRy = 300;
+        dialog.setPosition(buttonRx, buttonRy);
+//        buttonTable.add(dialog);
+        // 显示对话框
+        dialog.show(stage);
     }
 
     /**
@@ -231,11 +346,6 @@ public class GameUI {
         return stage;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-
     // 新增：减少血量
     public void subHealth() {
         health--;
@@ -245,8 +355,17 @@ public class GameUI {
     // 新增：显示游戏结束对话框
     private void showGameOverDialog() {
 
-        blockingTable.setVisible(true);
         gameScreen.pause();
+
+        Array<Actor> actores = this.stage.getActors();
+        for(Actor actor: actores){
+            if(actor instanceof Dialog dialogItem){
+                // 防止重复addActor
+                if(dialogItem.getTitleLabel()!=null && dialogItem.getTitleLabel().equals("游戏结束")){
+                    return ;
+                }
+            }
+        }
 
         Dialog dialog = new Dialog("游戏结束", this.skin);
         // 获取加载的中文字体
@@ -259,8 +378,6 @@ public class GameUI {
         // 设置Label的文本居中对齐
         gameOverLabel.setAlignment(Align.center);
         gameOverLabel.getStyle().background = skin.newDrawable("white");
-
-        // 获取 Dialog 的内容表
 
         // 设置 Dialog 的填充和对齐方式
         dialog.padTop(20);
@@ -297,19 +414,17 @@ public class GameUI {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                dialog.hide();  // 隐藏对话框
+//                dialog.hide();  // 隐藏对话框
                 if ("重新开始".equals(restartButton.getName())) {
                     // 重新开始游戏的逻辑
                     // restartGame();
-                    gameScreen.resume();
-                    blockingTable.setVisible(false);
-                    game.setScreen(new GameScreen(game, assetManager));
+//                    gameScreen.resume();
+                    game.setScreen(new GameScreen(game));
                 }
             }
         });
         // 添加标签并设置布局规则
         contentTable.add(restartButton).expandX().top().padTop(30).center().fillX();
-//        dialog.getButtonTable().add(restartButton);
 
         contentTable.row();
 
@@ -324,8 +439,7 @@ public class GameUI {
                     // 重新开始游戏的逻辑
                     // restartGame();
                     gameScreen.resume();
-                    blockingTable.setVisible(false);
-                    game.setScreen(new MainMenuScreen(game, assetManager));
+                    game.setScreen(new MainMenuScreen(game));
                 }
             }
         });
