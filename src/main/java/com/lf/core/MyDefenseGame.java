@@ -57,6 +57,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("enemy11.png", Texture.class);
         // 加载敌人的背景图片
         assetManager.load("enemy12.png", Texture.class);
+        // 加载纯白背景
+        assetManager.load("white.png", Texture.class);
+        // 加载纯黑背景
+        assetManager.load("black.png", Texture.class);
         // 等待字体加载完成
         assetManager.finishLoading();
         // 设置当前屏幕为 MyScreen

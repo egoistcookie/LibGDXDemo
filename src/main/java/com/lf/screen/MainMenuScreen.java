@@ -1,6 +1,5 @@
 package com.lf.screen;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -11,11 +10,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
@@ -34,11 +31,13 @@ public class MainMenuScreen implements Screen {
 
 //    private Button startButton;
     // 开始游戏按钮
-    private ImageButton startButton;
+    private TextButton startButton;
+    // 强化按钮
+    private TextButton enhanceButton;
     // 开始游戏事件监听
     private ClickListener startButtonClickListener;
     // 退出游戏按钮
-    private ImageButton exitButton;
+    private TextButton exitButton;
     // 退出游戏事件监听
     private ClickListener exitButtonClickListener;
 
@@ -65,17 +64,29 @@ public class MainMenuScreen implements Screen {
         // 将表格添加到舞台
         stage.addActor(table);
 
-        // 获取按钮的背景图片
-        Texture buttonTexture = assetManager.get("alertTitle.png", Texture.class);
-        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
+        // 获取加载的中文字体
+        BitmapFont customFont = this.assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+        //"fonts/xinsongti.fnt"资源在游戏中被缩小放大过，此处重置回原大小
+        customFont.getData().setScale(1f);
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = customFont;
+        buttonStyle.fontColor = Color.BLACK;
+        Texture textureUp = this.assetManager.get("white.png", Texture.class);// 这里一个白色的纹理文件
+        Texture textureDown = this.assetManager.get("black.png", Texture.class);// 这里一个黑色的纹理文件
+        Drawable borderedDrawableUp = new TextureRegionDrawable(new TextureRegion(textureUp));
+        Drawable borderedDrawableDown = new TextureRegionDrawable(new TextureRegion(textureDown));
+        borderedDrawableUp.setMinWidth(120); // 设置最小宽度
+        borderedDrawableUp.setMinHeight(30); // 设置最小高度
+        borderedDrawableDown.setMinWidth(120); // 设置最小宽度
+        borderedDrawableDown.setMinHeight(30); // 设置最小高度
+        buttonStyle.up = borderedDrawableUp; // 设置按钮正常状态下的背景
+        buttonStyle.down = borderedDrawableDown; // 设置按钮正常状态下的背景
 
-        // 获取加载的字体
-        BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
-        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.WHITE);
         // 加一个空行
         table.row();
+
         // 创建“开始游戏”按钮
-        startButton = new ImageButton(drawable);
+        startButton = new TextButton("开始游戏", buttonStyle);
         // 为按钮添加点击事件监听器
         startButtonClickListener = new ClickListener() {
             @Override
@@ -88,21 +99,18 @@ public class MainMenuScreen implements Screen {
         };
         startButton.addListener(startButtonClickListener);
         // 将按钮添加到表格中
-        table.add(startButton);
-        // 将Label放在按钮上面
-        Label startLabel = new Label("开始游戏", labelStyle);
-        table.add(startLabel).pad(-startButton.getHeight() / 2 + 50, -startButton.getWidth() / 2 - 100, 0, 0);
+        table.add(startButton).expandX().top().padTop(10).padLeft(200).padRight(200).fillX();
         // 加一个空行
         table.row();
-        ImageButton enhanceButton = new ImageButton(drawable);
+//        ImageButton enhanceButton = new ImageButton(drawable);
+        enhanceButton = new TextButton("强化防御塔", buttonStyle);
         // 将按钮添加到表格中
-        table.add(enhanceButton);
-        Label enhanceLabel = new Label("强化防御塔", labelStyle);
-        table.add(enhanceLabel).pad(-enhanceButton.getHeight() / 2 + 70, -enhanceButton.getWidth() / 2 -100 , 0, 0);
+        table.add(enhanceButton).expandX().top().padTop(10).padLeft(200).padRight(200).fillX();
         // 加一个空行
         table.row();
         // 将按钮添加到表格中
-        exitButton = new ImageButton(drawable);
+        exitButton = new TextButton("退出游戏", buttonStyle);
+//        exitButton = new ImageButton(drawable);
         // 为按钮添加点击事件监听器
         exitButtonClickListener = new ClickListener() {
             @Override
@@ -114,31 +122,10 @@ public class MainMenuScreen implements Screen {
             }
         };
         exitButton.addListener(exitButtonClickListener);
-        table.add(exitButton);
-        Label exitLabel = new Label("退出游戏", labelStyle);
-        table.add(exitLabel).pad(-exitButton.getHeight() / 2 + 70, -exitButton.getWidth() / 2 -120 , 0, 0);
+        table.add(exitButton).expandX().top().padTop(10).padLeft(200).padRight(200).fillX();
 
         // 重新计算表格布局
         table.layout();
-
-//        TextButton startButton = new VisTextButton("开始游戏");
-//        startButton.setPosition(100, 100); // 设置按钮位置
-//        startButton.setSize(200, 50); // 设置按钮大小
-//        // 为按钮添加点击事件监听器
-//        startButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                // 点击按钮后切换到游戏界面
-//                adapter.create();
-//            }
-//        });
-//        // 将按钮直接添加到舞台中
-//        stage.addActor(startButton);
-
-        // 创建“开始游戏”按钮
-//        TextButton startButton = new VisTextButton("Start Game");
-//        startButton.setPosition(100, 100); // 设置按钮位置
-//        startButton.setSize(200, 50); // 设置按钮大小
 
         // 使舞台成为输入处理器，接收用户输入
         Gdx.input.setInputProcessor(stage);

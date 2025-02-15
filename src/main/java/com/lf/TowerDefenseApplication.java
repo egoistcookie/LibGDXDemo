@@ -32,7 +32,7 @@ public class TowerDefenseApplication implements CommandLineRunner {
 
         // 配置 Lwjgl3Application
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setTitle("Tower Defense Game1");
+        config.setTitle("Tower");
         config.setWindowedMode(800, 600);
 
         // 启动 Lwjgl3Application

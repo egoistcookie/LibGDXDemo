@@ -6,11 +6,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.core.MyDefenseGame;
@@ -146,7 +150,7 @@ public class GameUI {
         // 初始化覆盖层
         blockingTable = new Table();
         blockingTable.setFillParent(true);
-        blockingTable.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("back.png")))));
+        blockingTable.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("white.png")))));
         blockingTable.setColor(0, 0, 0, 0.5f); // 半透明黑色
         blockingTable.setVisible(false);
         blockingTable.setTouchable(Touchable.enabled);
@@ -164,7 +168,13 @@ public class GameUI {
         // 调用stage的draw方法，绘制舞台中的所有演员
         stage.draw();
         if (health <= 0) {
-            showGameOverDialog();
+            gameScreen.showAlertInfo("Game over",0,0);
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    showGameOverDialog();
+                }
+            }, 2f);
         }
     }
 
@@ -238,65 +248,94 @@ public class GameUI {
         blockingTable.setVisible(true);
         gameScreen.pause();
 
-        Dialog dialog = new Dialog("游戏结束", this.skin) {
-            @Override
-            protected void result(Object object) {
-                if ("restart".equals(object)) {
-                    // 重新开始游戏的逻辑
-//                    restartGame();
-                    gameScreen.resume();
-                    blockingTable.setVisible(false);
-                    game.setScreen(new MainMenuScreen(game,assetManager));
-                }
-            }
-        };
+        Dialog dialog = new Dialog("游戏结束", this.skin);
         // 获取加载的中文字体
         BitmapFont customFont = this.assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
         // 字体大小倍率（以Hiero中生成的字体大小为基准）
         customFont.getData().setScale(0.5f);
+        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.RED);
+        // 创建 Label 并设置样式
+        Label gameOverLabel = new Label("建议调整策略", labelStyle);
+        // 设置Label的文本居中对齐
+        gameOverLabel.setAlignment(Align.center);
+        gameOverLabel.getStyle().background = skin.newDrawable("white");
 
-        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
-        dialog.text("game over", labelStyle);
+        // 获取 Dialog 的内容表
+
+        // 设置 Dialog 的填充和对齐方式
+        dialog.padTop(20);
+        dialog.setPosition(Math.round((stage.getWidth() - dialog.getWidth()) / 2), Math.round((stage.getHeight() - dialog.getHeight()) / 2));
+
+        // 获取 Dialog 的内容表
+        Table contentTable = dialog.getContentTable();
+        // 清除默认的填充和间距
+        contentTable.clearChildren();
+        // 确保 Table 填满 Dialog
+        contentTable.setFillParent(true);
+        // 添加标签并设置布局规则
+        contentTable.add(gameOverLabel).expandX().top().padTop(10).center().fillX();
+        // 将 Label 添加到内容表的顶部
+        contentTable.row();
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = customFont;
         buttonStyle.fontColor = Color.BLACK;
-        dialog.button("restart", "restart", buttonStyle);
-        dialog.show(stage);
+        Texture texture = new Texture(Gdx.files.internal("white.png")); // 这里假设存在一个白色的纹理文件
+        Drawable borderedDrawable = new TextureRegionDrawable(new TextureRegion(texture));
+        borderedDrawable.setMinWidth(90); // 设置最小宽度
+        borderedDrawable.setMinHeight(30); // 设置最小高度
+//        borderedDrawable.setLeftWidth(2); // 设置左边框宽度
+//        borderedDrawable.setRightWidth(2); // 设置右边框宽度
+//        borderedDrawable.setTopHeight(2); // 设置上边框宽度
+//        borderedDrawable.setBottomHeight(2); // 设置下边框宽度
+        buttonStyle.up = borderedDrawable; // 设置按钮正常状态下的背景
 
-        // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
-//        Label hintLabel = new Label("Game over",skin);
-//        // 加载背景图片
-//        Texture backgroundTexture = assetManager.get("alertTitle.png", Texture.class);
-//        TextureRegion backgroundRegion = new TextureRegion(backgroundTexture);
-//        Image backgroundImage = new Image(backgroundRegion);
-//        // 创建一个Table作为提示框容器
-//        Table dialogTable = new Table();
-//        dialogTable.setBackground(new TextureRegionDrawable(backgroundRegion));
-//        dialogTable.add(hintLabel).pad(20); // 添加一些内边距
-//        // 创建重新开始按钮
-//        TextButton restartButton = new TextButton("restart game", skin);
-//        restartButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                // 这里添加重新开始游戏的逻辑
-//                restartGame();
-//            }
-//        });
-//        dialogTable.row();
-//        dialogTable.add(restartButton).pad(20);
-//        // 调整提示框的大小以适应文字长度
-//        dialogTable.pack();
-//
-//        float x = (float) Gdx.graphics.getWidth() / 2 - dialogTable.getWidth() / 2;
-//        float y = (float) Gdx.graphics.getHeight() / 2 - dialogTable.getHeight() / 2;
-//        // 直接设置 dialogTable 的位置
-//        dialogTable.setPosition(x, y);
-//        // 将对话框添加到舞台
-//        stage.addActor(dialogTable);
-//
-//        // 确保重新开始按钮在最上层，可点击
-//        restartButton.toFront();
+        // 原代码：dialog.button("restart", "restart", buttonStyle);
+        // 替换为以下代码
+        TextButton restartButton = new TextButton("重新开始", buttonStyle);
+        restartButton.setName("重新开始");  // 设置按钮的名称，对应原代码中的第二个参数
+        restartButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                dialog.hide();  // 隐藏对话框
+                if ("重新开始".equals(restartButton.getName())) {
+                    // 重新开始游戏的逻辑
+                    // restartGame();
+                    gameScreen.resume();
+                    blockingTable.setVisible(false);
+                    game.setScreen(new GameScreen(game, assetManager));
+                }
+            }
+        });
+        // 添加标签并设置布局规则
+        contentTable.add(restartButton).expandX().top().padTop(30).center().fillX();
+//        dialog.getButtonTable().add(restartButton);
+
+        contentTable.row();
+
+//        dialog.button("return", "return", buttonStyle);
+        TextButton returnButton = new TextButton("回到菜单", buttonStyle);
+        returnButton.setName("回到菜单");  // 设置按钮的名称，对应原代码中的第二个参数
+        returnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                dialog.hide();  // 隐藏对话框
+                if ("回到菜单".equals(returnButton.getName())) {
+                    // 重新开始游戏的逻辑
+                    // restartGame();
+                    gameScreen.resume();
+                    blockingTable.setVisible(false);
+                    game.setScreen(new MainMenuScreen(game, assetManager));
+                }
+            }
+        });
+        // 添加标签并设置布局规则
+        contentTable.add(returnButton).expandX().top().padTop(30).center().fillX();
+
+        dialog.setSize(180,200);
+        this.stage.addActor(dialog);
+//        dialog.setSize(100,200);
+
 
         // 使用 Timer 在 3 秒后移除提示窗口（可根据需要调整时间）
 //        Timer.schedule(new Timer.Task() {

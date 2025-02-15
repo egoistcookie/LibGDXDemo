@@ -393,28 +393,31 @@ public class GameScreen implements Screen {
      * @param x X轴位置
      * @param y Y轴位置
      */
-    private void showAlertInfo(String alertInfo, float x, float y) {
-        // 获取加载的中文字体
+    public void showAlertInfo(String alertInfo, float x, float y) {
+        // 获取加载的中文字体（直接从assetManager获取字体，体感showAlertInfo提速1秒）
         BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
-        // 字体大小倍率（以Hiero中生成的字体大小为基准）
+        // 字体大小倍率
         customFont.getData().setScale(0.5f);
-        this.gameUI.getSkin().add("default",customFont);
+        // 创建LabelStyle时使用缩放后的字体
         Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
+
+
         // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
         Label hintLabel = new Label(alertInfo, labelStyle);
 
         // 加载背景图片
         Texture backgroundTexture = assetManager.get("alertTitle.png", Texture.class);
+        System.out.println("backgroundTexture.getWidth():"+backgroundTexture.getWidth());
         TextureRegion backgroundRegion = new TextureRegion(backgroundTexture);
         // 创建一个Table作为提示框容器
         Table dialogTable = new Table();
         dialogTable.setBackground(new TextureRegionDrawable(backgroundRegion));
-        dialogTable.add(hintLabel).pad(20); // 添加一些内边距
+        dialogTable.add(hintLabel).pad(0); // 添加一些内边距
         // 调整提示框的大小以适应文字长度
         dialogTable.pack();
 
         if(x == 0){
-            x = (float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2;
+            x = (float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2 - (float) backgroundTexture.getWidth() / 4;//还要减去图片留白部分的宽度
         }
         if(y == 0){
             y = (float) Gdx.graphics.getHeight() / 2 - hintLabel.getHeight() / 2;
