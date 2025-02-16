@@ -2,6 +2,7 @@ package com.lf.entities;
 // 引入LibGDX的相关类，用于游戏开发中的各种功能
 import com.badlogic.gdx.Gdx;
 // 引入Texture类，用于处理游戏中的纹理（图片）
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 // 引入SpriteBatch类，用于高效地批量绘制精灵（纹理）
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -25,8 +26,11 @@ public class TowerSelectionBox {
     // 记录当前选中的防御塔纹理的索引，-1表示未选中
     private int selectedIndex;
 
+    private AssetManager assetManager;
+
     // 构造函数，用于初始化TowerSelectionBox对象
-    public TowerSelectionBox() {
+    public TowerSelectionBox(AssetManager assetManager) {
+        this.assetManager = assetManager;
         // 初始化存储防御塔纹理的数组
         towerTextures = new Array<>();
         // 初始化存储纹理矩形区域的数组
@@ -45,15 +49,16 @@ public class TowerSelectionBox {
     // 私有方法，用于加载防御塔的纹理
     private void loadTowerTextures() {
         // 这里添加你的防御塔图片路径，将防御塔图片加载为纹理并添加到数组中
-        towerTextures.add(new Texture(Gdx.files.internal("arrowTower.png")));
-        towerTextures.add(new Texture(Gdx.files.internal("tower2.png")));
+        towerTextures.add(assetManager.get("rollback.png",Texture.class));
+        towerTextures.add(assetManager.get("tower2.png",Texture.class));
 
         // 初始化每个纹理对应的矩形区域
         for (int i = 0; i < towerTextures.size; i++) {
             // 获取当前索引的纹理
             Texture texture = towerTextures.get(i);
+            Rectangle rectangle = new Rectangle(position.x + i * (towerTextures.get(i).getWidth()) - 60, position.y, texture.getWidth(), texture.getHeight());
             // 创建一个矩形区域，根据纹理的宽度和位置计算矩形的位置和大小
-            textureRectangles.add(new Rectangle(position.x + i * (texture.getWidth() + 10), position.y, texture.getWidth(), texture.getHeight()));
+            textureRectangles.add(rectangle);
         }
     }
 
@@ -73,7 +78,7 @@ public class TowerSelectionBox {
             // 获取当前索引的矩形区域
             Rectangle rect = textureRectangles.get(i);
             // 根据纹理的宽度和选择框的位置更新矩形的位置
-            rect.setPosition(position.x + i * (towerTextures.get(i).getWidth() + 10), position.y);
+            rect.setPosition(position.x + i * (towerTextures.get(i).getWidth()) - 60, position.y);
         }
     }
 

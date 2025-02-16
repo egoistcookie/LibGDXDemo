@@ -5,22 +5,23 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.core.MyDefenseGame;
+import com.lf.entities.Stuff;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
@@ -67,6 +68,10 @@ public class GameUI {
     private Table buttonTable;
     // 用于控制是否继续渲染的标志变量
     private boolean isGameOver;
+    // 记录物品栏中物品集合
+    private Stuff[] stuffes = new Stuff[6];
+    // 物品栏
+    private Table stuffTable;
 
     public Skin getSkin() {
         return skin;
@@ -80,13 +85,14 @@ public class GameUI {
      * 构造函数，用于初始化GameUI对象。
      * 在构造函数中，会创建舞台、加载VisUI库、获取皮肤，并创建一个填充父容器的表格添加到舞台中。
      */
-    public GameUI(GameScreen gameScreen, Stage stage, MyDefenseGame game) {
+    public GameUI(GameScreen gameScreen, Stage stage, MyDefenseGame game, Stuff[] stuffes) {
         this.isGameOver = false;
         this.assetManager = game.getAssetManager();
         this.gameScreen = gameScreen;
         this.game = game;
         this.enemyLoadManager = game.getEnemyLoadManager();
         this.stage = stage;
+        this.stuffes = stuffes;
         // 获取VisUI库的默认皮肤
         skin = VisUI.getSkin();
         batch = new SpriteBatch();
@@ -102,8 +108,10 @@ public class GameUI {
         goldLabel = new VisLabel("" + gold);
         healthLabel = new VisLabel("" + health);
 
+        // 获取屏幕的宽度
+        int screenWidth = Gdx.graphics.getWidth();
         // 直接设置 goldLabel 的位置
-        goldLabel.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - 5,
+        goldLabel.setPosition(screenWidth - goldLabel.getWidth() - 5,
                 Gdx.graphics.getHeight() - goldLabel.getHeight() - 10);
         gameObjectTable.addActor(goldLabel);
 
@@ -112,12 +120,12 @@ public class GameUI {
         // 新增：创建金币图标
         Image goldIcon = new Image(goldIconTexture);
         // 新增：设置金币图标的位置
-        goldIcon.setPosition(Gdx.graphics.getWidth() - goldLabel.getWidth() - goldIcon.getWidth() - 10 ,
+        goldIcon.setPosition(screenWidth - goldLabel.getWidth() - goldIcon.getWidth() - 10 ,
                 goldLabel.getY());
         gameObjectTable.addActor(goldIcon);
 
         // 新增：设置血量标签的位置
-        healthLabel.setPosition(Gdx.graphics.getWidth() - goldIcon.getWidth() - goldLabel.getWidth()  - healthLabel.getWidth() - 30,
+        healthLabel.setPosition(screenWidth - goldIcon.getWidth() - goldLabel.getWidth()  - healthLabel.getWidth() - 30,
                 goldLabel.getY());
         gameObjectTable.addActor(healthLabel);
 
@@ -126,15 +134,12 @@ public class GameUI {
         // 新增：创建金币图标
         Image healthIcon = new Image(healthIconTexture);
         // 新增：设置金币图标的位置
-        healthIcon.setPosition(Gdx.graphics.getWidth() - goldIcon.getWidth() - goldLabel.getWidth()  - healthLabel.getWidth() - healthIcon.getWidth() - 35,
+        healthIcon.setPosition(screenWidth - goldIcon.getWidth() - goldLabel.getWidth()  - healthLabel.getWidth() - healthIcon.getWidth() - 35,
                 goldLabel.getY());
         gameObjectTable.addActor(healthIcon);
 
         // 创建暂停按钮
         pauseButton = new TextButton("Pause", skin);
-        // 获取屏幕的宽度和高度
-        int screenWidth = Gdx.graphics.getWidth();
-        int screenHeight = Gdx.graphics.getHeight();
         pauseButton.setSize(100, 30);
         // 计算按钮的位置，使其位于右下角
         float buttonX = screenWidth - pauseButton.getWidth();
@@ -147,6 +152,9 @@ public class GameUI {
             }
         });
         buttonTable.addActor(pauseButton);
+
+        //初始化右下角物品栏
+        initStuffTable();
 
         // 创建恢复按钮
         resumeButton = new TextButton("Resume", skin);
@@ -214,11 +222,56 @@ public class GameUI {
         this.stage.addActor(buttonTable);
     }
 
+    private void initStuffTable() {
+        // 获取屏幕的宽度
+        int screenWidth = Gdx.graphics.getWidth();
+        // 创建一个黑色边框的 Drawable
+        Texture texture = new Texture(Gdx.files.internal("white.png")); // 这里假设存在一个白色的纹理文件
+        NinePatch patch = new NinePatch(new TextureRegion(texture), 1, 1, 1, 1);
+        Drawable borderedDrawable = new NinePatchDrawable(patch);
+        borderedDrawable.setMinWidth(244); // 设置最小宽度
+        borderedDrawable.setMinHeight(63); // 设置最小高度
+
+        // 创建一个六格展示的表格
+        stuffTable = new Table();  // 创建一个新的表格用于展示图片
+        stuffTable.setSize(244,63);
+        stuffTable.defaults().pad(1);  // 设置默认的单元格间距
+        // 设置表格的背景为带有黑色边框的 Drawable
+        stuffTable.setBackground(borderedDrawable);
+        // 加载六张不同的贴图
+        Texture[] imageTextures = new Texture[6];
+        for (int i = 0; i < 6; i++) {
+            if(stuffes[i]!=null){
+                // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
+                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffTextureName() +".png", Texture.class);
+            }else{
+                // 空白格子显示为黑色背景图
+                imageTextures[i] = assetManager.get("black.png", Texture.class);
+            }
+            Image image = new Image(imageTextures[i]);
+            // 将图片添加到表格中
+            stuffTable.add(image);
+            // 每添加三个图片换行一次，实现两排展示
+            if ((i + 1) % 3 == 0) {
+                stuffTable.row();
+            }
+        }
+        // 计算 stuffTable 的位置，使其位于右下角 pauseButton 按钮上方
+        float tableX = screenWidth - stuffTable.getWidth() - 10;
+        float tableY = pauseButton.getHeight() + 20;  // 20 是与 pauseButton 的间距
+        stuffTable.setPosition(tableX, tableY);
+        // 将 stuffTable 添加到舞台
+        this.stage.addActor(stuffTable);
+    }
+
     /**
      * 渲染方法，用于更新和绘制舞台中的所有演员。
      * 该方法通常在游戏的渲染循环中被调用。
      */
     public void render() {
+
+        // 绘制物品栏
+        stuffTableRender();
         // 开始绘制
         batch.begin();
         // 调用stage的act方法，更新舞台中所有演员的状态，例如处理输入、动画等
@@ -249,6 +302,32 @@ public class GameUI {
         }
         // 结束绘制
         batch.end();
+    }
+
+    /**
+     * 绘制物品栏
+     */
+    private void stuffTableRender() {
+        //每次绘制前都先清空
+        stuffTable.clear();
+        // 加载六张不同的贴图
+        Texture[] imageTextures = new Texture[6];
+        for (int i = 0; i < 6; i++) {
+            if(stuffes[i]!=null){
+                // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
+                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffTextureName() +".png", Texture.class);
+            }else{
+                // 空白格子显示为黑色背景图
+                imageTextures[i] = assetManager.get("black.png", Texture.class);
+            }
+            Image image = new Image(imageTextures[i]);
+            // 将图片添加到表格中
+            stuffTable.add(image);
+            // 每添加三个图片换行一次，实现两排展示
+            if ((i + 1) % 3 == 0) {
+                stuffTable.row();
+            }
+        }
     }
 
     /**

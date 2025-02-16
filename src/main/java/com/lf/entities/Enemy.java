@@ -126,7 +126,8 @@ public class Enemy {
             // 敌人模型消失
 //            body.getWorld().destroyBody(body);
             this.isDead = true;
-            body.setActive(false);
+//            body.setActive(false);
+//            setDead(true);
         }
     }
 
@@ -134,7 +135,7 @@ public class Enemy {
      * 更新敌人的状态
      */
     public void update(float deltaTime) {
-        // 更新动画计时器
+        // 更新动画计时器，制造动画效果
         animationTimer += deltaTime;
         if (animationTimer >= frameDuration) {
             // 切换到下一帧
@@ -174,10 +175,6 @@ public class Enemy {
         return body.getPosition();
     }
 
-    public boolean isDead() {
-        return health <= 0;
-    }
-
     public Body getBody() {
         return body;
     }
@@ -190,9 +187,13 @@ public class Enemy {
         this.health -= damage; // 敌人受到伤害
         if (this.health <= 0) {
             // 敌人死亡，处理死亡逻辑
-            // body.setActive(false); // 使刚体失效
+            this.isDead = true;
+//             body.setActive(false); // 使刚体失效
+//            body.getWorld().destroyBody(body);
+            // 敌人死后，为界面增加10个金币
+            this.gameUI.addGold(10);
             // 敌人死亡，重新生成
-            respawn(initialPosition);
+//            respawn(initialPosition);
         }
     }
 
@@ -253,4 +254,18 @@ public class Enemy {
     public void setEnemyName(String enemyName) {
         this.enemyName = enemyName;
     }
+
+    //生成yml文本
+    public static void main(String[] args) {
+        System.out.println("# 敌人加载配置列表，每个元素代表一个敌人的加载配置\n" +
+                "enemyLoadConfigs:");
+        for(float i = 1; i <110;i ++ ){
+            float j = i*2;//2秒间隔
+            float loadtime = 2+j;
+            System.out.println(String.format("  - # %s",i));
+            System.out.println(String.format("    enemyType: \"Enemy %s\"",i));
+            System.out.println(String.format("    loadTime: %s",loadtime));
+        }
+    }
+
 }

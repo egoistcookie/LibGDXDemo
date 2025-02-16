@@ -155,7 +155,7 @@
 //        backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
 //
 //        // 加载箭的纹理
-//        arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
+//        arrowTexture = new Texture(Gdx.files.internal("arrow-old.png"));
 //
 //        // 创建防御塔选择框对象
 //        towerSelectionBox = new TowerSelectionBox();
@@ -267,7 +267,7 @@
 //                    // 获取选择的防御塔纹理
 //                    Texture towerTexture = towerSelectionBox.getTowerTextures().get(selectedIndex);
 //                    // 加载箭的纹理
-//                    Texture arrowTexture = new Texture(Gdx.files.internal("arrow1.png"));
+//                    Texture arrowTexture = new Texture(Gdx.files.internal("arrow-old.png"));
 //                    if(this.gameUI.getGold() < 100){
 //                        showAlertInfo("您的金币不足.",0,0);
 //                    }else{

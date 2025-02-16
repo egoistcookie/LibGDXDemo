@@ -12,9 +12,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.kotcrab.vis.ui.VisUI;
 import com.lf.manager.EnemyLoadManager;
-import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
-import com.lf.ui.GameUI;
 
 /**
  * 游戏
@@ -50,13 +48,21 @@ public class MyDefenseGame extends Game {
         // 加载血量的背景图片
         assetManager.load("health.png", Texture.class);
         // 加载箭矢的背景图片
-        assetManager.load("arrow2.png", Texture.class);
+        assetManager.load("arrow-old.png", Texture.class);
         // 加载箭矢的背景图片
-        assetManager.load("arrow3.png", Texture.class);
+        assetManager.load("arrow1.png", Texture.class);
+        // 加载箭矢的背景图片
+        assetManager.load("arrow2.png", Texture.class);
         // 加载防御塔1的背景图片
         assetManager.load("tower1.png", Texture.class);
         // 加载防御塔2的背景图片
         assetManager.load("tower2.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower/arrower.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower/arrower1.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower/arrower2.png", Texture.class);
         // 加载一级箭塔的背景图片
         assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片
@@ -69,6 +75,8 @@ public class MyDefenseGame extends Game {
         assetManager.load("white.png", Texture.class);
         // 加载纯黑背景
         assetManager.load("black.png", Texture.class);
+        // 加载回收图标的背景图片
+        assetManager.load("rollback.png", Texture.class);
         // 等待字体加载完成
         assetManager.finishLoading();
 

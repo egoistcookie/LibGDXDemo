@@ -9,19 +9,21 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.lf.screen.GameScreen;
 
 
-// Tower类表示游戏中的箭实体
+// Arrow类表示游戏中的箭实体
 public class Arrow {
     private Body body; // 箭的物理刚体
     private Sprite sprite; // 箭的精灵，用于渲染
     private Enemy target; // 箭的目标敌人
     private boolean isHit; // 标记箭是否已经击中敌人
     private Sound arrowSound; // 箭矢射出的音效
+    private Tower tower; // 箭矢所属的防御塔
 
-    public Arrow(World world, float x, float y, Texture texture, Enemy target) {
+    public Arrow(World world, float x, float y, Texture texture, Enemy target, Tower tower) {
         // 创建刚体定义
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody; // 设置为动态刚体
         bodyDef.position.set(x, y); // 设置初始位置
+        this.tower = tower;
 
         // 在物理世界中创建刚体
         body = world.createBody(bodyDef);
@@ -67,7 +69,7 @@ public class Arrow {
             direction.nor(); // 归一化方向向量
 
             // 设置箭的速度，使其缓缓射向敌人
-            body.setLinearVelocity(direction.scl(30 * GameScreen.getSclRate()));
+            body.setLinearVelocity(direction.scl(60 * GameScreen.getSclRate()));
 
             // 更新精灵的位置和旋转角度，使其与刚体同步
             sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f, body.getPosition().y - sprite.getHeight() / 2f);
@@ -77,9 +79,19 @@ public class Arrow {
             sprite.setRotation((float) Math.toDegrees(angle));
 //            sprite.setRotation((float) Math.toDegrees(body.getAngle()));
 
+            //有可能在箭矢飞行的过程中敌人就已经dead
+            if(target.getDead()){
+                this.arrowSound.dispose(); // 释放音效资源
+                return;
+            }
+
             // 检查箭是否击中敌人
-            if (body.getPosition().dst(target.getBody().getPosition()) < 0.5f) {
+            if (body.getPosition().dst(target.getBody().getPosition()) < 1f) {
                 target.takeDamage(1); // 敌人受到一点伤害
+                //如果敌人死亡，防御塔经验+1
+                if(target.getDead()){
+                    tower.addExperience(1);
+                }
                 isHit = true; // 标记箭已击中敌人
                 // 释放音效资源，避免内存泄漏
                 this.arrowSound.dispose(); // 释放音效资源
@@ -97,5 +109,10 @@ public class Arrow {
 
     public boolean isHit() {
         return isHit; // 返回箭是否已击中敌人
+    }
+
+    // 返回攻击的目标
+    public Enemy getTarget() {
+        return target;
     }
 }

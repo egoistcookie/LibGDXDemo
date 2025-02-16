@@ -1,26 +1,329 @@
 # 敌人加载配置列表，每个元素代表一个敌人的加载配置
 enemyLoadConfigs:
-  - # 1
-    enemyType: "Enemy1" # 敌人类型，用于区分不同类型的敌人
-    loadTime: 2.0 # 加载时间，单位为秒
-  - # 2
-    enemyType: "Enemy2"
+  - # 1.0
+    enemyType: "Enemy 1.0"
     loadTime: 3.0
-  - # 3
-    enemyType: "Enemy3"
+  - # 2.0
+    enemyType: "Enemy 2.0"
     loadTime: 4.0
-  - # 4
-    enemyType: "Enemy4"
+  - # 3.0
+    enemyType: "Enemy 3.0"
+    loadTime: 5.0
+  - # 4.0
+    enemyType: "Enemy 4.0"
+    loadTime: 6.0
+  - # 5.0
+    enemyType: "Enemy 5.0"
+    loadTime: 7.0
+  - # 6.0
+    enemyType: "Enemy 6.0"
+    loadTime: 8.0
+  - # 7.0
+    enemyType: "Enemy 7.0"
+    loadTime: 9.0
+  - # 8.0
+    enemyType: "Enemy 8.0"
     loadTime: 10.0
-  - # 5
-    enemyType: "Enemy5"
+  - # 9.0
+    enemyType: "Enemy 9.0"
+    loadTime: 11.0
+  - # 10.0
+    enemyType: "Enemy 10.0"
+    loadTime: 12.0
+  - # 11.0
+    enemyType: "Enemy 11.0"
+    loadTime: 13.0
+  - # 12.0
+    enemyType: "Enemy 12.0"
+    loadTime: 14.0
+  - # 13.0
+    enemyType: "Enemy 13.0"
     loadTime: 15.0
-  - # 6
-    enemyType: "Enemy6"
+  - # 14.0
+    enemyType: "Enemy 14.0"
+    loadTime: 16.0
+  - # 15.0
+    enemyType: "Enemy 15.0"
+    loadTime: 17.0
+  - # 16.0
+    enemyType: "Enemy 16.0"
+    loadTime: 18.0
+  - # 17.0
+    enemyType: "Enemy 17.0"
+    loadTime: 19.0
+  - # 18.0
+    enemyType: "Enemy 18.0"
     loadTime: 20.0
-  - # 7
-    enemyType: "Enemy7"
+  - # 19.0
+    enemyType: "Enemy 19.0"
+    loadTime: 21.0
+  - # 20.0
+    enemyType: "Enemy 20.0"
+    loadTime: 22.0
+  - # 21.0
+    enemyType: "Enemy 21.0"
+    loadTime: 23.0
+  - # 22.0
+    enemyType: "Enemy 22.0"
+    loadTime: 24.0
+  - # 23.0
+    enemyType: "Enemy 23.0"
     loadTime: 25.0
-  - # 8
-    enemyType: "Enemy8"
+  - # 24.0
+    enemyType: "Enemy 24.0"
+    loadTime: 26.0
+  - # 25.0
+    enemyType: "Enemy 25.0"
+    loadTime: 27.0
+  - # 26.0
+    enemyType: "Enemy 26.0"
+    loadTime: 28.0
+  - # 27.0
+    enemyType: "Enemy 27.0"
+    loadTime: 29.0
+  - # 28.0
+    enemyType: "Enemy 28.0"
     loadTime: 30.0
+  - # 29.0
+    enemyType: "Enemy 29.0"
+    loadTime: 31.0
+  - # 30.0
+    enemyType: "Enemy 30.0"
+    loadTime: 32.0
+  - # 31.0
+    enemyType: "Enemy 31.0"
+    loadTime: 33.0
+  - # 32.0
+    enemyType: "Enemy 32.0"
+    loadTime: 34.0
+  - # 33.0
+    enemyType: "Enemy 33.0"
+    loadTime: 35.0
+  - # 34.0
+    enemyType: "Enemy 34.0"
+    loadTime: 36.0
+  - # 35.0
+    enemyType: "Enemy 35.0"
+    loadTime: 37.0
+  - # 36.0
+    enemyType: "Enemy 36.0"
+    loadTime: 38.0
+  - # 37.0
+    enemyType: "Enemy 37.0"
+    loadTime: 39.0
+  - # 38.0
+    enemyType: "Enemy 38.0"
+    loadTime: 40.0
+  - # 39.0
+    enemyType: "Enemy 39.0"
+    loadTime: 41.0
+  - # 40.0
+    enemyType: "Enemy 40.0"
+    loadTime: 42.0
+  - # 41.0
+    enemyType: "Enemy 41.0"
+    loadTime: 43.0
+  - # 42.0
+    enemyType: "Enemy 42.0"
+    loadTime: 44.0
+  - # 43.0
+    enemyType: "Enemy 43.0"
+    loadTime: 45.0
+  - # 44.0
+    enemyType: "Enemy 44.0"
+    loadTime: 46.0
+  - # 45.0
+    enemyType: "Enemy 45.0"
+    loadTime: 47.0
+  - # 46.0
+    enemyType: "Enemy 46.0"
+    loadTime: 48.0
+  - # 47.0
+    enemyType: "Enemy 47.0"
+    loadTime: 49.0
+  - # 48.0
+    enemyType: "Enemy 48.0"
+    loadTime: 50.0
+  - # 49.0
+    enemyType: "Enemy 49.0"
+    loadTime: 51.0
+  - # 50.0
+    enemyType: "Enemy 50.0"
+    loadTime: 52.0
+  - # 51.0
+    enemyType: "Enemy 51.0"
+    loadTime: 53.0
+  - # 52.0
+    enemyType: "Enemy 52.0"
+    loadTime: 54.0
+  - # 53.0
+    enemyType: "Enemy 53.0"
+    loadTime: 55.0
+  - # 54.0
+    enemyType: "Enemy 54.0"
+    loadTime: 56.0
+  - # 55.0
+    enemyType: "Enemy 55.0"
+    loadTime: 57.0
+  - # 56.0
+    enemyType: "Enemy 56.0"
+    loadTime: 58.0
+  - # 57.0
+    enemyType: "Enemy 57.0"
+    loadTime: 59.0
+  - # 58.0
+    enemyType: "Enemy 58.0"
+    loadTime: 60.0
+  - # 59.0
+    enemyType: "Enemy 59.0"
+    loadTime: 61.0
+  - # 60.0
+    enemyType: "Enemy 60.0"
+    loadTime: 62.0
+  - # 61.0
+    enemyType: "Enemy 61.0"
+    loadTime: 63.0
+  - # 62.0
+    enemyType: "Enemy 62.0"
+    loadTime: 64.0
+  - # 63.0
+    enemyType: "Enemy 63.0"
+    loadTime: 65.0
+  - # 64.0
+    enemyType: "Enemy 64.0"
+    loadTime: 66.0
+  - # 65.0
+    enemyType: "Enemy 65.0"
+    loadTime: 67.0
+  - # 66.0
+    enemyType: "Enemy 66.0"
+    loadTime: 68.0
+  - # 67.0
+    enemyType: "Enemy 67.0"
+    loadTime: 69.0
+  - # 68.0
+    enemyType: "Enemy 68.0"
+    loadTime: 70.0
+  - # 69.0
+    enemyType: "Enemy 69.0"
+    loadTime: 71.0
+  - # 70.0
+    enemyType: "Enemy 70.0"
+    loadTime: 72.0
+  - # 71.0
+    enemyType: "Enemy 71.0"
+    loadTime: 73.0
+  - # 72.0
+    enemyType: "Enemy 72.0"
+    loadTime: 74.0
+  - # 73.0
+    enemyType: "Enemy 73.0"
+    loadTime: 75.0
+  - # 74.0
+    enemyType: "Enemy 74.0"
+    loadTime: 76.0
+  - # 75.0
+    enemyType: "Enemy 75.0"
+    loadTime: 77.0
+  - # 76.0
+    enemyType: "Enemy 76.0"
+    loadTime: 78.0
+  - # 77.0
+    enemyType: "Enemy 77.0"
+    loadTime: 79.0
+  - # 78.0
+    enemyType: "Enemy 78.0"
+    loadTime: 80.0
+  - # 79.0
+    enemyType: "Enemy 79.0"
+    loadTime: 81.0
+  - # 80.0
+    enemyType: "Enemy 80.0"
+    loadTime: 82.0
+  - # 81.0
+    enemyType: "Enemy 81.0"
+    loadTime: 83.0
+  - # 82.0
+    enemyType: "Enemy 82.0"
+    loadTime: 84.0
+  - # 83.0
+    enemyType: "Enemy 83.0"
+    loadTime: 85.0
+  - # 84.0
+    enemyType: "Enemy 84.0"
+    loadTime: 86.0
+  - # 85.0
+    enemyType: "Enemy 85.0"
+    loadTime: 87.0
+  - # 86.0
+    enemyType: "Enemy 86.0"
+    loadTime: 88.0
+  - # 87.0
+    enemyType: "Enemy 87.0"
+    loadTime: 89.0
+  - # 88.0
+    enemyType: "Enemy 88.0"
+    loadTime: 90.0
+  - # 89.0
+    enemyType: "Enemy 89.0"
+    loadTime: 91.0
+  - # 90.0
+    enemyType: "Enemy 90.0"
+    loadTime: 92.0
+  - # 91.0
+    enemyType: "Enemy 91.0"
+    loadTime: 93.0
+  - # 92.0
+    enemyType: "Enemy 92.0"
+    loadTime: 94.0
+  - # 93.0
+    enemyType: "Enemy 93.0"
+    loadTime: 95.0
+  - # 94.0
+    enemyType: "Enemy 94.0"
+    loadTime: 96.0
+  - # 95.0
+    enemyType: "Enemy 95.0"
+    loadTime: 97.0
+  - # 96.0
+    enemyType: "Enemy 96.0"
+    loadTime: 98.0
+  - # 97.0
+    enemyType: "Enemy 97.0"
+    loadTime: 99.0
+  - # 98.0
+    enemyType: "Enemy 98.0"
+    loadTime: 100.0
+  - # 99.0
+    enemyType: "Enemy 99.0"
+    loadTime: 101.0
+  - # 100.0
+    enemyType: "Enemy 100.0"
+    loadTime: 102.0
+  - # 101.0
+    enemyType: "Enemy 101.0"
+    loadTime: 103.0
+  - # 102.0
+    enemyType: "Enemy 102.0"
+    loadTime: 104.0
+  - # 103.0
+    enemyType: "Enemy 103.0"
+    loadTime: 105.0
+  - # 104.0
+    enemyType: "Enemy 104.0"
+    loadTime: 106.0
+  - # 105.0
+    enemyType: "Enemy 105.0"
+    loadTime: 107.0
+  - # 106.0
+    enemyType: "Enemy 106.0"
+    loadTime: 108.0
+  - # 107.0
+    enemyType: "Enemy 107.0"
+    loadTime: 109.0
+  - # 108.0
+    enemyType: "Enemy 108.0"
+    loadTime: 110.0
+  - # 109.0
+    enemyType: "Enemy 109.0"
+    loadTime: 111.0
