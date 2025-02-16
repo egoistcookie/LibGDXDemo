@@ -77,6 +77,8 @@ public class MyDefenseGame extends Game {
         assetManager.load("black.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("rollback.png", Texture.class);
+        // 加载回收图标的背景图片
+        assetManager.load("super.png", Texture.class);
         // 等待字体加载完成
         assetManager.finishLoading();
 

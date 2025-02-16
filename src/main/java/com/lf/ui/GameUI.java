@@ -12,10 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.VisUI;
@@ -72,6 +69,8 @@ public class GameUI {
     private Stuff[] stuffes = new Stuff[6];
     // 物品栏
     private Table stuffTable;
+    // 抽卡按钮
+    private Button getButton;
 
     public Skin getSkin() {
         return skin;
@@ -155,6 +154,21 @@ public class GameUI {
 
         //初始化右下角物品栏
         initStuffTable();
+
+        // 创建抽卡按钮，位于物品栏左侧
+        getButton = new TextButton("Get", skin);
+        getButton.setSize(50, 28);
+        // 计算按钮的位置，使其位于右下角
+        float buttonGX = screenWidth - stuffTable.getWidth() - getButton.getWidth() - 20;
+        float buttonGY = pauseButton.getHeight() + 22;  // 22 是与 pauseButton 的间距
+        getButton.setPosition(buttonGX, buttonGY);
+        getButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                gameScreen.getCard();
+            }
+        });
+        buttonTable.addActor(getButton);
 
         // 创建恢复按钮
         resumeButton = new TextButton("Resume", skin);
@@ -243,14 +257,14 @@ public class GameUI {
         for (int i = 0; i < 6; i++) {
             if(stuffes[i]!=null){
                 // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
-                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffTextureName() +".png", Texture.class);
+                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffType() +".png", Texture.class);
             }else{
                 // 空白格子显示为黑色背景图
                 imageTextures[i] = assetManager.get("black.png", Texture.class);
             }
             Image image = new Image(imageTextures[i]);
             // 将图片添加到表格中
-            stuffTable.add(image);
+            stuffTable.add(image).minHeight(30).minWidth(80);
             // 每添加三个图片换行一次，实现两排展示
             if ((i + 1) % 3 == 0) {
                 stuffTable.row();
@@ -315,14 +329,16 @@ public class GameUI {
         for (int i = 0; i < 6; i++) {
             if(stuffes[i]!=null){
                 // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
-                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffTextureName() +".png", Texture.class);
+                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffType() +".png", Texture.class);
+                // 设置纹理过滤方式为线性过滤
+////        enemyTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             }else{
                 // 空白格子显示为黑色背景图
                 imageTextures[i] = assetManager.get("black.png", Texture.class);
             }
             Image image = new Image(imageTextures[i]);
             // 将图片添加到表格中
-            stuffTable.add(image);
+            stuffTable.add(image).minHeight(30).minWidth(80);
             // 每添加三个图片换行一次，实现两排展示
             if ((i + 1) % 3 == 0) {
                 stuffTable.row();

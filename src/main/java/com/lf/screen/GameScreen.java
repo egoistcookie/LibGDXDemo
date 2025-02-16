@@ -38,12 +38,11 @@ import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.*;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.ui.GameUI;
-import com.lf.util.SpriteUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 // 游戏界面类，实现 Screen 接口
 public class GameScreen implements Screen {
@@ -61,6 +60,8 @@ public class GameScreen implements Screen {
     private TowerSelectionBox towerSelectionBox;
     // 防御塔对象集合
     private List<Tower> towers;
+    // 防御塔数量
+    private int towerCount;
     // 鼠标点击坐标
     private Vector2 clickPosition;
     // 新增：用于绘制形状（激光）的渲染器
@@ -105,6 +106,7 @@ public class GameScreen implements Screen {
 
     // 构造函数，接收游戏对象作为参数
     public GameScreen(MyDefenseGame game) {
+        towerCount =0;
         this.assetManager = game.getAssetManager();
         this.enemyLoadManager = game.getEnemyLoadManager();
         // 在游戏屏幕初始化时记录开始时间
@@ -120,8 +122,10 @@ public class GameScreen implements Screen {
         viewport = new FitViewport(800, 600, camera);
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), true);
-        Stuff firtstStuff = new Stuff("arrower","arrower",1);
+        Stuff firtstStuff = new Stuff("arrower","arrower",1, 1, 1);
         stuffes[0] = firtstStuff;
+        stuffes[1] = firtstStuff;
+        stuffes[2] = firtstStuff;
         // 创建游戏用户界面
         gameUI = new GameUI(this, stage, game, stuffes);
         // 加载地图
@@ -215,8 +219,6 @@ public class GameScreen implements Screen {
 
             backgroundSprite.draw(batch);
 
-            // 渲染防御塔选择框
-            towerSelectionBox.render(batch);
             // 遍历防御塔列表，渲染每个防御塔的精灵
             for (Tower tower : towers) {
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
@@ -228,6 +230,8 @@ public class GameScreen implements Screen {
                     arrow.getSprite().draw(batch);
                 }
             }
+            // 先渲染防御塔，再渲染防御塔选择框，使其在防御塔上层显示
+            towerSelectionBox.render(batch);
 
             // 如果敌人存在，则绘制敌人的精灵
             // 渲染敌人
@@ -346,52 +350,61 @@ public class GameScreen implements Screen {
             clickPosition.set(Gdx.input.getX(), Gdx.input.getY());
             // 将屏幕坐标转换为世界坐标
             viewport.unproject(clickPosition);
-            System.out.println("点击坐标："+clickPosition.x+"y:"+clickPosition.y);
+            System.out.println("点击坐标：" + clickPosition.x + "y:" + clickPosition.y);
 
-            // 遍历防御塔，判断鼠标点击位置是否命中防御塔
-            Iterator<Tower> iterator = towers.iterator();
-            while (iterator.hasNext()) {
-                Tower tower = iterator.next();
-                // 获取防御塔精灵的所在矩形（后期可以优化成非透明部位）
-                Rectangle towerBounds = tower.getSprite().getBoundingRectangle();
-                if(towerBounds.contains(clickPosition)){
-                    System.out.println("防御塔坐标："+towerBounds.x+"y:"+towerBounds.y);
-                    // 如果防御塔选择框不可见
-                    if (!towerSelectionBox.isVisible()) {
-                        // 显示防御塔选择框，并设置其位置为点击位置
-                        towerSelectionBox.show(clickPosition);
-                        // 显示防御塔的位置，应该为第一次点击空白位置的位置
-                        showTowerX = clickPosition.x;
-                        showTowerY = clickPosition.y;
-                    } else {
-                        // 处理防御塔选择框的输入事件
-                        towerSelectionBox.handleInput(clickPosition);
-                        // 获取选择的防御塔索引
-                        int selectedIndex = towerSelectionBox.getSelectedIndex();
-                        // 如果选择的索引不为-1，表示选择了一个防御塔
+            // 如果防御塔选择框可见，则要先选择防御塔上的图标才能继续其他点击操作
+            if (towerSelectionBox.isVisible()) {
+                // 处理防御塔选择框的输入事件
+                towerSelectionBox.handleInput(clickPosition);
+                // 获取选择的防御塔操作 回收或者升星
+                int selectedIndex = towerSelectionBox.getSelectedIndex();
+                int selectedTowerId = towerSelectionBox.getTowerId();
+
+                Iterator<Tower> iterator = towers.iterator();
+                while (iterator.hasNext()) {
+                    Tower tower = iterator.next();
+                    if(tower.getTowerId() == selectedTowerId){
+                        // 选择0位置，表示回收
                         if (selectedIndex == 0) {
-                            if(stuffes[5]!=null){
-                                showAlertInfo("物品栏已满，无法再回收");
-                                break ;
+                            // 查找第一个空闲位置
+                            int index = 0;
+                            while (index < stuffes.length && stuffes[index] != null) {
+                                index++;
                             }
-                            // 往物品栏中添加该防御塔对应的卡片（最后位置）
-                            for (int i = 0; i < stuffes.length; i++) {
-                                if (stuffes[i] == null) {
-                                    stuffes[i] = new Stuff(tower.getTowerType());
-                                    break ;
-                                }
+                            // 如果还有空闲位置，添加新元素
+                            if (index < stuffes.length) {
+                                stuffes[index] = new Stuff(tower.getTowerType(), tower.getTowerType(), tower.getTowerId(),
+                                        tower.getLevel(), tower.getStarLevel());
+                                // 经验值标签需要隐藏
+                                tower.dispose();
+                                // 回收
+                                world.destroyBody(tower.getBody());
+                                // 从towers中移除该元素
+                                iterator.remove();
+                            } else {
+                                showAlertInfo("物品栏已满,无法再回收");
                             }
-                            // 经验值标签需要隐藏
-                            tower.dispose();
-                            // 回收
-                            world.destroyBody(tower.getBody());
-                            iterator.remove();
-                        }else if (selectedIndex == 1){
+                        } else if (selectedIndex == 1) {
                             // 升星
-                            tower.superPass();
+                            if(!tower.superPass(stuffes)){
+                                showAlertInfo("请确保物品栏中存在\n同星级且满级的素材");
+                            }
                         }
-                        //无论点了哪里，选择框都应消失
-                        towerSelectionBox.hide();
+                    }
+                }
+                //只要界面上存在选择框，那么无论再次点了哪里，选择框都应消失
+                towerSelectionBox.hide();
+            } else {
+                // 遍历防御塔，判断鼠标点击位置是否命中防御塔
+                Iterator<Tower> iterator = towers.iterator();
+                while (iterator.hasNext()) {
+                    Tower tower = iterator.next();
+                    // 获取防御塔精灵的所在矩形（后期可以优化成非透明部位）
+                    Rectangle towerBounds = tower.getSprite().getBoundingRectangle();
+                    if (towerBounds.contains(clickPosition)) {
+                        System.out.println("防御塔坐标：" + towerBounds.x + "y:" + towerBounds.y);
+                        // 显示防御塔选择框，并设置其位置为点击位置，并获取到该位置的towerId
+                        towerSelectionBox.show(clickPosition,tower.getTowerId());
                     }
                 }
 //                Rectangle rectangle = SpriteUtils.getNonTransparentBounds(tower.getSprite());
@@ -399,6 +412,8 @@ public class GameScreen implements Screen {
 //                    System.out.println("防御塔非透明处的坐标："+rectangle.x+"y:"+rectangle.y);
 //                }
             }
+            // 重置选择的功能按钮编号
+            towerSelectionBox.resetSelectedIndex();
         }
         // 数字键1到6的按钮绑定事件：消耗物品栏中卡片，生成对应防御塔
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
@@ -413,6 +428,9 @@ public class GameScreen implements Screen {
             createTower(5);
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
             createTower(6);
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            //抽卡快捷键
+            getCard();
         }
     }
 
@@ -422,70 +440,70 @@ public class GameScreen implements Screen {
     private void createTowerBySelectBox() {
 
         // 设置点击位置为鼠标当前的屏幕坐标
-        clickPosition.set(Gdx.input.getX(), Gdx.input.getY());
-        // 将屏幕坐标转换为世界坐标
-        viewport.unproject(clickPosition);
-        System.out.println(clickPosition.x + "y:" +clickPosition.y);
-        //右下角为功能按钮位置，不可点击生成防御塔选择框
-        if(clickPosition.x > 370 && clickPosition.y < 45){
-            return;
-        }
-        //左下角为退出按钮位置，不可点击生成防御塔选择框
-        if(clickPosition.x < 200 && clickPosition.y < 45){
-            return;
-        }
-
-        // 如果防御塔选择框不可见
-        if (!towerSelectionBox.isVisible()) {
-            // 显示防御塔选择框，并设置其位置为点击位置
-            towerSelectionBox.show(clickPosition);
-            // 显示防御塔的位置，应该为第一次点击空白位置的位置
-            showTowerX = clickPosition.x;
-            showTowerY = clickPosition.y;
-        } else {
-            // 处理防御塔选择框的输入事件
-            towerSelectionBox.handleInput(clickPosition);
-            // 获取选择的防御塔索引
-            int selectedIndex = towerSelectionBox.getSelectedIndex();
-            // 如果选择的索引不为-1，表示选择了一个防御塔
-            if (selectedIndex != -1) {
-                // 获取选择的防御塔纹理
-                Texture towerTexture = towerSelectionBox.getTowerTextures().get(selectedIndex);
-                // 加载箭的纹理 默认1号箭矢
-                Texture arrowTexture = assetManager.get("arrow1.png", Texture.class);
-                //生成一号防御塔
-                if(selectedIndex == 0){
-                    arrowTexture = assetManager.get("arrow1.png", Texture.class);
-                }else if (selectedIndex == 1){
-                    //生成二号防御塔
-                    arrowTexture = assetManager.get("arrow2.png", Texture.class);
-                }
-                if(this.gameUI.getGold() < 100){
-                    showAlertInfo("您的金币不足.",0,0);
-                }else{
-                    boolean inRange = false;
-                    for(PolygonMapObject polygonMapObject : this.towerRanges ){
-                        //只要x和y坐标有位于其中一个防御塔允许摆放的多边形中，就可以创建新的防御塔对象
-                        if(isPointInPolygon(showTowerX,showTowerY,polygonMapObject.getPolygon())){
-                            inRange = true;
-                            this.gameUI.subGold(100);
-                            // 创建一个新的防御塔对象，位置为点击位置
-                            Tower tower = new Tower(world, "arrower",showTowerX, showTowerY, arrowTexture, assetManager, stage);
-                            // 将新的防御塔添加到防御塔列表中
-                            towers.add(tower);
-                            // 重置防御塔选择框的选择索引
-                            towerSelectionBox.resetSelectedIndex();
-                        }
-                    }
-                    if(!inRange){
-                        showAlertInfo("防御塔不能建在此处.",0,0);
-                    }
-                }
-            }else{
-                //如果点了其他位置，选择框应消失
-                towerSelectionBox.hide();
-            }
-        }
+//        clickPosition.set(Gdx.input.getX(), Gdx.input.getY());
+//        // 将屏幕坐标转换为世界坐标
+//        viewport.unproject(clickPosition);
+//        System.out.println(clickPosition.x + "y:" +clickPosition.y);
+//        //右下角为功能按钮位置，不可点击生成防御塔选择框
+//        if(clickPosition.x > 370 && clickPosition.y < 45){
+//            return;
+//        }
+//        //左下角为退出按钮位置，不可点击生成防御塔选择框
+//        if(clickPosition.x < 200 && clickPosition.y < 45){
+//            return;
+//        }
+//
+//        // 如果防御塔选择框不可见
+//        if (!towerSelectionBox.isVisible()) {
+//            // 显示防御塔选择框，并设置其位置为点击位置
+//            towerSelectionBox.show(clickPosition);
+//            // 显示防御塔的位置，应该为第一次点击空白位置的位置
+//            showTowerX = clickPosition.x;
+//            showTowerY = clickPosition.y;
+//        } else {
+//            // 处理防御塔选择框的输入事件
+//            towerSelectionBox.handleInput(clickPosition);
+//            // 获取选择的防御塔索引
+//            int selectedIndex = towerSelectionBox.getSelectedIndex();
+//            // 如果选择的索引不为-1，表示选择了一个防御塔
+//            if (selectedIndex != -1) {
+//                // 获取选择的防御塔纹理
+//                Texture towerTexture = towerSelectionBox.getTowerTextures().get(selectedIndex);
+//                // 加载箭的纹理 默认1号箭矢
+//                Texture arrowTexture = assetManager.get("arrow1.png", Texture.class);
+//                //生成一号防御塔
+//                if(selectedIndex == 0){
+//                    arrowTexture = assetManager.get("arrow1.png", Texture.class);
+//                }else if (selectedIndex == 1){
+//                    //生成二号防御塔
+//                    arrowTexture = assetManager.get("arrow2.png", Texture.class);
+//                }
+//                if(this.gameUI.getGold() < 100){
+//                    showAlertInfo("您的金币不足.",0,0);
+//                }else{
+//                    boolean inRange = false;
+//                    for(PolygonMapObject polygonMapObject : this.towerRanges ){
+//                        //只要x和y坐标有位于其中一个防御塔允许摆放的多边形中，就可以创建新的防御塔对象
+//                        if(isPointInPolygon(showTowerX,showTowerY,polygonMapObject.getPolygon())){
+//                            inRange = true;
+//                            this.gameUI.subGold(100);
+//                            // 创建一个新的防御塔对象，位置为点击位置
+//                            Tower tower = new Tower(world, "arrower",showTowerX, showTowerY, arrowTexture, assetManager, stage);
+//                            // 将新的防御塔添加到防御塔列表中
+//                            towers.add(tower);
+//                            // 重置防御塔选择框的选择索引
+//                            towerSelectionBox.resetSelectedIndex();
+//                        }
+//                    }
+//                    if(!inRange){
+//                        showAlertInfo("防御塔不能建在此处.",0,0);
+//                    }
+//                }
+//            }else{
+//                //如果点了其他位置，选择框应消失
+//                towerSelectionBox.hide();
+//            }
+//        }
     }
 
     /**
@@ -499,25 +517,27 @@ public class GameScreen implements Screen {
         viewport.unproject(clickPosition);
         // 判断对应物品栏中是否存在卡片
         if(stuffes[i-1] != null){
-            String towerTextureName = stuffes[i-1].getStuffTextureName();
+            Stuff stuff = stuffes[i-1];
+            String towerType = stuff.getStuffType();
             // 加载箭的纹理 默认1号箭矢
-            Texture arrowTexture = assetManager.get("arrow" + i + ".png", Texture.class);
+            Texture arrowTexture = assetManager.get("arrow1.png", Texture.class);
             boolean inRange = false;
             for(PolygonMapObject polygonMapObject : this.towerRanges ){
                 //只要x和y坐标有位于其中一个防御塔允许摆放的多边形中，就可以创建新的防御塔对象
                 if(isPointInPolygon(clickPosition.x,clickPosition.y,polygonMapObject.getPolygon())){
                     inRange = true;
-                    this.gameUI.subGold(100);
-                    // 创建一个新的防御塔对象，位置为点击位置
-                    Tower tower = new Tower(world, towerTextureName, clickPosition.x, clickPosition.y, arrowTexture, assetManager, stage);
+//                    this.gameUI.subGold(100);
+                    // 创建一个新的防御塔对象，位置为点击位置，tower序号作为id
+                    Tower tower = new Tower(world, towerCount++ ,towerType, clickPosition.x, clickPosition.y, arrowTexture, assetManager, stage,
+                            stuff.getStuffLevel(), stuff.getStuffStarLevel());
                     // 将新的防御塔添加到防御塔列表中
                     towers.add(tower);
                     // 创建防御塔后，物品栏中卡片消失
-                    stuffes[0] = null;
+                    stuffes[i-1] = null;
                 }
             }
             if(!inRange){
-                showAlertInfo("防御单位不能摆放在此处.",0,0);
+                showAlertInfo("防御单位不能摆放在此处！",0,0);
             }
         }else{
             System.out.println("物品栏中对应位置无卡片！");
@@ -680,5 +700,35 @@ public class GameScreen implements Screen {
     // 获取加速倍率
     public static float getSclRate() {
         return sclRate;
+    }
+
+    public void getCard() {
+        System.out.println("开始抽卡！");
+        if(gameUI.getGold() < 500){
+            showAlertInfo("您的金币不足");
+            return ;
+        }else{
+            this.gameUI.subGold(100);
+        }
+        // 获取一个1-100的随机数
+        // 当随机数小于80时，生成最基础的arrower卡片
+
+        // 大于80，小于95时，生成比较稀有的二级防御单位
+
+        // 大于95时，生成最稀有的三级防御单位
+
+        String towerType = "arrower";
+        Stuff newStuff = new Stuff(towerType,towerType,0,1,1);
+        // 查找第一个空闲位置
+        int index = 0;
+        while (index < stuffes.length && stuffes[index] != null) {
+            index++;
+        }
+        // 如果还有空闲位置，添加新元素
+        if (index < stuffes.length) {
+            stuffes[index] = newStuff;
+        }else{
+            showAlertInfo("物品栏已满,无法再抽卡");
+        }
     }
 }

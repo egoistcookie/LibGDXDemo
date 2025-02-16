@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.lf.screen.GameScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ public class Tower {
     private Body body;
     // 防御塔的精灵，用于图形渲染
     private Sprite sprite;
+    // 防御塔唯一id
+    private int towerId;
     // 防御塔类型
     private String towerType;
     // 防御塔的攻击范围
@@ -44,15 +47,21 @@ public class Tower {
     private float frameDuration = 0.4f;
     // 防御塔的当前等级，初始为1级
     private int level;
+    // 防御塔的当前星级，初始为1星
+    private int starLevel;
     // 防御塔的当前经验值，初始为0
     private int experience;
-    // 金币数量标签
+    // 等级数量标签
     private VisLabel levelLabel;
+    // 星级标签
+    private VisLabel starLevelLabel;
     // 构造函数，用于创建防御塔实例
-    public Tower(World world, String towerType,float x, float y, Texture arrowTexture, AssetManager assetManager, Stage stage) {
+    public Tower(World world, int towerId, String towerType,float x, float y, Texture arrowTexture, AssetManager assetManager, Stage stage, int level, int starLevel) {
         this.towerType = towerType;
+        this.towerId = towerId;
         experience = 0;
-        level = 1;
+        this.level = level;
+        this.starLevel = starLevel;
         Texture texture1 = assetManager.get("tower/"+towerType+"1.png", Texture.class);
         animationFrames = new Texture[]{texture1, assetManager.get("tower/"+towerType+"2.png", Texture.class)}; ;
         // 创建刚体定义
@@ -108,9 +117,14 @@ public class Tower {
         // 等级标签
         levelLabel = new VisLabel("" + level);
         // 直接设置 goldLabel 的位置 ,显示在防御塔头顶
-        levelLabel.setPosition(x-10,y+30);
-
+        levelLabel.setPosition(x-10,y+20);
         stage.addActor(levelLabel);
+
+        // 等级标签
+        starLevelLabel = new VisLabel(starLevel==1?"*":"**");
+        // 直接设置 goldLabel 的位置 ,显示在防御塔头顶，等级上方的位置
+        starLevelLabel.setPosition(x-10,y+30);
+        stage.addActor(starLevelLabel);
 
     }
 
@@ -188,6 +202,7 @@ public class Tower {
         arrowTexture = null;
         // 隐藏标签
         levelLabel.setVisible(false);
+        starLevelLabel.setVisible(false);
     }
 
     /**
@@ -204,6 +219,7 @@ public class Tower {
 
     private void showLevel() {
         levelLabel.setText("" + this.level);
+        starLevelLabel.setText(starLevel==1?"*":"**");
     }
 
     // 检查是否满足升级条件的方法
@@ -226,10 +242,30 @@ public class Tower {
     }
 
     // 升星
-    public void superPass(){
-        System.out.println("升星！");
+    public boolean superPass(Stuff[] stuffes){
         // 实现代码 TODO
-
+        String towerType = this.getTowerType();
+        for(int i =0 ; i <stuffes.length ; i++){
+            // 物品栏中是否有当前类型卡片
+            if(stuffes[i]!=null && stuffes[i].getStuffType().equals(towerType)){
+                Stuff stuff = stuffes[i];
+                System.out.println("升星！");
+                // 判断是否同星级且满等级
+                if(this.getStarLevel()==stuff.getStuffStarLevel() && stuff.getStuffLevel() == 10){
+                    // 物品栏中删去该卡片
+                    stuffes[i] = null;
+                    // 星级上升
+                    this.starLevel ++;
+                    // 显示等级
+                    showLevel();
+                    return true;
+                }else{
+                    System.out.println("素材星级："+stuff.getStuffStarLevel());
+                    System.out.println("素材等级："+stuff.getStuffLevel());
+                }
+            }
+        }
+        return false;
     }
     public Body getBody() {
         return body;
@@ -239,5 +275,28 @@ public class Tower {
     }
     public void setTowerType(String towerType) {
         this.towerType = towerType;
+    }
+    public int getTowerId() {
+        return towerId;
+    }
+
+    public void setTowerId(int towerId) {
+        this.towerId = towerId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getStarLevel() {
+        return starLevel;
+    }
+
+    public void setStarLevel(int starLevel) {
+        this.starLevel = starLevel;
     }
 }

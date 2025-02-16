@@ -5,9 +5,13 @@ public class Stuff {
     //物品名称
     private String stuffName;
     //物品贴图名称
-    private String stuffTextureName;
+    private String stuffType;
     //物品id
     private int stuffId;
+    //物品等级
+    private int stuffLevel;
+    //物品星级
+    private int stuffStarLevel;
 
     public Stuff() {
         this("default","default");
@@ -15,18 +19,34 @@ public class Stuff {
 
     public Stuff(String stuffName) {
         this.stuffName = stuffName;
-        this.stuffTextureName = stuffName;
+        this.stuffType = stuffName;
     }
 
-    public Stuff(String stuffName, String stuffTextureName) {
+    public Stuff(String stuffName, String stuffType) {
         this.stuffName = stuffName;
-        this.stuffTextureName = stuffTextureName;
+        this.stuffType = stuffType;
     }
 
-    public Stuff(String stuffName, String stuffTextureName, int stuffId) {
+    public Stuff(String stuffName, String stuffType, int stuffId) {
         this.stuffName = stuffName;
-        this.stuffTextureName = stuffTextureName;
+        this.stuffType = stuffType;
         this.stuffId = stuffId;
+    }
+
+    /**
+     *
+     * @param stuffName 物品名称
+     * @param stuffType 物品类型
+     * @param stuffId 物品编号
+     * @param stuffLevel 物品等级
+     * @param stuffStarLevel 物品星级
+     */
+    public Stuff(String stuffName, String stuffType, int stuffId, int stuffLevel, int stuffStarLevel) {
+        this.stuffName = stuffName;
+        this.stuffType = stuffType;
+        this.stuffId = stuffId;
+        this.stuffLevel = stuffLevel;
+        this.stuffStarLevel = stuffStarLevel;
     }
 
     public String getStuffName() {
@@ -37,12 +57,12 @@ public class Stuff {
         this.stuffName = stuffName;
     }
 
-    public String getStuffTextureName() {
-        return stuffTextureName;
+    public String getStuffType() {
+        return stuffType;
     }
 
-    public void setStuffTextureName(String stuffTextureName) {
-        this.stuffTextureName = stuffTextureName;
+    public void setStuffType(String stuffType) {
+        this.stuffType = stuffType;
     }
 
     public int getStuffId() {
@@ -51,5 +71,21 @@ public class Stuff {
 
     public void setStuffId(int stuffId) {
         this.stuffId = stuffId;
+    }
+
+    public int getStuffLevel() {
+        return stuffLevel;
+    }
+
+    public void setStuffLevel(int stuffLevel) {
+        this.stuffLevel = stuffLevel;
+    }
+
+    public int getStuffStarLevel() {
+        return stuffStarLevel;
+    }
+
+    public void setStuffStarLevel(int stuffStarLevel) {
+        this.stuffStarLevel = stuffStarLevel;
     }
 }
