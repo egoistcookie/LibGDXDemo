@@ -71,14 +71,13 @@ public class Tower {
     // 资源加载管理工具
     private AssetManager assetManager;
     // 构造函数，用于创建防御塔实例
-    public Tower(World world, int towerId, String cardType, float x, float y, Texture attackTexture, AssetManager assetManager, Stage stage, int level, int starLevel) {
+    public Tower(World world, int towerId, String cardType, float x, float y, Texture attackTexture, AssetManager assetManager, Stage stage, int experience, int starLevel) {
         this.cardType = cardType;
         this.assetManager = assetManager;
         // 根据卡片类型初始化卡片属性：生命值、移动速度、贴图
         initCardAttribute(cardType);
         this.towerId = towerId;
-        experience = 0;
-        this.level = level;
+        this.experience = experience;
         this.starLevel = starLevel;
         animationFrames = new Texture[]{mapTexture, mapTexture2}; ;
         // 创建刚体定义
@@ -293,7 +292,7 @@ public class Tower {
                 Stuff stuff = stuffes[i];
                 System.out.println("升星！");
                 // 判断是否同星级且满等级
-                if(this.getStarLevel()==stuff.getStuffStarLevel() && stuff.getStuffLevel() == 10){
+                if(this.getStarLevel()==stuff.getStuffStarLevel() && stuff.getStuffExp() == 10){
                     // 物品栏中删去该卡片
                     stuffes[i] = null;
                     // 星级上升
@@ -303,7 +302,7 @@ public class Tower {
                     return true;
                 }else{
                     System.out.println("素材星级："+stuff.getStuffStarLevel());
-                    System.out.println("素材等级："+stuff.getStuffLevel());
+                    System.out.println("素材经验值："+stuff.getStuffExp());
                 }
             }
         }
@@ -408,5 +407,9 @@ public class Tower {
 
     public void setMapTexture2(Texture mapTexture2) {
         this.mapTexture2 = mapTexture2;
+    }
+
+    public int getExperience() {
+        return experience;
     }
 }

@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 // 引入Array类，用于存储和管理对象数组
 import com.badlogic.gdx.utils.Array;
 
-// 定义一个名为TowerSelectionBox的公共类，用于处理防御塔选择框的逻辑
+// 定义一个名为TowerSelectionBox的公共类，用于处理卡片操作框的逻辑
 public class TowerSelectionBox {
     // 存储防御塔纹理的数组
     private Array<Texture> towerTextures;

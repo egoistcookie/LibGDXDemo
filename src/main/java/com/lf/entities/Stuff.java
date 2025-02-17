@@ -8,8 +8,8 @@ public class Stuff {
     private String stuffType;
     //物品id
     private int stuffId;
-    //物品等级
-    private int stuffLevel;
+    //物品经验值
+    private int stuffExp;
     //物品星级
     private int stuffStarLevel;
 
@@ -38,14 +38,14 @@ public class Stuff {
      * @param stuffName 物品名称
      * @param stuffType 物品类型
      * @param stuffId 物品编号
-     * @param stuffLevel 物品等级
+     * @param stuffExp 物品经验值
      * @param stuffStarLevel 物品星级
      */
-    public Stuff(String stuffName, String stuffType, int stuffId, int stuffLevel, int stuffStarLevel) {
+    public Stuff(String stuffName, String stuffType, int stuffId, int stuffExp, int stuffStarLevel) {
         this.stuffName = stuffName;
         this.stuffType = stuffType;
         this.stuffId = stuffId;
-        this.stuffLevel = stuffLevel;
+        this.stuffExp = stuffExp;
         this.stuffStarLevel = stuffStarLevel;
     }
 
@@ -73,12 +73,12 @@ public class Stuff {
         this.stuffId = stuffId;
     }
 
-    public int getStuffLevel() {
-        return stuffLevel;
+    public int getStuffExp() {
+        return stuffExp;
     }
 
-    public void setStuffLevel(int stuffLevel) {
-        this.stuffLevel = stuffLevel;
+    public void setStuffExp(int stuffExp) {
+        this.stuffExp = stuffExp;
     }
 
     public int getStuffStarLevel() {

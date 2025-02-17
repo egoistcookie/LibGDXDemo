@@ -55,7 +55,7 @@ public class GameScreen implements Screen {
     private GameUI gameUI;
     // 精灵批处理，用于高效地渲染精灵
     private SpriteBatch batch;
-    // 防御塔选择框
+    // 卡片操作框
     private TowerSelectionBox towerSelectionBox;
     // 防御塔对象集合
     private List<Tower> towers;
@@ -121,35 +121,31 @@ public class GameScreen implements Screen {
         viewport = new FitViewport(800, 600, camera);
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), true);
+        // 初始化三张arrower卡片
         Stuff firtstStuff = new Stuff("arrower","arrower",1, 1, 1);
         stuffes[0] = firtstStuff;
         stuffes[1] = firtstStuff;
         stuffes[2] = firtstStuff;
         // 创建游戏用户界面
         gameUI = new GameUI(this, stage, game, stuffes);
-        // 加载地图
         // 解析地图中的路径数据
         parseMapPath();
         // 创建调试渲染器
         debugRenderer = new CustomBox2DDebugRenderer();
-
         // 创建精灵批处理
         batch = new SpriteBatch();
-
         // 创建敌人列表
         enemies = new ArrayList<>();
-
+        // 加载地图背景
         backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
-
-        // 创建防御塔选择框对象
+        // 创建卡片操作框对象
         towerSelectionBox = new TowerSelectionBox(this.assetManager);
         // 初始化防御塔列表
         towers = new ArrayList<>();
         // 初始化鼠标点击位置向量
         clickPosition = new Vector2();
-
         // 初始化形状渲染器
         shapeRenderer = new ShapeRenderer();
         // 设置形状渲染器自动选择形状类型
@@ -174,19 +170,19 @@ public class GameScreen implements Screen {
             elapsedTimeSeconds += delta;
             float seconds = elapsedTimeSeconds;
 //            System.out.println("游戏已经进行了 " + seconds + " 秒");
-
+            // 遍历load配置文件，按其中时间轴来添加敌人enemies
             for (EnemyLoadConfig enemyLoadConfig : enemyLoadManager.getEnemyLoadConfigs()) {
+                // 敌人加载时间，以秒为单位
                 float loadTime = (float) enemyLoadConfig.getLoadTime();
                 String enemyName = enemyLoadConfig.getEnemyName();
                 String enemyType = enemyLoadConfig.getEnemyType();
+                // 以enemyName作为唯一标识，来确保敌人不会重复生成
                 if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyName)) {
                     // 生成敌人
                     Enemy enemy = new Enemy(world, 555f, 570f, enemyType, pathPoints, gameUI, enemyName);
                     enemies.add(enemy);
                 }
             }
-
-            float deltaTime = Gdx.graphics.getDeltaTime();
             // 清除屏幕，设置背景颜色为黑色
             Gdx.gl.glClearColor(1, 1, 1, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -197,8 +193,8 @@ public class GameScreen implements Screen {
             handleInput();
             // 更新相机
             camera.update();
-
-            // 更新敌人位置
+            // 更新敌人位置，传入deltaTime渲染间隔时间，渲染敌人动作
+            float deltaTime = Gdx.graphics.getDeltaTime();
             Iterator<Enemy> iterator = enemies.iterator();
             while (iterator.hasNext()) {
                 Enemy enemy = iterator.next();
@@ -210,14 +206,12 @@ public class GameScreen implements Screen {
                     }
                 }
             }
-
             // 设置精灵批处理的投影矩阵为相机的投影矩阵
             batch.setProjectionMatrix(camera.combined);
             // 开始精灵批处理
             batch.begin();
-
+            // 背景精灵绘制
             backgroundSprite.draw(batch);
-
             // 遍历防御塔列表，渲染每个防御塔的精灵
             for (Tower tower : towers) {
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
@@ -229,11 +223,9 @@ public class GameScreen implements Screen {
                     arrow.getSprite().draw(batch);
                 }
             }
-            // 先渲染防御塔，再渲染防御塔选择框，使其在防御塔上层显示
+            // 先渲染防御塔，再渲染卡片操作框，使其在防御塔上层显示
             towerSelectionBox.render(batch);
-
             // 如果敌人存在，则绘制敌人的精灵
-            // 渲染敌人
             for (Enemy enemy : enemies) {
                 if(!enemy.getDead()){
                     enemy.getSprite().draw(batch);
@@ -258,20 +250,6 @@ public class GameScreen implements Screen {
         }
         // 渲染游戏用户界面：按钮需要另外渲染，不可与游戏对象放在一起渲染
         gameUI.render();
-    }
-
-    /**
-     * 判断该敌人是否已经生成过
-     * @param enemyName 敌人名称
-     * @return
-     */
-    private boolean isEnemyAlreadySpawned(String enemyName) {
-        for (Enemy enemy : enemies) {
-            if (enemy.getEnemyName()!=null && enemy.getEnemyName().equals(enemyName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -351,9 +329,9 @@ public class GameScreen implements Screen {
             viewport.unproject(clickPosition);
             System.out.println("点击坐标：" + clickPosition.x + "y:" + clickPosition.y);
 
-            // 如果防御塔选择框可见，则要先选择防御塔上的图标才能继续其他点击操作
+            // 如果卡片操作框可见，则要先选择防御塔上的图标才能继续其他点击操作
             if (towerSelectionBox.isVisible()) {
-                // 处理防御塔选择框的输入事件
+                // 处理卡片操作框的输入事件
                 towerSelectionBox.handleInput(clickPosition);
                 // 获取选择的防御塔操作 回收或者升星
                 int selectedIndex = towerSelectionBox.getSelectedIndex();
@@ -373,7 +351,7 @@ public class GameScreen implements Screen {
                             // 如果还有空闲位置，添加新元素
                             if (index < stuffes.length) {
                                 stuffes[index] = new Stuff(tower.getCardType(), tower.getCardType(), tower.getTowerId(),
-                                        tower.getLevel(), tower.getStarLevel());
+                                        tower.getExperience(), tower.getStarLevel());
                                 // 经验值标签需要隐藏
                                 tower.dispose();
                                 // 回收
@@ -402,7 +380,7 @@ public class GameScreen implements Screen {
                     Rectangle towerBounds = tower.getSprite().getBoundingRectangle();
                     if (towerBounds.contains(clickPosition)) {
                         System.out.println("防御塔坐标：" + towerBounds.x + "y:" + towerBounds.y);
-                        // 显示防御塔选择框，并设置其位置为点击位置，并获取到该位置的towerId
+                        // 显示卡片操作框，并设置其位置为点击位置，并获取到该位置的towerId
                         towerSelectionBox.show(clickPosition,tower.getTowerId());
                     }
                 }
@@ -443,24 +421,24 @@ public class GameScreen implements Screen {
 //        // 将屏幕坐标转换为世界坐标
 //        viewport.unproject(clickPosition);
 //        System.out.println(clickPosition.x + "y:" +clickPosition.y);
-//        //右下角为功能按钮位置，不可点击生成防御塔选择框
+//        //右下角为功能按钮位置，不可点击生成卡片操作框
 //        if(clickPosition.x > 370 && clickPosition.y < 45){
 //            return;
 //        }
-//        //左下角为退出按钮位置，不可点击生成防御塔选择框
+//        //左下角为退出按钮位置，不可点击生成卡片操作框
 //        if(clickPosition.x < 200 && clickPosition.y < 45){
 //            return;
 //        }
 //
-//        // 如果防御塔选择框不可见
+//        // 如果卡片操作框不可见
 //        if (!towerSelectionBox.isVisible()) {
-//            // 显示防御塔选择框，并设置其位置为点击位置
+//            // 显示卡片操作框，并设置其位置为点击位置
 //            towerSelectionBox.show(clickPosition);
 //            // 显示防御塔的位置，应该为第一次点击空白位置的位置
 //            showTowerX = clickPosition.x;
 //            showTowerY = clickPosition.y;
 //        } else {
-//            // 处理防御塔选择框的输入事件
+//            // 处理卡片操作框的输入事件
 //            towerSelectionBox.handleInput(clickPosition);
 //            // 获取选择的防御塔索引
 //            int selectedIndex = towerSelectionBox.getSelectedIndex();
@@ -490,7 +468,7 @@ public class GameScreen implements Screen {
 //                            Tower tower = new Tower(world, "arrower",showTowerX, showTowerY, arrowTexture, assetManager, stage);
 //                            // 将新的防御塔添加到防御塔列表中
 //                            towers.add(tower);
-//                            // 重置防御塔选择框的选择索引
+//                            // 重置卡片操作框的选择索引
 //                            towerSelectionBox.resetSelectedIndex();
 //                        }
 //                    }
@@ -528,7 +506,7 @@ public class GameScreen implements Screen {
 //                    this.gameUI.subGold(100);
                     // 创建一个新的防御塔对象，位置为点击位置，tower序号作为id
                     Tower tower = new Tower(world, towerCount++ ,towerType, clickPosition.x, clickPosition.y, arrowTexture, assetManager, stage,
-                            stuff.getStuffLevel(), stuff.getStuffStarLevel());
+                            stuff.getStuffExp(), stuff.getStuffStarLevel());
                     // 将新的防御塔添加到防御塔列表中
                     towers.add(tower);
                     // 创建防御塔后，物品栏中卡片消失
@@ -634,7 +612,27 @@ public class GameScreen implements Screen {
             }
         }
     }
-    // 检查点是否在多边形内
+    /**
+     * 判断该敌人是否已经生成过
+     * @param enemyName 敌人名称
+     * @return
+     */
+    private boolean isEnemyAlreadySpawned(String enemyName) {
+        for (Enemy enemy : enemies) {
+            if (enemy.getEnemyName()!=null && enemy.getEnemyName().equals(enemyName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 检查点是否在多边形内
+     * @param x 当前位置的x坐标
+     * @param y 当前位置的y坐标
+     * @param polygon 防御塔允许摆放的多边形
+     * @return
+     */
     private boolean isPointInPolygon(float x, float y, Polygon polygon) {
         // 将世界坐标转换为多边形的本地坐标，获取多边形经过变换后的顶点数组
         float[] vertices = polygon.getTransformedVertices();
@@ -688,7 +686,7 @@ public class GameScreen implements Screen {
         shapeRenderer.dispose();
         // 释放背景图的资源
         backgroundTexture.dispose();
-        // 释放防御塔选择框的资源
+        // 释放卡片操作框的资源
         towerSelectionBox.dispose();
         // 遍历防御塔列表，释放每个防御塔的资源
         for (Tower tower : towers) {
@@ -701,9 +699,12 @@ public class GameScreen implements Screen {
         return sclRate;
     }
 
+    /**
+     * 抽卡，卡片放入物品栏，并扣除金币
+     */
     public void getCard() {
         System.out.println("开始抽卡！");
-        if(gameUI.getGold() < 500){
+        if(gameUI.getGold() < 100){
             showAlertInfo("您的金币不足");
             return ;
         }
