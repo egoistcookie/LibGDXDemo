@@ -44,7 +44,7 @@ public class EnemyLoadManager {
             // 读取配置文件内容
             Map<String, List<Map<String, Object>>> config = yaml.load(inputStream);
             // 获取卡片加载配置列表
-            List<Map<String, Object>> configList = config.get("CardTypeConfigs");
+            List<Map<String, Object>> configList = config.get("cardTypeConfigs");
             for (Map<String, Object> configMap : configList) {
                 // 创建卡片加载配置对象
                 CardTypeConfig cardTypeConfig = new CardTypeConfig();
