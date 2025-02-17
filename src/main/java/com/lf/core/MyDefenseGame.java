@@ -22,7 +22,7 @@ public class MyDefenseGame extends Game {
     // 资源管理工具
     private AssetManager assetManager;
     // 敌人加载管理器
-    private EnemyLoadManager enemyLoadManager;
+    public static EnemyLoadManager enemyLoadManager;
     // 用于控制是否继续渲染的标志变量
     private boolean isGameOver = false;
     @Override
@@ -68,9 +68,9 @@ public class MyDefenseGame extends Game {
         // 加载地图的背景图片
         assetManager.load("map/map3.png", Texture.class);
         // 加载敌人的背景图片
-        assetManager.load("enemy11.png", Texture.class);
+        assetManager.load("saberOne1.png", Texture.class);
         // 加载敌人的背景图片
-        assetManager.load("enemy12.png", Texture.class);
+        assetManager.load("saberOne2.png", Texture.class);
         // 加载纯白背景
         assetManager.load("white.png", Texture.class);
         // 加载纯黑背景

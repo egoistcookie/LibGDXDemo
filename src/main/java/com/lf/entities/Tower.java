@@ -211,6 +211,7 @@ public class Tower {
      */
     public void addExperience(int addExperience) {
         this.experience += addExperience;
+        System.out.println("经验值增加后："+this.experience);
         // 计算等级
         calcLevel();
         // 显示等级
@@ -226,6 +227,7 @@ public class Tower {
     private void calcLevel() {
         // 经验值达到1，从1级升到2级，按下述逻辑例推，最高10级
         switch (experience) {
+            //TODO 待优化
             case 1: level = 2;break;
             case 5: level = 3;break;
             case 10: level = 4;break;

@@ -88,9 +88,9 @@ public class Arrow {
             // 检查箭是否击中敌人
             if (body.getPosition().dst(target.getBody().getPosition()) < 1f) {
                 target.takeDamage(1); // 敌人受到一点伤害
-                //如果敌人死亡，防御塔经验+1
+                //如果敌人死亡，防御塔经验按照 敌人的经验值 增加
                 if(target.getDead()){
-                    tower.addExperience(1);
+                    tower.addExperience(target.getExperience());
                 }
                 isHit = true; // 标记箭已击中敌人
                 // 释放音效资源，避免内存泄漏

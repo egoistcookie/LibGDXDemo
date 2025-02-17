@@ -136,7 +136,7 @@
 //        enemies = new ArrayList<>();
 //
 //        // 创建敌人对象
-//        Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")};
+//        Texture[] enemyFrames = new Texture[]{new Texture("saberOne1.png"), new Texture("saberOne2.png")};
 //        // 游戏中的敌人对象
 //        Enemy enemy1 = new Enemy(world, 550, 550, enemyFrames, pathPoints, gameUI);
 //        enemies.add(enemy1);

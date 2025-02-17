@@ -1,0 +1,23 @@
+# 敌人类型配置列表，每个元素代表一种类型的敌人
+enemyTypeConfigs:
+  - # 初级剑客
+    enemyType: "saberOne"
+    rarity: N
+    health: 5
+    velocity: 10f
+    moveTexture: saberOne
+    experience: 2
+  - # 初级剑客
+    enemyType: "enemy2"
+    rarity: N
+    health: 5
+    velocity: 10f
+    moveTexture: enemy2
+    experience: 1
+  - # 初级剑客
+    enemyType: "enemy3"
+    rarity: N
+    health: 5
+    velocity: 10f
+    moveTexture: enemy3
+    experience: 1

@@ -5,26 +5,64 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 // 敌人加载管理器类，负责读取yml文件并管理敌人的加载时序
 public class EnemyLoadManager {
 
-    private List<EnemyLoadConfig> enemyLoadConfigs; // 存储敌人加载配置的列表
+    private List<EnemyLoadConfig> enemyLoadConfigs; // 存储敌人加载信息的列表
+    private List<EnemyTypeConfig> enemyTypeConfigs; // 存储敌人类型信息的列表
     private double elapsedTime; // 已经过去的时间
 
     // 构造函数，初始化敌人加载配置列表和已过去的时间
     public EnemyLoadManager() {
         this.enemyLoadConfigs = new ArrayList<>();
+        this.enemyTypeConfigs = new ArrayList<>();
         this.elapsedTime = 0.0;
-        // 调用loadConfig方法加载配置文件
-        loadConfig();
+        // 加载敌人类型配置文件
+        loadEnemyTypeConfig();
+        // 加载敌人时间配置文件
+        loadEnemyTimeConfig();
     }
-
-    // 加载配置文件的方法
-    private void loadConfig() {
+    // 加载敌人类型配置文件
+    private void loadEnemyTypeConfig() {
+        try {
+            // 创建Yaml对象
+            Yaml yaml = new Yaml();
+            // 打开配置文件的输入流
+            InputStream inputStream = this.getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("enemy_type_config.yml");
+            // 读取配置文件内容
+            Map<String, List<Map<String, Object>>> config = yaml.load(inputStream);
+            // 获取敌人加载配置列表
+            List<Map<String, Object>> configList = config.get("enemyTypeConfigs");
+            for (Map<String, Object> configMap : configList) {
+                // 创建敌人加载配置对象
+                EnemyTypeConfig enemyTypeConfig = new EnemyTypeConfig();
+                // 设置敌人类型
+                enemyTypeConfig.setEnemyType((String) configMap.get("enemyType"));
+                // 设置稀有度
+                enemyTypeConfig.setRarity((String) configMap.get("rarity"));
+                // 设置生命值
+                enemyTypeConfig.setHealth((int) configMap.get("health"));
+                // 设置移动速度
+                enemyTypeConfig.setVelocity(Float.parseFloat(configMap.get("velocity")+""));
+                // 设置贴图
+                enemyTypeConfig.setMoveTexture((String) configMap.get("moveTexture"));
+                // 设置经验值
+                enemyTypeConfig.setExperience((int) configMap.get("experience"));
+                // 将敌人加载配置对象添加到列表中
+                enemyTypeConfigs.add(enemyTypeConfig);
+            }
+        } catch (Exception e) {
+            // 打印异常信息
+            e.printStackTrace();
+        }
+    }
+    // 加载敌人时间配置文件
+    private void loadEnemyTimeConfig() {
         try {
             // 创建Yaml对象
             Yaml yaml = new Yaml();
@@ -41,6 +79,8 @@ public class EnemyLoadManager {
                 EnemyLoadConfig enemyLoadConfig = new EnemyLoadConfig();
                 // 设置敌人类型
                 enemyLoadConfig.setEnemyType((String) configMap.get("enemyType"));
+                // 设置敌人名称
+                enemyLoadConfig.setEnemyName((String) configMap.get("enemyName"));
                 // 设置加载时间
                 enemyLoadConfig.setLoadTime((double) configMap.get("loadTime"));
                 // 将敌人加载配置对象添加到列表中
@@ -69,6 +109,10 @@ public class EnemyLoadManager {
 
     public List<EnemyLoadConfig> getEnemyLoadConfigs() {
         return enemyLoadConfigs;
+    }
+
+    public List<EnemyTypeConfig> getEnemyTypeConfigs() {
+        return enemyTypeConfigs;
     }
 
     public static void main(String[] args) {

@@ -178,11 +178,11 @@ public class GameScreen implements Screen {
 
             for (EnemyLoadConfig enemyLoadConfig : enemyLoadManager.getEnemyLoadConfigs()) {
                 float loadTime = (float) enemyLoadConfig.getLoadTime();
+                String enemyName = enemyLoadConfig.getEnemyName();
                 String enemyType = enemyLoadConfig.getEnemyType();
-                if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyType)) {
+                if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyName)) {
                     // 生成敌人
-                    Texture[] enemyFrames = new Texture[]{new Texture("enemy11.png"), new Texture("enemy12.png")};
-                    Enemy enemy = new Enemy(world, 555, 570, enemyFrames, pathPoints, gameUI, enemyType); // 假设Enemy类有相应的构造函数
+                    Enemy enemy = new Enemy(world, 555f, 570f, enemyType, pathPoints, gameUI, enemyName);
                     enemies.add(enemy);
                 }
             }
@@ -707,9 +707,8 @@ public class GameScreen implements Screen {
         if(gameUI.getGold() < 500){
             showAlertInfo("您的金币不足");
             return ;
-        }else{
-            this.gameUI.subGold(100);
         }
+        // TODO:至少设计有三种防御塔
         // 获取一个1-100的随机数
         // 当随机数小于80时，生成最基础的arrower卡片
 
@@ -727,6 +726,8 @@ public class GameScreen implements Screen {
         // 如果还有空闲位置，添加新元素
         if (index < stuffes.length) {
             stuffes[index] = newStuff;
+            // 卡到位了再扣钱
+            this.gameUI.subGold(100);
         }else{
             showAlertInfo("物品栏已满,无法再抽卡");
         }

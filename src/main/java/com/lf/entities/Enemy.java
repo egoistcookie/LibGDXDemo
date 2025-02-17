@@ -4,21 +4,30 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.lf.core.MyDefenseGame;
+import com.lf.manager.EnemyLoadManager;
+import com.lf.manager.EnemyTypeConfig;
 import com.lf.screen.GameScreen;
 import com.lf.ui.GameUI;
 
 import java.util.List;
 
-// Tower类表示游戏中的敌人实体
+// Enemy类表示游戏中的敌人实体
 public class Enemy {
     private Body body; // 敌人的物理刚体
     private Sprite sprite; // 敌人的精灵，用于渲染
     private int health = 5; // 敌人的血量，初始为5
+    // 敌人的经验值
+    private int experience;
+    private String rarity = "N"; // 敌人稀有度
+    private String moveTexture; // 敌人贴图
 
     private String enemyName;
     private String enemyType;
     private Vector2 initialPosition; // 敌人的初始位置
+
     private Vector2 velocity; // 敌人的移动速度
+    private float velocityFloat; // 敌人的移动速度
     private Vector2 targetPosition; // 敌人的目标位置，用于移动到指定地点
     private boolean isMoving; // 标记敌人是否正在移动
     private List<Vector2> pathPoints;
@@ -48,11 +57,14 @@ public class Enemy {
         this.pathPoints = pathPoints;
     }
 
-    public Enemy(World world, float x, float y, Texture[] animationFrames, List<Vector2> pathPoints, GameUI gameUI) {
-        this.animationFrames = animationFrames;
+    public Enemy(World world, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI) {
         this.initialPosition = new Vector2(x, y); // 记录初始位置
         this.targetPosition = null; // 初始化目标位置为null
         this.isMoving = false; // 初始化移动状态为false
+        // 根据敌人类型初始化敌人属性：生命值、移动速度、贴图
+        initEnemyAttribute(enemyType);
+        // 按照moveTexture初始化贴图
+        this.animationFrames = new Texture[]{new Texture(moveTexture+"1.png"), new Texture(moveTexture+"2.png")};
 
         this.pathPoints = pathPoints;
         // 创建刚体定义
@@ -91,8 +103,27 @@ public class Enemy {
         this.gameUI = gameUI;
     }
 
-    public Enemy(World world, float x, float y, Texture[] animationFrames, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
-        this(world,x,y,animationFrames,pathPoints,gameUI);
+    /**
+     * 按地人类行为敌人初始化部分属性
+     * @param enemyType
+     */
+    private void initEnemyAttribute(String enemyType) {
+        // 按类型为属性赋值
+        EnemyLoadManager enemyLoadManager = MyDefenseGame.enemyLoadManager;
+        for (EnemyTypeConfig enemyTypeConfig : enemyLoadManager.getEnemyTypeConfigs()) {
+            if(enemyTypeConfig.getEnemyType()!=null && enemyTypeConfig.getEnemyType().equals(enemyType)){
+                this.setHealth(enemyTypeConfig.getHealth());
+                this.setVelocityFloat(enemyTypeConfig.getVelocity());
+                this.setRarity(enemyTypeConfig.getRarity());
+                this.setMoveTexture(enemyTypeConfig.getMoveTexture());
+                this.setExperience(enemyTypeConfig.getExperience());
+            }
+        }
+
+    }
+
+    public Enemy(World world, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
+        this(world,x,y,enemyType,pathPoints,gameUI);
         this.enemyName = enemyName;
     }
 
@@ -113,7 +144,7 @@ public class Enemy {
             Vector2 targetPoint = pathPoints.get(currentPathIndex);
             Vector2 currentPosition = body.getPosition();
             Vector2 direction = targetPoint.cpy().sub(currentPosition).nor();
-            velocity = direction.scl(10f * GameScreen.getSclRate());
+            velocity = direction.scl(velocityFloat * GameScreen.getSclRate());
             body.setLinearVelocity(velocity); // 设置移动速度（可根据需要调整速度值）
             if (currentPosition.dst(targetPoint) < 1f) {
                 currentPathIndex++;
@@ -255,6 +286,46 @@ public class Enemy {
         this.enemyName = enemyName;
     }
 
+    public Vector2 getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vector2 velocity) {
+        this.velocity = velocity;
+    }
+
+    public float getVelocityFloat() {
+        return velocityFloat;
+    }
+
+    public void setVelocityFloat(float velocityFloat) {
+        this.velocityFloat = velocityFloat;
+    }
+
+    public String getRarity() {
+        return rarity;
+    }
+
+    public void setRarity(String rarity) {
+        this.rarity = rarity;
+    }
+
+    public String getMoveTexture() {
+        return moveTexture;
+    }
+
+    public void setMoveTexture(String moveTexture) {
+        this.moveTexture = moveTexture;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
     //生成yml文本
     public static void main(String[] args) {
         System.out.println("# 敌人加载配置列表，每个元素代表一个敌人的加载配置\n" +
@@ -263,7 +334,8 @@ public class Enemy {
             float j = i*2;//2秒间隔
             float loadtime = 2+j;
             System.out.println(String.format("  - # %s",i));
-            System.out.println(String.format("    enemyType: \"Enemy %s\"",i));
+            System.out.println(String.format("    enemyType: saberOne",i));
+            System.out.println(String.format("    enemyName: \"Enemy %s\"",i));
             System.out.println(String.format("    loadTime: %s",loadtime));
         }
     }
