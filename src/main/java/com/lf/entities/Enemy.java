@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.lf.core.MyDefenseGame;
 import com.lf.manager.EnemyLoadManager;
-import com.lf.manager.EnemyTypeConfig;
+import com.lf.config.EnemyTypeConfig;
 import com.lf.screen.GameScreen;
 import com.lf.ui.GameUI;
 

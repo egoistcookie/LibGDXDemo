@@ -13,11 +13,11 @@ enemyTypeConfigs:
     health: 5
     velocity: 10f
     moveTexture: enemy2
-    experience: 1
+    experience: 4
   - # 初级剑客
     enemyType: "enemy3"
     rarity: N
     health: 5
     velocity: 10f
     moveTexture: enemy3
-    experience: 1
+    experience: 5

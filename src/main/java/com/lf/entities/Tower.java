@@ -7,7 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.kotcrab.vis.ui.widget.VisLabel;
-import com.lf.screen.GameScreen;
+import com.lf.config.CardTypeConfig;
+import com.lf.core.MyDefenseGame;
+import com.lf.manager.EnemyLoadManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +23,33 @@ public class Tower {
     // 防御塔唯一id
     private int towerId;
     // 防御塔类型
-    private String towerType;
+    private String cardType;
+    // 稀有度
+    private String rarity;
     // 防御塔的攻击范围
     private float attackRange = 100f;
     // 新增：用于记录激光终点（敌人位置）
     private Vector2 laserEndPoint;
     public List<Arrow> arrows; // 箭矢列表，用于存储发射的箭矢
-
     private World world;
-    // 攻击箭矢贴图
-    private Texture arrowTexture;
+    // 攻击贴图
+    private Texture attackTexture;
+    // 攻击贴图
+    private Texture mapTexture;
+
+    // 攻击贴图
+    private Texture mapTexture2;
+    // 攻击贴图
+    private Texture stuffTexture;
+    // 攻击贴图
+    private Texture cardTexture;
     private float timeSinceLastFire; // 距离上次发射的时间
     // 同时发动的攻击数
     private float attckCount;
     // 同时发动的攻击最大数
-    private float maxAttckCount;
-    private float fireRate; // 发射频率
+    private float maxAttackCount;
+    // 发射频率
+    private float fireRate;
     // 新增：存储动画帧的纹理数组
     private Texture[] animationFrames;
     // 新增：当前动画帧索引
@@ -55,15 +68,19 @@ public class Tower {
     private VisLabel levelLabel;
     // 星级标签
     private VisLabel starLevelLabel;
+    // 资源加载管理工具
+    private AssetManager assetManager;
     // 构造函数，用于创建防御塔实例
-    public Tower(World world, int towerId, String towerType,float x, float y, Texture arrowTexture, AssetManager assetManager, Stage stage, int level, int starLevel) {
-        this.towerType = towerType;
+    public Tower(World world, int towerId, String cardType, float x, float y, Texture attackTexture, AssetManager assetManager, Stage stage, int level, int starLevel) {
+        this.cardType = cardType;
+        this.assetManager = assetManager;
+        // 根据卡片类型初始化卡片属性：生命值、移动速度、贴图
+        initCardAttribute(cardType);
         this.towerId = towerId;
         experience = 0;
         this.level = level;
         this.starLevel = starLevel;
-        Texture texture1 = assetManager.get("tower/"+towerType+"1.png", Texture.class);
-        animationFrames = new Texture[]{texture1, assetManager.get("tower/"+towerType+"2.png", Texture.class)}; ;
+        animationFrames = new Texture[]{mapTexture, mapTexture2}; ;
         // 创建刚体定义
         BodyDef bodyDef = new BodyDef();
         // 设置为静态刚体，因为防御塔通常不会自行移动
@@ -71,8 +88,8 @@ public class Tower {
         // 设置刚体的初始位置
         bodyDef.position.set(x, y);
         this.world = world; // 设置物理世界
-        this.arrowTexture = arrowTexture; // 设置箭的纹理
-        this.maxAttckCount = 3; // 同时攻击敌人数量
+        this.attackTexture = attackTexture; // 设置箭的纹理
+        this.maxAttackCount = 3; // 同时攻击敌人数量
         this.timeSinceLastFire = 0;
         this.fireRate = 0.5f; // 攻击速度，即间隔多长时间（秒）射一箭
 
@@ -82,7 +99,7 @@ public class Tower {
         // 创建圆形形状，用于定义防御塔的碰撞范围
         CircleShape shape = new CircleShape();
         // 设置圆形形状的半径，这里以纹理宽度的一半作为半径
-        shape.setRadius(texture1.getWidth() / 2f);
+        shape.setRadius(mapTexture.getWidth() / 2f);
 
         // 创建夹具定义，用于将形状与刚体关联，并设置物理属性
         FixtureDef fixtureDef = new FixtureDef();
@@ -99,9 +116,9 @@ public class Tower {
         shape.dispose();
 
         // 创建精灵
-        sprite = new Sprite(texture1);
+        sprite = new Sprite(mapTexture);
         // 设置精灵的大小
-        sprite.setSize(texture1.getWidth(), texture1.getHeight());
+        sprite.setSize(mapTexture.getWidth(), mapTexture.getHeight());
         // 设置精灵的原点为中心，方便旋转和定位
         sprite.setOriginCenter();
         // 设置精灵的位置
@@ -128,6 +145,25 @@ public class Tower {
 
     }
 
+    // 根据卡片类型初始化卡片属性
+    private void initCardAttribute(String towerType) {
+        // 按类型为属性赋值
+        EnemyLoadManager enemyLoadManager = MyDefenseGame.enemyLoadManager;
+        for (CardTypeConfig cardTypeConfig : enemyLoadManager.getCardTypeConfigs()) {
+            if(cardTypeConfig.getCardType()!=null && cardTypeConfig.getCardType().equals(towerType)){
+                this.setCardType(cardTypeConfig.getCardType());
+                this.setMaxAttackCount(cardTypeConfig.getMaxAttackCount());
+                this.setAttackRange(cardTypeConfig.getAttackRange());
+                this.setRarity(cardTypeConfig.getRarity());
+                this.setMapTexture(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"1.png", Texture.class));
+                this.setMapTexture2(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"2.png", Texture.class));
+                this.setCardTexture(assetManager.get("tower/"+ cardTypeConfig.getCardTexture() +".png", Texture.class));
+                this.setStuffTexture(assetManager.get("tower/"+ cardTypeConfig.getStuffTexture() +".png", Texture.class));
+                this.setAttackTexture(assetManager.get("tower/"+ cardTypeConfig.getAttackTexture() +"1.png", Texture.class));
+            }
+        }
+    }
+
     // 更新方法，用于检查敌人是否在攻击范围内并进行攻击
     public void update(List<Enemy> enemies, float deltaTime) {
         // 计算攻击间隔时间
@@ -142,9 +178,9 @@ public class Tower {
         for (Enemy enemy : enemies) {
             if (body.getPosition().dst(enemy.getBody().getPosition()) < attackRange) {
                 // 已达到攻击间隔时间，并且同时攻击数未达到上限，并且敌人未死亡，发起攻击
-                if (timeSinceLastFire >= fireRate && attckCount < maxAttckCount && !enemy.getDead()) {
+                if (timeSinceLastFire >= fireRate && attckCount < maxAttackCount && !enemy.getDead()) {
                     // 攻击介质应该从防御塔坐标的前方一点射出，会比较自然
-                    Arrow arrow = new Arrow(world, body.getPosition().x + 20, body.getPosition().y +10, arrowTexture, enemy, this);
+                    Arrow arrow = new Arrow(world, body.getPosition().x + 20, body.getPosition().y +10, attackTexture, enemy, this);
                     arrows.add(arrow); // 将箭添加到列表中
                     timeSinceLastFire = 0;
                     // 同时攻击数+1
@@ -199,7 +235,7 @@ public class Tower {
 
     public void dispose() {
         // 箭矢纹理释放
-        arrowTexture = null;
+        attackTexture = null;
         // 隐藏标签
         levelLabel.setVisible(false);
         starLevelLabel.setVisible(false);
@@ -226,27 +262,31 @@ public class Tower {
     // 检查是否满足升级条件的方法
     private void calcLevel() {
         // 经验值达到1，从1级升到2级，按下述逻辑例推，最高10级
-        switch (experience) {
-            //TODO 待优化
-            case 1: level = 2;break;
-            case 5: level = 3;break;
-            case 10: level = 4;break;
-            case 20: level = 5;break;
-            case 30: level = 6;break;
-            case 40: level = 7;break;
-            case 50: level = 8;break;
-            case 60: level = 9;break;
-            case 70: level = 10;break;
-            default:
-                // 不满足升级条件，不做操作
-                break;
+        if(experience > 70){
+            level =10;
+        }else if(experience > 60){
+            level =8;
+        }else if(experience > 50){
+            level =7;
+        }else if(experience > 40){
+            level =6;
+        }else if(experience > 30){
+            level =5;
+        }else if(experience > 20){
+            level =4;
+        }else if(experience > 10){
+            level =3;
+        }else if(experience > 5){
+            level =2;
+        }else{
+            level =1;
         }
     }
 
     // 升星
     public boolean superPass(Stuff[] stuffes){
         // 实现代码 TODO
-        String towerType = this.getTowerType();
+        String towerType = this.getCardType();
         for(int i =0 ; i <stuffes.length ; i++){
             // 物品栏中是否有当前类型卡片
             if(stuffes[i]!=null && stuffes[i].getStuffType().equals(towerType)){
@@ -272,11 +312,11 @@ public class Tower {
     public Body getBody() {
         return body;
     }
-    public String getTowerType() {
-        return towerType;
+    public String getCardType() {
+        return cardType;
     }
-    public void setTowerType(String towerType) {
-        this.towerType = towerType;
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
     public int getTowerId() {
         return towerId;
@@ -300,5 +340,73 @@ public class Tower {
 
     public void setStarLevel(int starLevel) {
         this.starLevel = starLevel;
+    }
+
+    public void setAttackRange(float attackRange) {
+        this.attackRange = attackRange;
+    }
+
+    public Texture getAttackTexture() {
+        return attackTexture;
+    }
+
+    public void setAttackTexture(Texture attackTexture) {
+        this.attackTexture = attackTexture;
+    }
+
+    public Texture getMapTexture() {
+        return mapTexture;
+    }
+
+    public void setMapTexture(Texture mapTexture) {
+        this.mapTexture = mapTexture;
+    }
+
+    public Texture getStuffTexture() {
+        return stuffTexture;
+    }
+
+    public void setStuffTexture(Texture stuffTexture) {
+        this.stuffTexture = stuffTexture;
+    }
+
+    public Texture getCardTexture() {
+        return cardTexture;
+    }
+
+    public void setCardTexture(Texture cardTexture) {
+        this.cardTexture = cardTexture;
+    }
+
+    public float getMaxAttackCount() {
+        return maxAttackCount;
+    }
+
+    public void setMaxAttackCount(float maxAttackCount) {
+        this.maxAttackCount = maxAttackCount;
+    }
+
+    public float getFireRate() {
+        return fireRate;
+    }
+
+    public void setFireRate(float fireRate) {
+        this.fireRate = fireRate;
+    }
+
+    public String getRarity() {
+        return rarity;
+    }
+
+    public void setRarity(String rarity) {
+        this.rarity = rarity;
+    }
+
+    public Texture getMapTexture2() {
+        return mapTexture2;
+    }
+
+    public void setMapTexture2(Texture mapTexture2) {
+        this.mapTexture2 = mapTexture2;
     }
 }

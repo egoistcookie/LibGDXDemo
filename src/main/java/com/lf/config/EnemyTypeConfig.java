@@ -1,4 +1,4 @@
-package com.lf.manager;
+package com.lf.config;
 
 // 敌人类型配置类，用于存储从yml文件中读取的敌人类型对应的属性信息
 public class EnemyTypeConfig {

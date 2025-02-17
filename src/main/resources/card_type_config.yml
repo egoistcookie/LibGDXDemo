@@ -1,0 +1,32 @@
+# 敌人类型配置列表，每个元素代表一种类型的敌人
+cardTypeConfigs:
+  - # 初级弓箭手
+    cardType: "arrower"
+    rarity: N
+    attackRange: 100f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: arrower
+    mapTexture: arrower
+    stuffTexture: arrower
+    attackTexture: arrower
+  - # 初级弓箭手
+    cardType: "arrower1"
+    rarity: N
+    attackRange: 100f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: arrow
+    mapTexture: arrow
+    stuffTexture: arrow
+    attackTexture: arrow
+  - # 初级弓箭手
+    cardType: "arrower2"
+    rarity: N
+    attackRange: 100f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: arrow
+    mapTexture: arrow
+    stuffTexture: arrow
+    attackTexture: arrow

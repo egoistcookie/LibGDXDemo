@@ -42,7 +42,6 @@ import com.lf.ui.GameUI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 // 游戏界面类，实现 Screen 接口
 public class GameScreen implements Screen {
@@ -373,7 +372,7 @@ public class GameScreen implements Screen {
                             }
                             // 如果还有空闲位置，添加新元素
                             if (index < stuffes.length) {
-                                stuffes[index] = new Stuff(tower.getTowerType(), tower.getTowerType(), tower.getTowerId(),
+                                stuffes[index] = new Stuff(tower.getCardType(), tower.getCardType(), tower.getTowerId(),
                                         tower.getLevel(), tower.getStarLevel());
                                 // 经验值标签需要隐藏
                                 tower.dispose();
