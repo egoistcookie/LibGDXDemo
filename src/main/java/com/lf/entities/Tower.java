@@ -1,6 +1,8 @@
 package com.lf.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -10,6 +12,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.config.CardTypeConfig;
 import com.lf.core.MyDefenseGame;
 import com.lf.manager.EnemyLoadManager;
+import com.lf.util.GameUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,8 @@ public class Tower {
     private String cardType;
     // 稀有度
     private String rarity;
+    // 攻击力
+    private int attackPower;
     // 防御塔的攻击范围
     private float attackRange = 100f;
     // 新增：用于记录激光终点（敌人位置）
@@ -71,14 +76,16 @@ public class Tower {
     // 资源加载管理工具
     private AssetManager assetManager;
     // 构造函数，用于创建防御塔实例
-    public Tower(World world, int towerId, String cardType, float x, float y, Texture attackTexture, AssetManager assetManager, Stage stage, int experience, int starLevel) {
+    public Tower(World world, int towerId, String cardType, float x, float y, AssetManager assetManager, Stage stage, int experience, int starLevel) {
         this.cardType = cardType;
         this.assetManager = assetManager;
-        // 根据卡片类型初始化卡片属性：生命值、移动速度、贴图
+        this.experience = experience;
+        // 根据经验值计算等级
+        this.level = GameUtil.calcLevel(this.experience);
+        this.starLevel = starLevel;
+        // 根据卡片类型和星级，初始化卡片属性
         initCardAttribute(cardType);
         this.towerId = towerId;
-        this.experience = experience;
-        this.starLevel = starLevel;
         animationFrames = new Texture[]{mapTexture, mapTexture2}; ;
         // 创建刚体定义
         BodyDef bodyDef = new BodyDef();
@@ -87,10 +94,7 @@ public class Tower {
         // 设置刚体的初始位置
         bodyDef.position.set(x, y);
         this.world = world; // 设置物理世界
-        this.attackTexture = attackTexture; // 设置箭的纹理
-        this.maxAttackCount = 3; // 同时攻击敌人数量
         this.timeSinceLastFire = 0;
-        this.fireRate = 0.5f; // 攻击速度，即间隔多长时间（秒）射一箭
 
         // 在物理世界中创建刚体
         body = world.createBody(bodyDef);
@@ -151,14 +155,19 @@ public class Tower {
         for (CardTypeConfig cardTypeConfig : enemyLoadManager.getCardTypeConfigs()) {
             if(cardTypeConfig.getCardType()!=null && cardTypeConfig.getCardType().equals(towerType)){
                 this.setCardType(cardTypeConfig.getCardType());
-                this.setMaxAttackCount(cardTypeConfig.getMaxAttackCount());
-                this.setAttackRange(cardTypeConfig.getAttackRange());
                 this.setRarity(cardTypeConfig.getRarity());
+                this.setAttackRange(cardTypeConfig.getAttackRange());
+                this.setMaxAttackCount(cardTypeConfig.getMaxAttackCount());
+                // 攻击力按照星级翻倍
+                this.setAttackPower(cardTypeConfig.getAttackPower()*starLevel);
+                // 攻击频率按照星级减半
+                this.setFireRate(cardTypeConfig.getFireRate()/starLevel);
                 this.setMapTexture(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"1.png", Texture.class));
                 this.setMapTexture2(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"2.png", Texture.class));
                 this.setCardTexture(assetManager.get("tower/"+ cardTypeConfig.getCardTexture() +".png", Texture.class));
                 this.setStuffTexture(assetManager.get("tower/"+ cardTypeConfig.getStuffTexture() +".png", Texture.class));
-                this.setAttackTexture(assetManager.get("tower/"+ cardTypeConfig.getAttackTexture() +"1.png", Texture.class));
+                // 攻击贴图按星级加载
+                this.setAttackTexture(assetManager.get("tower/"+ cardTypeConfig.getAttackTexture() + starLevel +".png", Texture.class));
             }
         }
     }
@@ -247,8 +256,15 @@ public class Tower {
     public void addExperience(int addExperience) {
         this.experience += addExperience;
         System.out.println("经验值增加后："+this.experience);
+        int oldLevel = this.level;
         // 计算等级
-        calcLevel();
+        this.level = GameUtil.calcLevel(this.experience);
+        if(oldLevel<this.level){
+            // 加载音效
+            Sound arrowSound = assetManager.get("wav/levelUp.mp3",Sound.class);
+            // 播放音效
+            arrowSound.play(1f); //表示以 50% 的音量播放音效
+        }
         // 显示等级
         showLevel();
     }
@@ -258,33 +274,8 @@ public class Tower {
         starLevelLabel.setText(starLevel==1?"*":"**");
     }
 
-    // 检查是否满足升级条件的方法
-    private void calcLevel() {
-        // 经验值达到1，从1级升到2级，按下述逻辑例推，最高10级
-        if(experience > 70){
-            level =10;
-        }else if(experience > 60){
-            level =8;
-        }else if(experience > 50){
-            level =7;
-        }else if(experience > 40){
-            level =6;
-        }else if(experience > 30){
-            level =5;
-        }else if(experience > 20){
-            level =4;
-        }else if(experience > 10){
-            level =3;
-        }else if(experience > 5){
-            level =2;
-        }else{
-            level =1;
-        }
-    }
-
     // 升星
     public boolean superPass(Stuff[] stuffes){
-        // 实现代码 TODO
         String towerType = this.getCardType();
         for(int i =0 ; i <stuffes.length ; i++){
             // 物品栏中是否有当前类型卡片
@@ -292,13 +283,21 @@ public class Tower {
                 Stuff stuff = stuffes[i];
                 System.out.println("升星！");
                 // 判断是否同星级且满等级
-                if(this.getStarLevel()==stuff.getStuffStarLevel() && stuff.getStuffExp() == 10){
+                if(this.getStarLevel()==stuff.getStuffStarLevel() && stuff.getStuffExp() >= 70){
                     // 物品栏中删去该卡片
                     stuffes[i] = null;
                     // 星级上升
                     this.starLevel ++;
+                    // 攻击力按照星级翻倍
+                    this.setAttackPower(this.getAttackPower()*starLevel);
+                    // 攻击频率按照星级减半
+                    this.setFireRate(this.getFireRate()/starLevel);
                     // 显示等级
                     showLevel();
+                    // 加载音效
+                    Sound arrowSound = assetManager.get("wav/starUp.mp3",Sound.class);
+                    // 播放音效
+                    arrowSound.play(1f); //表示以 50% 的音量播放音效
                     return true;
                 }else{
                     System.out.println("素材星级："+stuff.getStuffStarLevel());
@@ -411,5 +410,13 @@ public class Tower {
 
     public int getExperience() {
         return experience;
+    }
+
+    public int getAttackPower() {
+        return attackPower;
+    }
+
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
     }
 }

@@ -52,11 +52,13 @@ public class EnemyLoadManager {
                 cardTypeConfig.setCardType((String) configMap.get("cardType"));
                 // 设置稀有度
                 cardTypeConfig.setRarity((String) configMap.get("rarity"));
+                // 设置最大攻击数
+                cardTypeConfig.setAttackPower((int) configMap.get("attackPower"));
                 // 设置攻击范围
                 cardTypeConfig.setAttackRange(Float.parseFloat(configMap.get("attackRange")+""));
                 // 设置攻击速度
                 cardTypeConfig.setFireRate(Float.parseFloat(configMap.get("fireRate")+""));
-                // 设置生命值
+                // 设置最大攻击数
                 cardTypeConfig.setMaxAttackCount((int) configMap.get("maxAttackCount"));
                 // 设置地图模型贴图
                 cardTypeConfig.setMapTexture((String) configMap.get("mapTexture"));

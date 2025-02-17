@@ -6,6 +6,8 @@ public class CardTypeConfig {
     private String cardType;
     // 稀有度
     private String rarity;
+    // 攻击力
+    private int attackPower;
     // 攻击范围
     private float attackRange;
     // 攻击速度
@@ -91,5 +93,13 @@ public class CardTypeConfig {
 
     public void setFireRate(float fireRate) {
         this.fireRate = fireRate;
+    }
+
+    public int getAttackPower() {
+        return attackPower;
+    }
+
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
     }
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -49,20 +50,22 @@ public class MyDefenseGame extends Game {
         assetManager.load("health.png", Texture.class);
         // 加载箭矢的背景图片
         assetManager.load("arrow-old.png", Texture.class);
-        // 加载箭矢的背景图片
-        assetManager.load("arrow1.png", Texture.class);
-        // 加载箭矢的背景图片
-        assetManager.load("arrow2.png", Texture.class);
         // 加载防御塔1的背景图片
         assetManager.load("tower1.png", Texture.class);
         // 加载防御塔2的背景图片
         assetManager.load("tower2.png", Texture.class);
-        // 加载防御塔2的背景图片
+        // 加载卡片的背景图片
         assetManager.load("tower/arrower.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower/arrowerStuff.png", Texture.class);
         // 加载防御塔2的背景图片
         assetManager.load("tower/arrower1.png", Texture.class);
         // 加载防御塔2的背景图片
         assetManager.load("tower/arrower2.png", Texture.class);
+        // 加载箭矢的背景图片
+        assetManager.load("tower/arrow1.png", Texture.class);
+        // 加载箭矢的背景图片
+        assetManager.load("tower/arrow2.png", Texture.class);
         // 加载一级箭塔的背景图片
         assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片
@@ -79,6 +82,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("rollback.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
+        // 升级音效
+        assetManager.load("wav/levelUp.mp3", Sound.class);
+        // 升星音效
+        assetManager.load("wav/starUp.mp3", Sound.class);
         // 等待字体加载完成
         assetManager.finishLoading();
 

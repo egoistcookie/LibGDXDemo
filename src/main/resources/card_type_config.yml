@@ -3,16 +3,18 @@ cardTypeConfigs:
   - # 初级弓箭手
     cardType: "arrower"
     rarity: N
+    attackPower: 1
     attackRange: 100f
     maxAttackCount: 2
     fireRate: 0.5f
     cardTexture: arrower
     mapTexture: arrower
-    stuffTexture: arrower
-    attackTexture: arrower
+    stuffTexture: arrowerStuff
+    attackTexture: arrow
   - # 初级弓箭手
     cardType: "arrower1"
     rarity: N
+    attackPower: 1
     attackRange: 100f
     maxAttackCount: 2
     fireRate: 0.5f
@@ -23,6 +25,7 @@ cardTypeConfigs:
   - # 初级弓箭手
     cardType: "arrower2"
     rarity: N
+    attackPower: 1
     attackRange: 100f
     maxAttackCount: 2
     fireRate: 0.5f

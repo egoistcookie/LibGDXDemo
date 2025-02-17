@@ -22,6 +22,7 @@ import com.lf.entities.Stuff;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
+import com.lf.util.GameUtil;
 
 /**
  * GameUI类用于管理游戏的用户界面。
@@ -255,16 +256,33 @@ public class GameUI {
         // 加载六张不同的贴图
         Texture[] imageTextures = new Texture[6];
         for (int i = 0; i < 6; i++) {
+            // 创建一个 Stack 布局来组合图片和数字标签
+            Stack stack = new Stack();
+            // 空label
+            Label countLabel = new Label("",skin);
             if(stuffes[i]!=null){
+                Stuff stuff = stuffes[i];
                 // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
-                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffType() +".png", Texture.class);
+                imageTextures[i] = assetManager.get("tower/"+stuff.getStuffType() +"Stuff.png", Texture.class);
+                // 获取字体
+                BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+                // 缩小一下
+                customFont.getData().setScale(0.4f);
+                Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.WHITE);
+                // 值为计算后的stuff等级
+                countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), labelStyle);
+                // 设置 Label 的对齐方式为右下角
+                countLabel.setAlignment(Align.topRight);
             }else{
                 // 空白格子显示为黑色背景图
                 imageTextures[i] = assetManager.get("black.png", Texture.class);
             }
             Image image = new Image(imageTextures[i]);
-            // 将图片添加到表格中
-            stuffTable.add(image).minHeight(30).minWidth(80);
+            stack.add(image);
+            // label必须放在image下add才能显示出来
+            stack.add(countLabel);
+            // 将 Stack 布局添加到表格中
+            stuffTable.add(stack).minHeight(30).minWidth(80);
             // 每添加三个图片换行一次，实现两排展示
             if ((i + 1) % 3 == 0) {
                 stuffTable.row();
@@ -327,18 +345,38 @@ public class GameUI {
         // 加载六张不同的贴图
         Texture[] imageTextures = new Texture[6];
         for (int i = 0; i < 6; i++) {
+            // 创建一个 Stack 布局来组合图片和数字标签
+            Stack stack = new Stack();
+            // 空label
+            Label countLabel = new Label("",skin);
+            // 空starLabel
+            Label starLabel = new Label("",skin);
             if(stuffes[i]!=null){
-                // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
-                imageTextures[i] = assetManager.get("tower/"+stuffes[i].getStuffType() +".png", Texture.class);
-                // 设置纹理过滤方式为线性过滤
-////        enemyTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                Stuff stuff = stuffes[i];
+                // （贴图图片的长宽比应该是8:3，且以Stuff.png为后缀)
+                imageTextures[i] = assetManager.get("tower/"+stuff.getStuffType() +"Stuff.png", Texture.class);
+                // 获取默认字体，底色为白色
+                BitmapFont customFont = new BitmapFont();
+                Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.WHITE);
+                // 计算等级
+                countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), labelStyle);
+                // 星级
+                starLabel = new Label(stuff.getStuffStarLevel()==1?"*":"**", labelStyle);
+                // 设置登记标签的对齐方式为右上角
+                countLabel.setAlignment(Align.topRight);
+                // 设置星级标签的对齐方式为左上角
+                starLabel.setAlignment(Align.topLeft);
             }else{
                 // 空白格子显示为黑色背景图
                 imageTextures[i] = assetManager.get("black.png", Texture.class);
             }
             Image image = new Image(imageTextures[i]);
-            // 将图片添加到表格中
-            stuffTable.add(image).minHeight(30).minWidth(80);
+            stack.add(image);
+            // label必须放在image下add才能显示出来
+            stack.add(countLabel);
+            stack.add(starLabel);
+            // 将 Stack 布局添加到表格中
+            stuffTable.add(stack).minHeight(30).minWidth(80);
             // 每添加三个图片换行一次，实现两排展示
             if ((i + 1) % 3 == 0) {
                 stuffTable.row();

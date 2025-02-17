@@ -81,20 +81,22 @@ public class Arrow {
 
             //有可能在箭矢飞行的过程中敌人就已经dead
             if(target.getDead()){
-                this.arrowSound.dispose(); // 释放音效资源
+                // 释放音效资源
+                this.arrowSound.dispose();
                 return;
             }
-
             // 检查箭是否击中敌人
             if (body.getPosition().dst(target.getBody().getPosition()) < 1f) {
-                target.takeDamage(1); // 敌人受到一点伤害
-                //如果敌人死亡，防御塔经验按照 敌人的经验值 增加
+                // 按照防御塔的攻击力来造成伤害
+                target.takeDamage(tower.getAttackPower());
+                //如果敌人死亡，卡片经验按照 敌人的经验值 增加
                 if(target.getDead()){
                     tower.addExperience(target.getExperience());
                 }
-                isHit = true; // 标记箭已击中敌人
+                // 标记箭已击中敌人
+                isHit = true;
                 // 释放音效资源，避免内存泄漏
-                this.arrowSound.dispose(); // 释放音效资源
+                this.arrowSound.dispose();
             }
         }
     }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -78,7 +79,9 @@ public class GameScreen implements Screen {
     // tmx地图
     private TiledMap map;
     // 敌人运动路径集合1
-    private List<Vector2> pathPoints; // 使用 Vector2 存储点的坐标
+    private List<Vector2> pathPoints1; // 使用 Vector2 存储点的坐标
+    // 敌人运动路径集合2
+    private List<Vector2> pathPoints2; // 使用 Vector2 存储点的坐标
     // 防御塔摆放范围
     private List<PolygonMapObject> towerRanges; // 防御塔可以摆放的位置，可能有多个多边形
     // 用于控制是否继续渲染的标志变量
@@ -102,6 +105,8 @@ public class GameScreen implements Screen {
 
     // 控制游戏进行倍速
     private static float sclRate = 1f;
+    private ShaderProgram shaderProgram;
+    private float time;
 
     // 构造函数，接收游戏对象作为参数
     public GameScreen(MyDefenseGame game) {
@@ -155,6 +160,14 @@ public class GameScreen implements Screen {
         if (skin == null) {
             System.out.println("皮肤加载失败");
         }
+        // 创建 Shader 程序
+        String vertexShader = Gdx.files.internal("vertex.glsl").readString();
+        String fragmentShader = Gdx.files.internal("cool_fragment.glsl").readString();
+        shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
+
+        if (!shaderProgram.isCompiled()) {
+            Gdx.app.error("Shader", shaderProgram.getLog());
+        }
     }
 
     @Override
@@ -179,8 +192,11 @@ public class GameScreen implements Screen {
                 // 以enemyName作为唯一标识，来确保敌人不会重复生成
                 if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyName)) {
                     // 生成敌人
-                    Enemy enemy = new Enemy(world, 555f, 570f, enemyType, pathPoints, gameUI, enemyName);
+                    Enemy enemy = new Enemy(world, 555f, 570f, enemyType, pathPoints1, gameUI, enemyName);
                     enemies.add(enemy);
+                    // 生成双倍敌人，按照order2路线行进
+                    Enemy enemy2 = new Enemy(world, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName);
+                    enemies.add(enemy2);
                 }
             }
             // 清除屏幕，设置背景颜色为黑色
@@ -212,12 +228,24 @@ public class GameScreen implements Screen {
             batch.begin();
             // 背景精灵绘制
             backgroundSprite.draw(batch);
+            // 渲染塔 发光特效
+            time += Gdx.graphics.getDeltaTime();
             // 遍历防御塔列表，渲染每个防御塔的精灵
             for (Tower tower : towers) {
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
                 tower.update(enemies,deltaTime);
+                // 为卡片制造一种若隐若现的特效（fragment.glsl）
+//                batch.setShader(shaderProgram);
+//                shaderProgram.setUniformf("u_time", time);
+
+                // 若隐若现的特效+1（cool_fragment.glsl）
+                batch.setShader(shaderProgram);
+                shaderProgram.setUniformf("u_time", time);
+                shaderProgram.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                tower.getSprite().draw(batch, 1);
+                batch.setShader(null);
                 // 渲染塔
-                tower.getSprite().draw(batch);
+//                tower.getSprite().draw(batch);
                 // 渲染箭
                 for (Arrow arrow : tower.arrows) {
                     arrow.getSprite().draw(batch);
@@ -363,7 +391,9 @@ public class GameScreen implements Screen {
                             }
                         } else if (selectedIndex == 1) {
                             // 升星
-                            if(!tower.superPass(stuffes)){
+                            if(tower.getLevel()<10){
+                                showAlertInfo("防御单位等级不够");
+                            }else if(!tower.superPass(stuffes)){
                                 showAlertInfo("请确保物品栏中存在\n同星级且满级的素材");
                             }
                         }
@@ -497,7 +527,7 @@ public class GameScreen implements Screen {
             Stuff stuff = stuffes[i-1];
             String towerType = stuff.getStuffType();
             // 加载箭的纹理 默认1号箭矢
-            Texture arrowTexture = assetManager.get("arrow1.png", Texture.class);
+            Texture arrowTexture = assetManager.get("tower/arrow1.png", Texture.class);
             boolean inRange = false;
             for(PolygonMapObject polygonMapObject : this.towerRanges ){
                 //只要x和y坐标有位于其中一个防御塔允许摆放的多边形中，就可以创建新的防御塔对象
@@ -505,7 +535,7 @@ public class GameScreen implements Screen {
                     inRange = true;
 //                    this.gameUI.subGold(100);
                     // 创建一个新的防御塔对象，位置为点击位置，tower序号作为id
-                    Tower tower = new Tower(world, towerCount++ ,towerType, clickPosition.x, clickPosition.y, arrowTexture, assetManager, stage,
+                    Tower tower = new Tower(world, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
                             stuff.getStuffExp(), stuff.getStuffStarLevel());
                     // 将新的防御塔添加到防御塔列表中
                     towers.add(tower);
@@ -581,7 +611,8 @@ public class GameScreen implements Screen {
         map = new TmxMapLoader().load("map/冰天雪地1.tmx");
 
         // 初始化路径点列表
-        pathPoints = new ArrayList<>();
+        pathPoints1 = new ArrayList<>();
+        pathPoints2 = new ArrayList<>();
 
         // 初始化防御塔摆放范围
         towerRanges = new ArrayList<>();
@@ -602,7 +633,17 @@ public class GameScreen implements Screen {
                 // 将点的坐标和 order 值存储到 Vector2 中
                 Vector2 point = new Vector2(x, y);
                 // 将点添加到列表中
-                pathPoints.add(point);
+                pathPoints1.add(point);
+            }
+            // 敌人运动轨迹2
+            if (object.getProperties().containsKey("order2")) {
+                // 获取点的 x 和 y 坐标
+                float x = object.getProperties().get("x", Float.class);
+                float y = object.getProperties().get("y", Float.class);
+                // 将点的坐标和 order 值存储到 Vector2 中
+                Vector2 point = new Vector2(x, y);
+                // 将点添加到列表中
+                pathPoints2.add(point);
             }
             // 获取towerRange1和towerRange2的多边形对象，保存进防御塔允许摆放的范围list
             if (object instanceof PolygonMapObject) {
