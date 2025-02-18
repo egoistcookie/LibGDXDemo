@@ -62,6 +62,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/arrower1.png", Texture.class);
         // 加载防御塔2的背景图片
         assetManager.load("tower/arrower2.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower/arrowerOneStar1.png", Texture.class);
+        // 加载防御塔2的背景图片
+        assetManager.load("tower/arrowerOneStar2.png", Texture.class);
         // 加载箭矢的背景图片
         assetManager.load("tower/arrow1.png", Texture.class);
         // 加载箭矢的背景图片

@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
@@ -106,6 +103,8 @@ public class GameScreen implements Screen {
     // 控制游戏进行倍速
     private static float sclRate = 1f;
     private ShaderProgram shaderProgram;
+    // 粒子特效
+    private ParticleEffect particleEffect;
     private float time;
 
     // 构造函数，接收游戏对象作为参数
@@ -164,6 +163,9 @@ public class GameScreen implements Screen {
         String vertexShader = Gdx.files.internal("vertex.glsl").readString();
         String fragmentShader = Gdx.files.internal("cool_fragment.glsl").readString();
         shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
+
+        particleEffect = new ParticleEffect();
+        particleEffect.load(Gdx.files.internal("whitePix.p"), Gdx.files.internal(""));
 
         if (!shaderProgram.isCompiled()) {
             Gdx.app.error("Shader", shaderProgram.getLog());
@@ -234,15 +236,21 @@ public class GameScreen implements Screen {
             for (Tower tower : towers) {
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
                 tower.update(enemies,deltaTime);
-                // 为卡片制造一种若隐若现的特效（fragment.glsl）
+                // 为卡片制造一种若隐若现特效（fragment.glsl）
 //                batch.setShader(shaderProgram);
 //                shaderProgram.setUniformf("u_time", time);
+                // 若隐若现特效+1（cool_fragment.glsl）
+//                batch.setShader(shaderProgram);
+//                shaderProgram.setUniformf("u_time", time);
+//                shaderProgram.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                // 粒子特效渲染
+                particleEffect.setPosition(tower.getSprite().getX() + tower.getSprite().getWidth() / 2,
+                        tower.getSprite().getY() + tower.getSprite().getHeight() / 2);
+                particleEffect.draw(batch, Gdx.graphics.getDeltaTime());
 
-                // 若隐若现的特效+1（cool_fragment.glsl）
-                batch.setShader(shaderProgram);
-                shaderProgram.setUniformf("u_time", time);
-                shaderProgram.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 tower.getSprite().draw(batch, 1);
+
+
                 batch.setShader(null);
                 // 渲染塔
 //                tower.getSprite().draw(batch);
@@ -715,6 +723,8 @@ public class GameScreen implements Screen {
         gameUI.dispose();
         // 释放精灵批处理的资源
         batch.dispose();
+        // 粒子特效释放
+        particleEffect.dispose();
         // 释放敌人纹理的资源
         for (Enemy enemy : enemies) {
             if(!enemy.getDead()){

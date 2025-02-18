@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.config.CardTypeConfig;
 import com.lf.core.MyDefenseGame;
@@ -261,9 +262,16 @@ public class Tower {
         this.level = GameUtil.calcLevel(this.experience);
         if(oldLevel<this.level){
             // 加载音效
-            Sound arrowSound = assetManager.get("wav/levelUp.mp3",Sound.class);
+            Sound levelUpSound = assetManager.get("wav/levelUp.mp3",Sound.class);
             // 播放音效
-            arrowSound.play(1f); //表示以 50% 的音量播放音效
+            levelUpSound.play(1f); //表示以 50% 的音量播放音效
+//            Timer.schedule(new Timer.Task() {
+//                @Override
+//                public void run() {
+//                    // 播放1秒后释放
+//                    levelUpSound = null;
+//                }
+//            }, 2f);
         }
         // 显示等级
         showLevel();
@@ -295,9 +303,19 @@ public class Tower {
                     // 显示等级
                     showLevel();
                     // 加载音效
-                    Sound arrowSound = assetManager.get("wav/starUp.mp3",Sound.class);
+                    Sound starUpSound = assetManager.get("wav/starUp.mp3",Sound.class);
                     // 播放音效
-                    arrowSound.play(1f); //表示以 50% 的音量播放音效
+                    starUpSound.play(1f); //表示以 50% 的音量播放音效
+                    Timer.schedule(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            // 播放2秒后释放
+                            starUpSound.dispose();
+                        }
+                    }, 2f);
+                    // 贴图更新
+                    animationFrames = new Texture[]{assetManager.get("tower/"+ this.getCardType() +"OneStar1.png", Texture.class),
+                            assetManager.get("tower/"+ this.getCardType() +"OneStar2.png", Texture.class)};
                     return true;
                 }else{
                     System.out.println("素材星级："+stuff.getStuffStarLevel());
