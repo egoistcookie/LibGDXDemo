@@ -3,6 +3,7 @@ package com.lf.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -28,6 +29,8 @@ public class Tower {
     private int towerId;
     // 防御塔类型
     private String cardType;
+    // 攻击类型
+    private String attackType;
     // 稀有度
     private String rarity;
     // 攻击力
@@ -165,8 +168,20 @@ public class Tower {
                 this.setFireRate(cardTypeConfig.getFireRate()/starLevel);
                 this.setMapTexture(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"1.png", Texture.class));
                 this.setMapTexture2(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"2.png", Texture.class));
+                // 使用 Pixmap 加载纹理
+//                Pixmap pixmap = new Pixmap(Gdx.files.internal("tower/arrower1.png"));
+//                Texture texture1 = new Texture(pixmap);
+//                Pixmap pixmap2 = new Pixmap(Gdx.files.internal("tower/arrower2.png"));
+//                Texture texture2 = new Texture(pixmap2);
+//                this.setMapTexture(texture1);
+//                this.setMapTexture(texture2);
+//                pixmap.dispose(); // 使用完 Pixmap 后及时释放资源
+//                pixmap2.dispose(); // 使用完 Pixmap 后及时释放资源
+
                 this.setCardTexture(assetManager.get("tower/"+ cardTypeConfig.getCardTexture() +".png", Texture.class));
                 this.setStuffTexture(assetManager.get("tower/"+ cardTypeConfig.getStuffTexture() +".png", Texture.class));
+                // 攻击类型
+                this.setAttackType(cardTypeConfig.getAttackTexture());
                 // 攻击贴图按星级加载
                 this.setAttackTexture(assetManager.get("tower/"+ cardTypeConfig.getAttackTexture() + starLevel +".png", Texture.class));
             }
@@ -265,13 +280,6 @@ public class Tower {
             Sound levelUpSound = assetManager.get("wav/levelUp.mp3",Sound.class);
             // 播放音效
             levelUpSound.play(1f); //表示以 50% 的音量播放音效
-//            Timer.schedule(new Timer.Task() {
-//                @Override
-//                public void run() {
-//                    // 播放1秒后释放
-//                    levelUpSound = null;
-//                }
-//            }, 2f);
         }
         // 显示等级
         showLevel();
@@ -305,17 +313,11 @@ public class Tower {
                     // 加载音效
                     Sound starUpSound = assetManager.get("wav/starUp.mp3",Sound.class);
                     // 播放音效
-                    starUpSound.play(1f); //表示以 50% 的音量播放音效
-                    Timer.schedule(new Timer.Task() {
-                        @Override
-                        public void run() {
-                            // 播放2秒后释放
-                            starUpSound.dispose();
-                        }
-                    }, 2f);
+                    starUpSound.play(1f); //表示以 100% 的音量播放音效
                     // 贴图更新
                     animationFrames = new Texture[]{assetManager.get("tower/"+ this.getCardType() +"OneStar1.png", Texture.class),
                             assetManager.get("tower/"+ this.getCardType() +"OneStar2.png", Texture.class)};
+                    this.setAttackTexture(assetManager.get("tower/"+ this.getAttackType() + starLevel +".png", Texture.class));
                     return true;
                 }else{
                     System.out.println("素材星级："+stuff.getStuffStarLevel());
@@ -436,5 +438,13 @@ public class Tower {
 
     public void setAttackPower(int attackPower) {
         this.attackPower = attackPower;
+    }
+
+    public String getAttackType() {
+        return attackType;
+    }
+
+    public void setAttackType(String attackType) {
+        this.attackType = attackType;
     }
 }

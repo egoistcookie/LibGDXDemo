@@ -54,22 +54,37 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower1.png", Texture.class);
         // 加载防御塔2的背景图片
         assetManager.load("tower2.png", Texture.class);
-        // 加载卡片的背景图片
+
+        // 加载弓箭手的背景图片
         assetManager.load("tower/arrower.png", Texture.class);
-        // 加载防御塔2的背景图片
         assetManager.load("tower/arrowerStuff.png", Texture.class);
-        // 加载防御塔2的背景图片
         assetManager.load("tower/arrower1.png", Texture.class);
-        // 加载防御塔2的背景图片
         assetManager.load("tower/arrower2.png", Texture.class);
-        // 加载防御塔2的背景图片
         assetManager.load("tower/arrowerOneStar1.png", Texture.class);
-        // 加载防御塔2的背景图片
         assetManager.load("tower/arrowerOneStar2.png", Texture.class);
-        // 加载箭矢的背景图片
         assetManager.load("tower/arrow1.png", Texture.class);
-        // 加载箭矢的背景图片
         assetManager.load("tower/arrow2.png", Texture.class);
+
+        // 加载阴阳师的背景图片
+        assetManager.load("tower/yys.png", Texture.class);
+        assetManager.load("tower/yysStuff.png", Texture.class);
+        assetManager.load("tower/yys1.png", Texture.class);
+        assetManager.load("tower/yys2.png", Texture.class);
+        assetManager.load("tower/yysOneStar1.png", Texture.class);
+        assetManager.load("tower/yysOneStar2.png", Texture.class);
+        assetManager.load("tower/fan1.png", Texture.class);
+        assetManager.load("tower/fan2.png", Texture.class);
+
+        // 加载剑士的背景图片
+        assetManager.load("tower/saber.png", Texture.class);
+        assetManager.load("tower/saberStuff.png", Texture.class);
+        assetManager.load("tower/saber1.png", Texture.class);
+        assetManager.load("tower/saber2.png", Texture.class);
+        assetManager.load("tower/saberOneStar1.png", Texture.class);
+        assetManager.load("tower/saberOneStar2.png", Texture.class);
+        assetManager.load("tower/whiteAttack1.png", Texture.class);
+        assetManager.load("tower/whiteAttack2.png", Texture.class);
+
         // 加载一级箭塔的背景图片
         assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片

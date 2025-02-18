@@ -18,6 +18,9 @@ import com.lf.entities.Tower;
 
 import java.util.Iterator;
 
+/**
+ * TODO：重写此类只是为了箭矢、防御塔、敌人的刚体无需显示，后期优化项目
+ */
 public class CustomBox2DDebugRenderer implements Disposable {
     protected ShapeRenderer renderer;
     private static final Vector2[] vertices = new Vector2[1000];

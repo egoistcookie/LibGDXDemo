@@ -14,22 +14,22 @@ cardTypeConfigs:
   - #
     cardType: "yys"
     rarity: S
-    attackPower: 2
-    attackRange: 100f
+    attackPower: 3
+    attackRange: 120f
     maxAttackCount: 2
     fireRate: 0.5f
     cardTexture: yys
     mapTexture: yys
-    stuffTexture: yys
-    attackTexture: yys
+    stuffTexture: yysStuff
+    attackTexture: fan
   - #
-    cardType: "arrower2"
+    cardType: "saber"
     rarity: SR
-    attackPower: 1
-    attackRange: 100f
-    maxAttackCount: 2
+    attackPower: 5
+    attackRange: 120f
+    maxAttackCount: 3
     fireRate: 0.5f
-    cardTexture: arrow
-    mapTexture: arrow
-    stuffTexture: arrow
-    attackTexture: arrow
+    cardTexture: saber
+    mapTexture: saber
+    stuffTexture: saberStuff
+    attackTexture: whiteAttack

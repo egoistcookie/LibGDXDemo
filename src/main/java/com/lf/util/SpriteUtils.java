@@ -2,6 +2,7 @@ package com.lf.util;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.math.Rectangle;
 //import com.badlogic.gdx.graphics.PixmapTextureData;
 
@@ -24,10 +25,10 @@ public class SpriteUtils {
         }
 
         // 检查 TextureData 是否支持返回 Pixmap
-//        if (!(texture.getTextureData() instanceof PixmapTextureData)) {
-//            System.err.println("This TextureData implementation does not return a Pixmap");
-//            return null;
-//        }
+        if (!(texture.getTextureData() instanceof PixmapTextureData)) {
+            System.err.println("This TextureData implementation does not return a Pixmap");
+            return null;
+        }
 
         // 如果纹理没有绑定Pixmap，需要创建一个
         if (!texture.getTextureData().isPrepared()) {
@@ -64,7 +65,7 @@ public class SpriteUtils {
         }
 
         // 释放Pixmap资源
-        pixmap.dispose();
+//        pixmap.dispose();
 
         // 如果没有找到非透明像素，返回null
         if (minX == Integer.MAX_VALUE || minY == Integer.MAX_VALUE) {
