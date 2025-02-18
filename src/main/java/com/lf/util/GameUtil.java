@@ -13,8 +13,10 @@ public class GameUtil {
     public static int calcLevel(int experience) {
         int level =1;
         // 经验值达到1，从1级升到2级，按下述逻辑例推，最高10级
-        if(experience > 70){
+        if(experience > 80){
             level =10;
+        }else if(experience > 70){
+            level =9;
         }else if(experience > 60){
             level =8;
         }else if(experience > 50){
