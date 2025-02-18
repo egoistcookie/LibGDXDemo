@@ -11,20 +11,20 @@ cardTypeConfigs:
     mapTexture: arrower
     stuffTexture: arrowerStuff
     attackTexture: arrow
-  - # 初级弓箭手
-    cardType: "arrower1"
-    rarity: N
-    attackPower: 1
+  - #
+    cardType: "yys"
+    rarity: S
+    attackPower: 2
     attackRange: 100f
     maxAttackCount: 2
     fireRate: 0.5f
-    cardTexture: arrow
-    mapTexture: arrow
-    stuffTexture: arrow
-    attackTexture: arrow
-  - # 初级弓箭手
+    cardTexture: yys
+    mapTexture: yys
+    stuffTexture: yys
+    attackTexture: yys
+  - #
     cardType: "arrower2"
-    rarity: N
+    rarity: SR
     attackPower: 1
     attackRange: 100f
     maxAttackCount: 2

@@ -1,13 +1,11 @@
 package com.lf.screen;
 
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -20,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -248,9 +247,69 @@ public class GameScreen implements Screen {
                         tower.getSprite().getY() + tower.getSprite().getHeight() / 2);
                 particleEffect.draw(batch, Gdx.graphics.getDeltaTime());
 
-                tower.getSprite().draw(batch, 1);
+                // 获取鼠标在世界坐标系中的位置
+                Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(mousePos);
+                // 获取塔的矩形区域
+                Rectangle towerRect = new Rectangle(tower.getSprite().getX(), tower.getSprite().getY(), tower.getSprite().getWidth(), tower.getSprite().getHeight());
+                // 检查鼠标是否在塔的矩形区域内
+                if (towerRect.contains(mousePos.x, mousePos.y)) {
+
+                    Texture texture = tower.getSprite().getTexture();
+                    // 创建一个FrameBuffer来处理纹理
+                    FrameBuffer frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, texture.getWidth(), texture.getHeight(), false);
+                    frameBuffer.begin();
+                    batch.end();  // 先结束当前的batch
+                    batch.begin();
+                    batch.draw(texture, 0, 0);
+                    batch.end();
+                    frameBuffer.end();
+
+                    // 获取FrameBuffer的颜色缓冲区纹理
+                    Texture bufferTexture = frameBuffer.getColorBufferTexture();
+
+                    // 创建一个Pixmap来检查像素的透明度
+                    Pixmap pixmap = new Pixmap(texture.getWidth(), texture.getHeight(), Pixmap.Format.RGBA8888);
+                    if (!bufferTexture.getTextureData().isPrepared()) {
+                        bufferTexture.getTextureData().prepare();
+                    }
+                    pixmap.drawPixmap(bufferTexture.getTextureData().consumePixmap(), 0, 0);
+
+                    // 使用ShapeRenderer绘制红色边框
+                    ShapeRenderer shapeRenderer = new ShapeRenderer();
+                    shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                    shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                    shapeRenderer.setColor(Color.RED);
+
+                    // 遍历Pixmap的像素，只绘制非透明部分的边框
+                    for (int x = 0; x < pixmap.getWidth(); x++) {
+                        for (int y = 0; y < pixmap.getHeight(); y++) {
+                            int pixel = pixmap.getPixel(x, y);
+                            // 检查alpha通道是否不为0
+                            if ((pixel & 0xff000000) != 0) {
+                                shapeRenderer.rect(x + towerRect.x, y + towerRect.y, 1, 1);
+                            }
+                        }
+                    }
+                    shapeRenderer.end();
+
+                    // 释放资源
+                    pixmap.dispose();
+                    frameBuffer.dispose();
+
+                    batch.begin();  // 重新开始batch
+                    tower.getSprite().draw(batch, 1);
+                    batch.draw(texture, towerRect.x, towerRect.y);
+
+                    // 鼠标在塔上，进行高亮处理，这里简单将颜色设置为红色
+                    batch.setColor(Color.RED);
+                }
+
+//                tower.getSprite().draw(batch, 1);
 
 
+                batch.setColor(Color.WHITE); // 恢复默认颜色
                 batch.setShader(null);
                 // 渲染塔
 //                tower.getSprite().draw(batch);
@@ -270,6 +329,23 @@ public class GameScreen implements Screen {
 
             // 结束精灵批处理
             batch.end();
+
+            // 创建ShapeRenderer实例用于绘制高亮边缘
+            ShapeRenderer shapeRenderer = new ShapeRenderer();
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.RED); // 设置高亮颜色为红色
+            for (Tower tower : towers) {
+                // 获取塔的位置和尺寸
+                float x = tower.getSprite().getX();
+                float y = tower.getSprite().getY();
+                float width = tower.getSprite().getWidth();
+                float height = tower.getSprite().getHeight();
+                // 绘制矩形边缘
+                shapeRenderer.rect(x, y, width, height);
+            }
+            shapeRenderer.end();
+            shapeRenderer.dispose();
 
             // 创建一个Array<Body>对象
 //            Array<Body> bodiesArray = new Array<>();

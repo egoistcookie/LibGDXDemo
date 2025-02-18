@@ -3,6 +3,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
+//import com.badlogic.gdx.graphics.PixmapTextureData;
+
 
 public class SpriteUtils {
 
@@ -20,6 +22,12 @@ public class SpriteUtils {
         if (texture == null) {
             return null;
         }
+
+        // 检查 TextureData 是否支持返回 Pixmap
+//        if (!(texture.getTextureData() instanceof PixmapTextureData)) {
+//            System.err.println("This TextureData implementation does not return a Pixmap");
+//            return null;
+//        }
 
         // 如果纹理没有绑定Pixmap，需要创建一个
         if (!texture.getTextureData().isPrepared()) {
@@ -44,7 +52,6 @@ public class SpriteUtils {
                 // 提取像素的alpha通道值
                 int alpha = (pixel >> 24) & 0xff;
 
-                System.out.println("像素通道值："+alpha);
                 // 如果像素不是完全透明的
                 if (alpha > 0) {
                     // 更新最小和最大坐标
