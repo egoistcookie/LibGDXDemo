@@ -12,13 +12,14 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.config.CardTypeConfig;
 import com.lf.core.MyDefenseGame;
 import com.lf.manager.EnemyLoadManager;
+import com.lf.screen.GameScreen;
 import com.lf.util.GameUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // Tower类表示游戏中的防御塔实体
-public class Tower {
+public class Card {
     // 防御塔的物理刚体，用于处理物理相关行为
     private Body body;
     // 防御塔的精灵，用于图形渲染
@@ -81,9 +82,12 @@ public class Tower {
     private String effectType;
     // 特效持续时间
     private float effectDuration;
+    // 用于获取场地buff
+    private GameScreen gameScreen;
     // 构造函数，用于创建防御塔实例
-    public Tower(World world, int towerId, String cardType, float x, float y, AssetManager assetManager, Stage stage, int experience, int starLevel) {
+    public Card(World world, GameScreen gameScreen, int towerId, String cardType, float x, float y, AssetManager assetManager, Stage stage, int experience, int starLevel) {
         this.cardType = cardType;
+        this.gameScreen = gameScreen;
         this.assetManager = assetManager;
         this.experience = experience;
         // 根据经验值计算等级
@@ -203,8 +207,17 @@ public class Tower {
         // 遍历敌人列表，检查是否有敌人进入攻击范围
         for (Enemy enemy : enemies) {
             if (body.getPosition().dst(enemy.getBody().getPosition()) < attackRange) {
+
+                // 获取场地buff
+                float rateBuff = 1f;
+                // 攻击频率buff
+                if(!gameScreen.getRateBuff().isEmpty() && gameScreen.getRateBuff().get(this.getCardType()+"Rate")!=null){
+                    // 获取每种卡片各自的攻击频率场地buff
+                    rateBuff = gameScreen.getRateBuff().get(this.getCardType()+"Rate");
+                }
+
                 // 已达到攻击间隔时间，并且同时攻击数未达到上限，并且敌人未死亡，发起攻击
-                if (timeSinceLastFire >= fireRate && attckCount < maxAttackCount && !enemy.getDead()) {
+                if (timeSinceLastFire >= fireRate/rateBuff && attckCount < maxAttackCount && !enemy.getDead()) {
                     // 攻击介质应该从防御塔坐标的前方一点射出，会比较自然
                     Arrow arrow = new Arrow(world, body.getPosition().x + 20, body.getPosition().y +10, attackTexture, enemy, this);
                     arrows.add(arrow); // 将箭添加到列表中

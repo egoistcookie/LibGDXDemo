@@ -74,10 +74,27 @@ public class GameUI {
     private Button getButton;
     // 白色字体-默认
     private BitmapFont whiteFont;
+    // 自定义字体-包含中文
+    private BitmapFont customFont;
     // 黑色背景图
     private Texture blackTexture;
+    // 透明背景图
+    private Texture transBackTexture;
+    // 透明特效
+    private Image transBackImage;
+    // 一号特效 swifterArrow
+    private Image swiftImage;
     // 白色字体-默认
     private Label.LabelStyle whiteLabelStyle;
+    // 一号特效的Image
+    private Image buffImage;
+    // 蓝色字体标签style
+    private Label.LabelStyle blueLabelStyle;
+    // 悬浮框管理器
+    private TooltipManager tooltipManager;
+    // 急湍甚箭
+    private Label swifterArrowLabel;
+    private Tooltip<Label> swifterArrowTooltip;
 
     public Skin getSkin() {
         return skin;
@@ -103,7 +120,14 @@ public class GameUI {
         skin = VisUI.getSkin();
         batch = new SpriteBatch();
         whiteFont = new BitmapFont();
+        // 加载自定义字体
+        customFont = this.assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+        // 白色字体样式
         whiteLabelStyle = new Label.LabelStyle(whiteFont, Color.WHITE);
+        // 字体大小倍率（以Hiero中生成的字体大小为基准）
+        customFont.getData().setScale(0.6f);
+        // 蓝色字体样式
+        blueLabelStyle = new Label.LabelStyle(customFont, Color.BLUE);
         // 黑色背景图
         blackTexture = assetManager.get("black.png", Texture.class);
 
@@ -126,12 +150,34 @@ public class GameUI {
         gameObjectTable.addActor(goldLabel);
 
 
-        Texture buffIconTexture = assetManager.get("buff/swifterArrow.png", Texture.class);
-        // 新增：创建buff图标
-        Image buffImage = new Image(buffIconTexture);
+        // 透明背景
+        transBackTexture = assetManager.get("transBack.png", Texture.class);
+        // 透明特效图标
+        transBackImage = new Image(transBackTexture);
+
+        // 实例化 TooltipManager
+        tooltipManager = TooltipManager.getInstance();
+        tooltipManager.initialTime = 0.2f; // 设置悬浮框显示的延迟时间
+        // 创建悬浮框
+        swifterArrowLabel = new Label("急湍甚箭:弓箭手提速百分之二十", blueLabelStyle);
+        swifterArrowTooltip = new Tooltip<>(swifterArrowLabel, tooltipManager);
+        swifterArrowTooltip.setInstant(true); // 设置为立即显示
+
+        // swifter特效图标背景
+        swiftImage = new Image(assetManager.get("buff/swifterArrow.png", Texture.class));
+        // 新增：创建buff图标 初始为透明背景
+        buffImage = new Image(transBackTexture);
         // 新增：设置buff图标的位置：位于屏幕左上角
-        buffImage.setPosition(10 ,
-                Gdx.graphics.getHeight() - buffImage.getHeight() - 30);
+        buffImage.setPosition(10 , Gdx.graphics.getHeight() - 40);
+        buffImage.setSize(30,30);
+        buffImage.addListener(swifterArrowTooltip);
+
+        // 模拟鼠标进入事件，强制显示Tooltip
+//        InputEvent enterEvent = new InputEvent();
+//        enterEvent.setType(InputEvent.Type.enter);
+//        buffImage.fire(enterEvent);
+//        swifterArrowTooltip.hide(); // 立即隐藏
+
         gameObjectTable.addActor(buffImage);
 
         // 加载金币图标纹理
@@ -619,4 +665,22 @@ public class GameUI {
         // 其他重置逻辑，如重置敌人、防御塔等
     }
 
+    public Image getBuffImage() {
+        return buffImage;
+    }
+
+    /**
+     * 更新buff类型
+     * @param buffType buff类型
+     */
+    public void setBuffImage(String buffType) {
+        if(buffType!=null && assetManager.get("buff/"+buffType+".png", Texture.class)!=null){
+            buffImage.setDrawable(swiftImage.getDrawable());
+            buffImage.addListener(swifterArrowTooltip);
+        }else{
+            // 若未触发，或找不到特效png，则赋值为透明特效图标
+            buffImage.setDrawable(transBackImage.getDrawable());
+            buffImage.removeListener(swifterArrowTooltip);
+        }
+    }
 }

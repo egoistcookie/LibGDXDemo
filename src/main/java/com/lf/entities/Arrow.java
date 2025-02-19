@@ -16,14 +16,14 @@ public class Arrow {
     private Enemy target; // 箭的目标敌人
     private boolean isHit; // 标记箭是否已经击中敌人
     private Sound arrowSound; // 箭矢射出的音效
-    private Tower tower; // 箭矢所属的防御塔
+    private Card card; // 箭矢所属的防御塔
 
-    public Arrow(World world, float x, float y, Texture texture, Enemy target, Tower tower) {
+    public Arrow(World world, float x, float y, Texture texture, Enemy target, Card card) {
         // 创建刚体定义
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody; // 设置为动态刚体
         bodyDef.position.set(x, y); // 设置初始位置
-        this.tower = tower;
+        this.card = card;
 
         // 在物理世界中创建刚体
         body = world.createBody(bodyDef);
@@ -88,10 +88,10 @@ public class Arrow {
             // 检查箭是否击中敌人
             if (body.getPosition().dst(target.getBody().getPosition()) < 1f) {
                 // 按照防御塔的攻击力来造成伤害
-                target.takeDamage(tower.getAttackPower());
+                target.takeDamage(card.getAttackPower());
                 //如果敌人死亡，卡片经验按照 敌人的经验值 增加
                 if(target.getDead()){
-                    tower.addExperience(target.getExperience());
+                    card.addExperience(target.getExperience());
                 }
                 // 标记箭已击中敌人
                 isHit = true;

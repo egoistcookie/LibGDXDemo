@@ -35,9 +35,7 @@ import com.lf.entities.*;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.ui.GameUI;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 // 游戏界面类，实现 Screen 接口
@@ -55,11 +53,13 @@ public class GameScreen implements Screen {
     // 卡片操作框
     private TowerSelectionBox towerSelectionBox;
     // 防御塔对象集合
-    private List<Tower> towers;
+    private List<Card> cardes;
     // 防御塔数量
     private int towerCount;
     // 弓箭手数量
     private int arrowerCount;
+    // 各种防御塔的数量
+    private Map<String, Integer> cardCountMap;
     // 鼠标点击坐标
     private Vector2 clickPosition;
     // 新增：用于绘制形状（激光）的渲染器
@@ -86,10 +86,6 @@ public class GameScreen implements Screen {
     private static boolean isPaused = false;
     // 用于控制是否继续渲染的标志变量
     private static boolean isGameOver = false;
-    // 控制当前防御塔摆放x坐标
-    float showTowerX = 0;
-    // 控制当前防御塔摆放y坐标
-    float showTowerY = 0;
     // 舞台对象，用于管理和渲染游戏界面元素
     private Stage stage;
     // 资源加载管理工具
@@ -107,6 +103,8 @@ public class GameScreen implements Screen {
     // 白色粒子特效
     private ParticleEffect whiteEffect;
     private float time;
+    // 场地buff集合
+    private Map<String, Float> buffMap;
 
     // 构造函数，接收游戏对象作为参数
     public GameScreen(MyDefenseGame game) {
@@ -143,6 +141,10 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         // 创建敌人列表
         enemies = new ArrayList<>();
+        // 创建卡片数量map
+        cardCountMap = new HashMap<>();
+        // 初始化场地buff
+        buffMap = new HashMap<>();
         // 加载地图背景
         backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
@@ -150,7 +152,7 @@ public class GameScreen implements Screen {
         // 创建卡片操作框对象
         towerSelectionBox = new TowerSelectionBox(this.assetManager);
         // 初始化防御塔列表
-        towers = new ArrayList<>();
+        cardes = new ArrayList<>();
         // 初始化鼠标点击位置向量
         clickPosition = new Vector2();
         // 初始化形状渲染器
@@ -236,28 +238,35 @@ public class GameScreen implements Screen {
             time += Gdx.graphics.getDeltaTime();
 
             // 遍历防御塔列表，渲染每个防御塔的精灵
-            for (Tower tower : towers) {
-                // 判断各自数量
-                if("arrower".equals(tower.getCardType())){
+            int arrowerCount = 0;
+            int yysCount = 0;
+            int saberCount = 0;
+            for (Card card : cardes) {
+                // 获取各卡片数量
+                if("arrower".equals(card.getCardType())){
                     arrowerCount ++ ;
+                }else if("yys".equals(card.getCardType())){
+                    yysCount ++ ;
+                }else if("saber".equals(card.getCardType())){
+                    saberCount ++ ;
                 }
                 // 渲染塔 发光特效
 //                time = 0.1f + Gdx.graphics.getDeltaTime(); // 加了0.1f就会变成固定半隐半现
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
-                tower.update(enemies,deltaTime);
+                card.update(enemies,deltaTime);
                 // 渲染升级特效
-                if(tower.getEffectType()!=null && "whiteEffect".equals(tower.getEffectType())){
-                    float durationTime = tower.getEffectDuration();
+                if(card.getEffectType()!=null && "whiteEffect".equals(card.getEffectType())){
+                    float durationTime = card.getEffectDuration();
                     durationTime = durationTime - Gdx.graphics.getDeltaTime();
                     if(durationTime >=0 ){
                         // 白色粒子特效渲染：代表升级或者升星
-                        whiteEffect.setPosition(tower.getSprite().getX() + tower.getSprite().getWidth() / 2,
-                                tower.getSprite().getY() + tower.getSprite().getHeight() / 2);
+                        whiteEffect.setPosition(card.getSprite().getX() + card.getSprite().getWidth() / 2,
+                                card.getSprite().getY() + card.getSprite().getHeight() / 2);
                         whiteEffect.draw(batch, Gdx.graphics.getDeltaTime());
                         // 持续时间减少相应时间
-                        tower.setEffectDuration(durationTime);
+                        card.setEffectDuration(durationTime);
                     }else{
-                        tower.setEffectDuration(0f);
+                        card.setEffectDuration(0f);
                     }
                 }
                 // 渲染鼠标选中tower特效
@@ -265,21 +274,21 @@ public class GameScreen implements Screen {
                 Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
                 camera.unproject(mousePos);
                 // 获取塔的矩形区域
-                Rectangle towerRect = new Rectangle(tower.getSprite().getX(), tower.getSprite().getY(), tower.getSprite().getWidth(), tower.getSprite().getHeight());
+                Rectangle towerRect = new Rectangle(card.getSprite().getX(), card.getSprite().getY(), card.getSprite().getWidth(), card.getSprite().getHeight());
                 // 检查鼠标是否在塔的矩形区域内
                 if (towerRect.contains(mousePos.x, mousePos.y)) {
                     // 为卡片制造一种若隐若现特效（fragment.glsl）
                     batch.setShader(shaderProgram);
                     shaderProgram.setUniformf("u_time", time);
                     shaderProgram.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                    tower.getSprite().draw(batch, 1);
+                    card.getSprite().draw(batch, 1);
                     batch.setShader(null);
                 }else{
                     // 无特效渲染塔
-                    tower.getSprite().draw(batch);
+                    card.getSprite().draw(batch);
                 }
                 // 渲染箭
-                for (Arrow arrow : tower.arrows) {
+                for (Arrow arrow : card.arrows) {
                     arrow.getSprite().draw(batch);
                 }
             }
@@ -291,6 +300,11 @@ public class GameScreen implements Screen {
                     enemy.getSprite().draw(batch);
                 }
             }
+            // 为各种card的数量赋值
+            cardCountMap.clear();
+            cardCountMap.put("arrowerCount",arrowerCount);
+            cardCountMap.put("yysCount",yysCount);
+            cardCountMap.put("saberCount",saberCount);
             buffRender(batch);
 
             // 结束精灵批处理
@@ -316,8 +330,18 @@ public class GameScreen implements Screen {
     // 渲染场地buff
     private void buffRender(SpriteBatch batch) {
         // 根据场上card类型和数量来渲染场地buff
-        if(arrowerCount >= 3){
-            arrowerCount ++ ;
+        if(!cardCountMap.isEmpty() && cardCountMap.get("arrowerCount")!=null && cardCountMap.get("arrowerCount") >= 3){
+            gameUI.setBuffImage("swifterArrow");
+            System.out.println("arrowerCount:" + cardCountMap.get("arrowerCount"));
+            // 已经赋予了buff就不要重复再赋
+            if(!buffMap.isEmpty() && buffMap.get("arrowerRate")!=1.2f){
+                // 攻击速度提升1.2倍
+                buffMap.put("arrowerRate",1.2f);
+            }
+        }else{
+            // buff还原
+            buffMap.put("arrowerRate",1f);
+            gameUI.setBuffImage(null);
         }
     }
 
@@ -406,10 +430,10 @@ public class GameScreen implements Screen {
                 int selectedIndex = towerSelectionBox.getSelectedIndex();
                 int selectedTowerId = towerSelectionBox.getTowerId();
 
-                Iterator<Tower> iterator = towers.iterator();
+                Iterator<Card> iterator = cardes.iterator();
                 while (iterator.hasNext()) {
-                    Tower tower = iterator.next();
-                    if(tower.getTowerId() == selectedTowerId){
+                    Card card = iterator.next();
+                    if(card.getTowerId() == selectedTowerId){
                         // 选择0位置，表示回收
                         if (selectedIndex == 0) {
                             // 查找第一个空闲位置
@@ -419,12 +443,12 @@ public class GameScreen implements Screen {
                             }
                             // 如果还有空闲位置，添加新元素
                             if (index < stuffes.length) {
-                                stuffes[index] = new Stuff(tower.getCardType(), tower.getCardType(), tower.getTowerId(),
-                                        tower.getExperience(), tower.getStarLevel());
+                                stuffes[index] = new Stuff(card.getCardType(), card.getCardType(), card.getTowerId(),
+                                        card.getExperience(), card.getStarLevel());
                                 // 经验值标签需要隐藏
-                                tower.dispose();
+                                card.dispose();
                                 // 回收
-                                world.destroyBody(tower.getBody());
+                                world.destroyBody(card.getBody());
                                 // 从towers中移除该元素
                                 iterator.remove();
                             } else {
@@ -432,9 +456,9 @@ public class GameScreen implements Screen {
                             }
                         } else if (selectedIndex == 1) {
                             // 升星
-                            if(tower.getLevel()<10){
+                            if(card.getLevel()<10){
                                 showAlertInfo("防御单位等级不够");
-                            }else if(!tower.superPass(stuffes)){
+                            }else if(!card.superPass(stuffes)){
                                 showAlertInfo("请确保物品栏中存在\n同星级且满级的素材");
                             }
                         }
@@ -444,15 +468,15 @@ public class GameScreen implements Screen {
                 towerSelectionBox.hide();
             } else {
                 // 遍历防御塔，判断鼠标点击位置是否命中防御塔
-                Iterator<Tower> iterator = towers.iterator();
+                Iterator<Card> iterator = cardes.iterator();
                 while (iterator.hasNext()) {
-                    Tower tower = iterator.next();
+                    Card card = iterator.next();
                     // 获取防御塔精灵的所在矩形（后期可以优化成非透明部位）
-                    Rectangle towerBounds = tower.getSprite().getBoundingRectangle();
+                    Rectangle towerBounds = card.getSprite().getBoundingRectangle();
                     if (towerBounds.contains(clickPosition)) {
                         System.out.println("防御塔坐标：" + towerBounds.x + "y:" + towerBounds.y);
                         // 显示卡片操作框，并设置其位置为点击位置，并获取到该位置的towerId
-                        towerSelectionBox.show(clickPosition,tower.getTowerId());
+                        towerSelectionBox.show(clickPosition, card.getTowerId());
                     }
                 }
 //                Rectangle rectangle = SpriteUtils.getNonTransparentBounds(tower.getSprite());
@@ -576,10 +600,10 @@ public class GameScreen implements Screen {
                     inRange = true;
 //                    this.gameUI.subGold(100);
                     // 创建一个新的防御塔对象，位置为点击位置，tower序号作为id
-                    Tower tower = new Tower(world, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
+                    Card card = new Card(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
                             stuff.getStuffExp(), stuff.getStuffStarLevel());
                     // 将新的防御塔添加到防御塔列表中
-                    towers.add(tower);
+                    cardes.add(card);
                     // 创建防御塔后，物品栏中卡片消失
                     stuffes[i-1] = null;
                 }
@@ -773,8 +797,8 @@ public class GameScreen implements Screen {
         // 释放卡片操作框的资源
         towerSelectionBox.dispose();
         // 遍历防御塔列表，释放每个防御塔的资源
-        for (Tower tower : towers) {
-            tower.dispose();
+        for (Card card : cardes) {
+            card.dispose();
         }
     }
 
@@ -818,5 +842,13 @@ public class GameScreen implements Screen {
         }else{
             showAlertInfo("物品栏已满,无法再抽卡");
         }
+    }
+
+    public Map<String, Float> getRateBuff() {
+        return buffMap;
+    }
+
+    public void setRateBuff(Map<String, Float> rateBuffMap) {
+        this.buffMap = rateBuffMap;
     }
 }

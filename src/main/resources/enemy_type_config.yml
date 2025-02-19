@@ -3,7 +3,7 @@ enemyTypeConfigs:
   - # 初级剑客
     enemyType: "saberOne"
     rarity: N
-    health: 5
+    health: 10
     velocity: 10f
     moveTexture: saberOne
     experience: 5

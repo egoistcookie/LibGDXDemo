@@ -13,10 +13,8 @@ import com.badlogic.gdx.physics.box2d.joints.PulleyJoint;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.lf.entities.Arrow;
+import com.lf.entities.Card;
 import com.lf.entities.Enemy;
-import com.lf.entities.Tower;
-
-import java.util.Iterator;
 
 /**
  * TODO：重写此类只是为了箭矢、防御塔、敌人的刚体无需显示，后期优化项目
@@ -91,7 +89,7 @@ public class CustomBox2DDebugRenderer implements Disposable {
             for (Body body : bodies) {
                 Object userData = body.getUserData();
                 //箭矢、防御塔、敌人的刚体无需显示 20250207-lf
-                if (userData instanceof Arrow || userData instanceof Tower || userData instanceof Enemy) {
+                if (userData instanceof Arrow || userData instanceof Card || userData instanceof Enemy) {
                     continue;
                 }
                 if (body.isActive() || this.drawInactiveBodies) {
