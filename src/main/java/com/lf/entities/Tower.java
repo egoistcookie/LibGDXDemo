@@ -1,9 +1,7 @@
 package com.lf.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -79,6 +77,10 @@ public class Tower {
     private VisLabel starLevelLabel;
     // 资源加载管理工具
     private AssetManager assetManager;
+    // 特效类型
+    private String effectType;
+    // 特效持续时间
+    private float effectDuration;
     // 构造函数，用于创建防御塔实例
     public Tower(World world, int towerId, String cardType, float x, float y, AssetManager assetManager, Stage stage, int experience, int starLevel) {
         this.cardType = cardType;
@@ -277,9 +279,19 @@ public class Tower {
         this.level = GameUtil.calcLevel(this.experience);
         if(oldLevel<this.level){
             // 加载音效
-            Sound levelUpSound = assetManager.get("wav/levelUp.mp3",Sound.class);
+            final Sound[] levelUpSound = {assetManager.get("wav/levelUp.mp3", Sound.class)};
             // 播放音效
-            levelUpSound.play(1f); //表示以 50% 的音量播放音效
+            levelUpSound[0].play(1f); //表示以 50% 的音量播放音效
+            // 使用Timer在1秒后移除提示窗口
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    levelUpSound[0] = null;
+                }
+            }, 1f);
+            // 设置特效类型与持续时间
+            setEffectType("whiteEffect");
+            setEffectDuration(1f);
         }
         // 显示等级
         showLevel();
@@ -311,9 +323,16 @@ public class Tower {
                     // 显示等级
                     showLevel();
                     // 加载音效
-                    Sound starUpSound = assetManager.get("wav/starUp.mp3",Sound.class);
+                    final Sound[] starUpSound = {assetManager.get("wav/starUp.mp3", Sound.class)};
                     // 播放音效
-                    starUpSound.play(1f); //表示以 100% 的音量播放音效
+                    starUpSound[0].play(1f); //表示以 100% 的音量播放音效
+                    // 使用Timer在1秒后移除提示窗口
+                    Timer.schedule(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            starUpSound[0] = null;
+                        }
+                    }, 1f);
                     // 贴图更新
                     animationFrames = new Texture[]{assetManager.get("tower/"+ this.getCardType() +"OneStar1.png", Texture.class),
                             assetManager.get("tower/"+ this.getCardType() +"OneStar2.png", Texture.class)};
@@ -446,5 +465,21 @@ public class Tower {
 
     public void setAttackType(String attackType) {
         this.attackType = attackType;
+    }
+
+    public String getEffectType() {
+        return effectType;
+    }
+
+    public void setEffectType(String effectType) {
+        this.effectType = effectType;
+    }
+
+    public float getEffectDuration() {
+        return effectDuration;
+    }
+
+    public void setEffectDuration(float effectDuration) {
+        this.effectDuration = effectDuration;
     }
 }

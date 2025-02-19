@@ -72,6 +72,12 @@ public class GameUI {
     private Table stuffTable;
     // 抽卡按钮
     private Button getButton;
+    // 白色字体-默认
+    private BitmapFont whiteFont;
+    // 黑色背景图
+    private Texture blackTexture;
+    // 白色字体-默认
+    private Label.LabelStyle whiteLabelStyle;
 
     public Skin getSkin() {
         return skin;
@@ -96,6 +102,10 @@ public class GameUI {
         // 获取VisUI库的默认皮肤
         skin = VisUI.getSkin();
         batch = new SpriteBatch();
+        whiteFont = new BitmapFont();
+        whiteLabelStyle = new Label.LabelStyle(whiteFont, Color.WHITE);
+        // 黑色背景图
+        blackTexture = assetManager.get("black.png", Texture.class);
 
         // 初始化游戏对象区域和按钮区域
         gameObjectTable = new Table();
@@ -114,6 +124,15 @@ public class GameUI {
         goldLabel.setPosition(screenWidth - goldLabel.getWidth() - 5,
                 Gdx.graphics.getHeight() - goldLabel.getHeight() - 10);
         gameObjectTable.addActor(goldLabel);
+
+
+        Texture buffIconTexture = assetManager.get("buff/swifterArrow.png", Texture.class);
+        // 新增：创建buff图标
+        Image buffImage = new Image(buffIconTexture);
+        // 新增：设置buff图标的位置：位于屏幕左上角
+        buffImage.setPosition(10 ,
+                Gdx.graphics.getHeight() - buffImage.getHeight() - 30);
+        gameObjectTable.addActor(buffImage);
 
         // 加载金币图标纹理
         Texture goldIconTexture = assetManager.get("gold.png", Texture.class);
@@ -264,18 +283,13 @@ public class GameUI {
                 Stuff stuff = stuffes[i];
                 // 假设图片命名为 image1.png 到 image6.png (图片的长宽比应该是8:3)
                 imageTextures[i] = assetManager.get("tower/"+stuff.getStuffType() +"Stuff.png", Texture.class);
-                // 获取字体
-                BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
-                // 缩小一下
-                customFont.getData().setScale(0.4f);
-                Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.WHITE);
                 // 值为计算后的stuff等级
-                countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), labelStyle);
+                countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), whiteLabelStyle);
                 // 设置 Label 的对齐方式为右下角
                 countLabel.setAlignment(Align.topRight);
             }else{
                 // 空白格子显示为黑色背景图
-                imageTextures[i] = assetManager.get("black.png", Texture.class);
+                imageTextures[i] = blackTexture;
             }
             Image image = new Image(imageTextures[i]);
             stack.add(image);
@@ -354,14 +368,12 @@ public class GameUI {
             if(stuffes[i]!=null){
                 Stuff stuff = stuffes[i];
                 // （贴图图片的长宽比应该是8:3，且以Stuff.png为后缀)
+                // TODO：贴图的加载不要每次都从asserManager获取，占用内存，后期改为初始化时同统一获取所有贴图
                 imageTextures[i] = assetManager.get("tower/"+stuff.getStuffType() +"Stuff.png", Texture.class);
-                // 获取默认字体，底色为白色
-                BitmapFont customFont = new BitmapFont();
-                Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.WHITE);
                 // 计算等级
-                countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), labelStyle);
+                countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), whiteLabelStyle);
                 // 星级
-                starLabel = new Label(stuff.getStuffStarLevel()==1?"*":"**", labelStyle);
+                starLabel = new Label(stuff.getStuffStarLevel()==1?"*":"**", whiteLabelStyle);
                 // 设置登记标签的对齐方式为右上角
                 countLabel.setAlignment(Align.topRight);
                 // 设置星级标签的对齐方式为左上角

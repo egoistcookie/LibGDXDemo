@@ -1,13 +1,11 @@
 package com.lf.screen;
 
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
@@ -42,8 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.lf.util.SpriteUtils.getNonTransparentBounds;
-
 // 游戏界面类，实现 Screen 接口
 public class GameScreen implements Screen {
     // 正交相机，用于定义游戏的视图范围
@@ -62,6 +58,8 @@ public class GameScreen implements Screen {
     private List<Tower> towers;
     // 防御塔数量
     private int towerCount;
+    // 弓箭手数量
+    private int arrowerCount;
     // 鼠标点击坐标
     private Vector2 clickPosition;
     // 新增：用于绘制形状（激光）的渲染器
@@ -106,8 +104,8 @@ public class GameScreen implements Screen {
     // 控制游戏进行倍速
     private static float sclRate = 1f;
     private ShaderProgram shaderProgram;
-    // 粒子特效
-    private ParticleEffect particleEffect;
+    // 白色粒子特效
+    private ParticleEffect whiteEffect;
     private float time;
 
     // 构造函数，接收游戏对象作为参数
@@ -169,8 +167,8 @@ public class GameScreen implements Screen {
         String fragmentShader = Gdx.files.internal("cool_fragment.glsl").readString();
         shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
-        particleEffect = new ParticleEffect();
-        particleEffect.load(Gdx.files.internal("whitePix.p"), Gdx.files.internal(""));
+        whiteEffect = new ParticleEffect();
+        whiteEffect.load(Gdx.files.internal("whitePix.p"), Gdx.files.internal(""));
 
         if (!shaderProgram.isCompiled()) {
             Gdx.app.error("Shader", shaderProgram.getLog());
@@ -239,15 +237,30 @@ public class GameScreen implements Screen {
 
             // 遍历防御塔列表，渲染每个防御塔的精灵
             for (Tower tower : towers) {
+                // 判断各自数量
+                if("arrower".equals(tower.getCardType())){
+                    arrowerCount ++ ;
+                }
                 // 渲染塔 发光特效
 //                time = 0.1f + Gdx.graphics.getDeltaTime(); // 加了0.1f就会变成固定半隐半现
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
                 tower.update(enemies,deltaTime);
-                // 粒子特效渲染
-//                particleEffect.setPosition(tower.getSprite().getX() + tower.getSprite().getWidth() / 2,
-//                        tower.getSprite().getY() + tower.getSprite().getHeight() / 2);
-//                particleEffect.draw(batch, Gdx.graphics.getDeltaTime());
-
+                // 渲染升级特效
+                if(tower.getEffectType()!=null && "whiteEffect".equals(tower.getEffectType())){
+                    float durationTime = tower.getEffectDuration();
+                    durationTime = durationTime - Gdx.graphics.getDeltaTime();
+                    if(durationTime >=0 ){
+                        // 白色粒子特效渲染：代表升级或者升星
+                        whiteEffect.setPosition(tower.getSprite().getX() + tower.getSprite().getWidth() / 2,
+                                tower.getSprite().getY() + tower.getSprite().getHeight() / 2);
+                        whiteEffect.draw(batch, Gdx.graphics.getDeltaTime());
+                        // 持续时间减少相应时间
+                        tower.setEffectDuration(durationTime);
+                    }else{
+                        tower.setEffectDuration(0f);
+                    }
+                }
+                // 渲染鼠标选中tower特效
                 // 获取鼠标在世界坐标系中的位置
                 Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
                 camera.unproject(mousePos);
@@ -278,6 +291,7 @@ public class GameScreen implements Screen {
                     enemy.getSprite().draw(batch);
                 }
             }
+            buffRender(batch);
 
             // 结束精灵批处理
             batch.end();
@@ -297,6 +311,14 @@ public class GameScreen implements Screen {
         }
         // 渲染游戏用户界面：按钮需要另外渲染，不可与游戏对象放在一起渲染
         gameUI.render();
+    }
+
+    // 渲染场地buff
+    private void buffRender(SpriteBatch batch) {
+        // 根据场上card类型和数量来渲染场地buff
+        if(arrowerCount >= 3){
+            arrowerCount ++ ;
+        }
     }
 
     @Override
@@ -735,7 +757,7 @@ public class GameScreen implements Screen {
         // 释放精灵批处理的资源
         batch.dispose();
         // 粒子特效释放
-        particleEffect.dispose();
+        whiteEffect.dispose();
         // 释放敌人纹理的资源
         for (Enemy enemy : enemies) {
             if(!enemy.getDead()){

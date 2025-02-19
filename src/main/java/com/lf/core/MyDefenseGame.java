@@ -85,6 +85,9 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/whiteAttack1.png", Texture.class);
         assetManager.load("tower/whiteAttack2.png", Texture.class);
 
+        // 加载buff图标
+        assetManager.load("buff/swifterArrow.png", Texture.class);
+
         // 加载一级箭塔的背景图片
         assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片
