@@ -96,6 +96,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("saberOne1.png", Texture.class);
         // 加载敌人的背景图片
         assetManager.load("saberOne2.png", Texture.class);
+        // 加载敌人的倒地背景图片
+        assetManager.load("enemy/deathing1.png", Texture.class);
+        // 加载敌人的倒地背景图片
+        assetManager.load("enemy/deathing2.png", Texture.class);
         // 加载透明背景
         assetManager.load("transBack.png", Texture.class);
         // 加载纯白背景

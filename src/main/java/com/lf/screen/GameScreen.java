@@ -72,6 +72,8 @@ public class GameScreen implements Screen {
     private Skin skin;
     // 背景纹理
     private Texture backgroundTexture;
+    // 新增：存储倒地贴图
+    private Texture[] deathingTexture;
     // 背景精灵
     private Sprite backgroundSprite;
     // 适配视口，用于根据窗口大小调整相机的视图
@@ -147,8 +149,13 @@ public class GameScreen implements Screen {
         cardCountMap = new HashMap<>();
         // 创建卡片加载集合
         isCardLoaded = new HashMap<>();
+        Texture deathingTexture1 = assetManager.get("enemy/deathing2.png", Texture.class);
+        Texture deathingTexture2 = deathingTexture1;
+        deathingTexture = new Texture[]{deathingTexture1, deathingTexture2}; ;
         // 初始化场地buff
         buffMap = new HashMap<>();
+        backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         // 加载地图背景
         backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         backgroundSprite = new Sprite(backgroundTexture);
@@ -228,6 +235,10 @@ public class GameScreen implements Screen {
 //                if (enemy != null && !enemy.getDead()) {
                     enemy.update(deltaTime);
                     if (enemy.getDead()) {
+                        // 停止移动
+                        enemy.getBody().setActive(false);
+                        // 更换为倒地贴图
+                        enemy.setAnimationFrames(deathingTexture);
                         Timer.schedule(new Timer.Task() {
                             @Override
                             public void run() {
@@ -314,9 +325,9 @@ public class GameScreen implements Screen {
             towerSelectionBox.render(batch);
             // 如果敌人存在，则绘制敌人的精灵
             for (Enemy enemy : enemies) {
-//                if(!enemy.getDead()){
+                if(!enemy.isDisappearing()){
                     enemy.getSprite().draw(batch);
-//                }
+                }
             }
             // 为各种card的数量赋值
             cardCountMap.clear();
