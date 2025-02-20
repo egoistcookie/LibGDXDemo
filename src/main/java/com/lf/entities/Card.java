@@ -286,7 +286,7 @@ public class Card {
      */
     public void addExperience(int addExperience) {
         this.experience += addExperience;
-        System.out.println("经验值增加后："+this.experience);
+//        System.out.println("经验值增加后："+this.experience);
         int oldLevel = this.level;
         // 计算等级
         this.level = GameUtil.calcLevel(this.experience);

@@ -60,6 +60,8 @@ public class GameScreen implements Screen {
     private int arrowerCount;
     // 各种防御塔的数量
     private Map<String, Integer> cardCountMap;
+    // 卡片是否已经加载的集合
+    private Map<String, Boolean> isCardLoaded;
     // 鼠标点击坐标
     private Vector2 clickPosition;
     // 新增：用于绘制形状（激光）的渲染器
@@ -143,6 +145,8 @@ public class GameScreen implements Screen {
         enemies = new ArrayList<>();
         // 创建卡片数量map
         cardCountMap = new HashMap<>();
+        // 创建卡片加载集合
+        isCardLoaded = new HashMap<>();
         // 初始化场地buff
         buffMap = new HashMap<>();
         // 加载地图背景
@@ -250,6 +254,8 @@ public class GameScreen implements Screen {
                 }else if("saber".equals(card.getCardType())){
                     saberCount ++ ;
                 }
+                // 加载卡片图片（只有第一次显示才加载）
+                cardImageLoad(card.getCardType());
                 // 渲染塔 发光特效
 //                time = 0.1f + Gdx.graphics.getDeltaTime(); // 加了0.1f就会变成固定半隐半现
                 // 更新塔的逻辑：用于检查敌人是否在攻击范围内并进行攻击
@@ -325,6 +331,15 @@ public class GameScreen implements Screen {
         }
         // 渲染游戏用户界面：按钮需要另外渲染，不可与游戏对象放在一起渲染
         gameUI.render();
+    }
+
+    // 判断card是否初次加载，如果是初次加载则显示卡片
+    private void cardImageLoad(String cardType) {
+        // 为空或者获取到为false都代表没有加载过
+        if(isCardLoaded.get(cardType)==null || !isCardLoaded.get(cardType)){
+            gameUI.showCardImage(cardType);
+            isCardLoaded.put(cardType, true);
+        }
     }
 
     // 渲染场地buff

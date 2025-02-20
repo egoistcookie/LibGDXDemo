@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.core.MyDefenseGame;
@@ -23,6 +24,8 @@ import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
 import com.lf.util.GameUtil;
+
+import java.util.HashMap;
 
 /**
  * GameUI类用于管理游戏的用户界面。
@@ -86,6 +89,16 @@ public class GameUI {
     private Image swiftImage;
     // 白色字体-默认
     private Label.LabelStyle whiteLabelStyle;
+    // 当前展示的卡片image
+    private Image showCardImage;
+    // 卡片image集合
+    private HashMap<String,Image> cardImages;
+    // arrower卡片image
+    private Image arrowerImage;
+    // yys卡片image
+    private Image yysImage;
+    // saber卡片image
+    private Image saberImage;
     // 一号特效的Image
     private Image buffImage;
     // 蓝色字体标签style
@@ -155,7 +168,7 @@ public class GameUI {
         // 透明特效图标
         transBackImage = new Image(transBackTexture);
 
-        // 实例化 TooltipManager
+        // 实例化悬浮框管理器
         tooltipManager = TooltipManager.getInstance();
         tooltipManager.initialTime = 0.2f; // 设置悬浮框显示的延迟时间
         // 创建悬浮框
@@ -179,6 +192,22 @@ public class GameUI {
 //        swifterArrowTooltip.hide(); // 立即隐藏
 
         gameObjectTable.addActor(buffImage);
+
+        // 初始化各类卡片的image以备用
+        cardImages = new HashMap<>();
+        arrowerImage = new Image(assetManager.get("tower/arrower.png", Texture.class));
+        yysImage = new Image(assetManager.get("tower/yys.png", Texture.class));
+        saberImage = new Image(assetManager.get("tower/saber.png", Texture.class));
+        cardImages.put("arrower",arrowerImage);
+        cardImages.put("yys",yysImage);
+        cardImages.put("saber",saberImage);
+        // 创建用来显示卡片的image
+        // 初始为透明背景
+        showCardImage = new Image(transBackTexture);
+        // 设置卡片的位置：位于屏幕正中间
+        showCardImage.setPosition((float) Gdx.graphics.getHeight() /2 , (float) Gdx.graphics.getHeight() /2);
+        showCardImage.setSize(100,200);
+        gameObjectTable.addActor(showCardImage);
 
         // 加载金币图标纹理
         Texture goldIconTexture = assetManager.get("gold.png", Texture.class);
@@ -681,6 +710,23 @@ public class GameUI {
             // 若未触发，或找不到特效png，则赋值为透明特效图标
             buffImage.setDrawable(transBackImage.getDrawable());
             buffImage.removeListener(swifterArrowTooltip);
+        }
+    }
+
+    /**
+     * 显示卡片图片
+     * @param cardType
+     */
+    public void showCardImage(String cardType){
+        if(cardImages.get(cardType) != null){
+            showCardImage.setDrawable(cardImages.get(cardType).getDrawable());
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    // 2秒后自动消失
+                    showCardImage.setDrawable(transBackImage.getDrawable());
+                }
+            }, 2f);
         }
     }
 }
