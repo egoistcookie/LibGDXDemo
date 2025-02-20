@@ -332,7 +332,7 @@ public class GameScreen implements Screen {
         // 根据场上card类型和数量来渲染场地buff
         if(!cardCountMap.isEmpty() && cardCountMap.get("arrowerCount")!=null && cardCountMap.get("arrowerCount") >= 3){
             gameUI.setBuffImage("swifterArrow");
-            System.out.println("arrowerCount:" + cardCountMap.get("arrowerCount"));
+//            System.out.println("arrowerCount:" + cardCountMap.get("arrowerCount"));
             // 已经赋予了buff就不要重复再赋
             if(!buffMap.isEmpty() && buffMap.get("arrowerRate")!=1.2f){
                 // 攻击速度提升1.2倍
