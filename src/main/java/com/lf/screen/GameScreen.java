@@ -225,13 +225,25 @@ public class GameScreen implements Screen {
             Iterator<Enemy> iterator = enemies.iterator();
             while (iterator.hasNext()) {
                 Enemy enemy = iterator.next();
-                if (enemy != null && !enemy.getDead()) {
+//                if (enemy != null && !enemy.getDead()) {
                     enemy.update(deltaTime);
                     if (enemy.getDead()) {
+                        Timer.schedule(new Timer.Task() {
+                            @Override
+                            public void run() {
+                                // 敌人死亡，设置一个标志表示该敌人即将消失
+                                if (!enemy.isDisappearing()) {
+                                    enemy.setDisappearing(true);
+                                }
+                            }
+                        }, 2f); // 延迟2秒
+                    }
+                    // 2秒后删除
+                    if (enemy.isDisappearing()){
                         world.destroyBody(enemy.getBody());
                         iterator.remove();
                     }
-                }
+//                }
             }
             // 设置精灵批处理的投影矩阵为相机的投影矩阵
             batch.setProjectionMatrix(camera.combined);
@@ -302,9 +314,9 @@ public class GameScreen implements Screen {
             towerSelectionBox.render(batch);
             // 如果敌人存在，则绘制敌人的精灵
             for (Enemy enemy : enemies) {
-                if(!enemy.getDead()){
+//                if(!enemy.getDead()){
                     enemy.getSprite().draw(batch);
-                }
+//                }
             }
             // 为各种card的数量赋值
             cardCountMap.clear();

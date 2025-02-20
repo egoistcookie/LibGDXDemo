@@ -205,8 +205,9 @@ public class GameUI {
         // 初始为透明背景
         showCardImage = new Image(transBackTexture);
         // 设置卡片的位置：位于屏幕正中间
-        showCardImage.setPosition((float) Gdx.graphics.getHeight() /2 , (float) Gdx.graphics.getHeight() /2);
-        showCardImage.setSize(100,200);
+        showCardImage.setSize(200,400);
+        showCardImage.setPosition((float) Gdx.graphics.getWidth() /2 - showCardImage.getWidth()/2 ,
+                (float) Gdx.graphics.getHeight() /2 - showCardImage.getHeight()/2 );
         gameObjectTable.addActor(showCardImage);
 
         // 加载金币图标纹理

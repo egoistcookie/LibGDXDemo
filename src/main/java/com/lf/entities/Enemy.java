@@ -46,6 +46,9 @@ public class Enemy {
 
     private boolean isDead = false;
 
+    private boolean isDisappearing;
+
+
     public void setDead(boolean dead) {
         this.isDead = dead;
     }
@@ -67,6 +70,7 @@ public class Enemy {
         this.animationFrames = new Texture[]{new Texture(moveTexture+"1.png"), new Texture(moveTexture+"2.png")};
 
         this.pathPoints = pathPoints;
+        isDisappearing = false;
         // 创建刚体定义
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody; // 设置为动态刚体
@@ -340,4 +344,15 @@ public class Enemy {
         }
     }
 
+    public boolean isDisappearing() {
+        return isDisappearing;
+    }
+
+    public void setDisappearing(boolean disappearing) {
+        isDisappearing = disappearing;
+    }
+
+    public void setAnimationFrames(Texture[] animationFrames) {
+        this.animationFrames = animationFrames;
+    }
 }
