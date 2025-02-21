@@ -12,8 +12,8 @@ import com.badlogic.gdx.physics.box2d.Shape.Type;
 import com.badlogic.gdx.physics.box2d.joints.PulleyJoint;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.lf.entities.Arrow;
-import com.lf.entities.Card;
+import com.lf.entities.attackItem.Arrow;
+import com.lf.entities.card.Card;
 import com.lf.entities.Enemy;
 
 /**

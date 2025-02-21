@@ -32,6 +32,9 @@ import com.lf.config.EnemyLoadConfig;
 import com.lf.core.MyDefenseGame;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.*;
+import com.lf.entities.attackItem.Arrow;
+import com.lf.entities.card.Card;
+import com.lf.entities.card.SwordSaintCard;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.ui.GameUI;
 
@@ -68,6 +71,8 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     // 敌人列表
     private List<Enemy> enemies;
+    // 敌人列表（包含已经死亡的敌人）
+    private List<Enemy> enemiesTotol;
     // 皮肤对象，用于管理界面元素的样式
     private Skin skin;
     // 背景纹理
@@ -133,7 +138,7 @@ public class GameScreen implements Screen {
         stuffes[0] = firtstStuff;
         Stuff stuff2 = new Stuff("yys","yys",1, 1, 1);
         stuffes[1] = stuff2;
-        Stuff stuff3 = new Stuff("saber","saber",1, 1, 1);
+        Stuff stuff3 = new Stuff("swordSaint","swordSaint",1, 1, 1);
         stuffes[2] = stuff3;
         // 创建游戏用户界面
         gameUI = new GameUI(this, stage, game, stuffes);
@@ -145,6 +150,8 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         // 创建敌人列表
         enemies = new ArrayList<>();
+        // 创建敌人列表（包含已经死亡的敌人）
+        enemiesTotol = new ArrayList<>();
         // 创建卡片数量map
         cardCountMap = new HashMap<>();
         // 创建卡片加载集合
@@ -212,9 +219,11 @@ public class GameScreen implements Screen {
                     // 生成敌人
                     Enemy enemy = new Enemy(world, 555f, 570f, enemyType, pathPoints1, gameUI, enemyName);
                     enemies.add(enemy);
+                    enemiesTotol.add(enemy);
                     // 生成双倍敌人，按照order2路线行进
                     Enemy enemy2 = new Enemy(world, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName);
                     enemies.add(enemy2);
+                    enemiesTotol.add(enemy2);
                 }
             }
             // 清除屏幕，设置背景颜色为黑色
@@ -334,6 +343,7 @@ public class GameScreen implements Screen {
             cardCountMap.put("arrowerCount",arrowerCount);
             cardCountMap.put("yysCount",yysCount);
             cardCountMap.put("saberCount",saberCount);
+            // 渲染特效图标
             buffRender(batch);
 
             // 结束精灵批处理
@@ -649,6 +659,10 @@ public class GameScreen implements Screen {
                     // 创建一个新的防御塔对象，位置为点击位置，tower序号作为id
                     Card card = new Card(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
                             stuff.getStuffExp(), stuff.getStuffStarLevel());
+                    if("swordSaint".equals(towerType)){
+                        card = new SwordSaintCard(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
+                                stuff.getStuffExp(), stuff.getStuffStarLevel());
+                    }
                     // 将新的防御塔添加到防御塔列表中
                     cardes.add(card);
                     // 创建防御塔后，物品栏中卡片消失
@@ -771,7 +785,8 @@ public class GameScreen implements Screen {
      * @return
      */
     private boolean isEnemyAlreadySpawned(String enemyName) {
-        for (Enemy enemy : enemies) {
+        // BUG0001-20250221：应该将已经死亡过的敌人也纳入判断范畴
+        for (Enemy enemy : enemiesTotol) {
             if (enemy.getEnemyName()!=null && enemy.getEnemyName().equals(enemyName)) {
                 return true;
             }

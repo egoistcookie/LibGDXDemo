@@ -1,4 +1,4 @@
-package com.lf.entities;
+package com.lf.entities.card;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
@@ -11,6 +11,9 @@ import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.config.CardTypeConfig;
 import com.lf.core.MyDefenseGame;
+import com.lf.entities.attackItem.Arrow;
+import com.lf.entities.Enemy;
+import com.lf.entities.Stuff;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.util.GameUtil;
@@ -21,69 +24,69 @@ import java.util.List;
 // Tower类表示游戏中的防御塔实体
 public class Card {
     // 防御塔的物理刚体，用于处理物理相关行为
-    private Body body;
+    public Body body;
     // 防御塔的精灵，用于图形渲染
-    private Sprite sprite;
+    public Sprite sprite;
     // 防御塔唯一id
     private int towerId;
     // 防御塔类型
     private String cardType;
     // 攻击类型
-    private String attackType;
+    public String attackType;
     // 稀有度
     private String rarity;
     // 攻击力
-    private int attackPower;
+    public int attackPower;
     // 防御塔的攻击范围
-    private float attackRange = 100f;
+    public float attackRange = 100f;
     // 新增：用于记录激光终点（敌人位置）
-    private Vector2 laserEndPoint;
+    public Vector2 laserEndPoint;
     public List<Arrow> arrows; // 箭矢列表，用于存储发射的箭矢
-    private World world;
+    public World world;
     // 攻击贴图
-    private Texture attackTexture;
-    // 攻击贴图
-    private Texture mapTexture;
-
-    // 攻击贴图
+    public Texture attackTexture;
+    // 地图中卡片贴图1
+    public Texture mapTexture;
+    // 地图中卡片贴图2
     private Texture mapTexture2;
-    // 攻击贴图
+    // 物品栏贴图
     private Texture stuffTexture;
-    // 攻击贴图
+    // 卡片贴图
     private Texture cardTexture;
-    private float timeSinceLastFire; // 距离上次发射的时间
+    // 距离上次发射的时间
+    public float timeSinceLastFire;
     // 同时发动的攻击数
-    private float attckCount;
+    public float attckCount;
     // 同时发动的攻击最大数
-    private float maxAttackCount;
+    public float maxAttackCount;
     // 发射频率
-    private float fireRate;
+    public float fireRate;
     // 新增：存储动画帧的纹理数组
-    private Texture[] animationFrames;
+    public Texture[] animationFrames;
     // 新增：当前动画帧索引
-    private int currentFrameIndex = 0;
+    public int currentFrameIndex = 0;
     // 新增：动画计时器
-    private float animationTimer = 0f;
+    public float animationTimer = 0f;
     // 新增：动画帧切换时间间隔
-    private float frameDuration = 0.4f;
+    public float frameDuration = 0.4f;
     // 防御塔的当前等级，初始为1级
-    private int level;
+    public int level;
     // 防御塔的当前星级，初始为1星
-    private int starLevel;
+    public int starLevel;
     // 防御塔的当前经验值，初始为0
-    private int experience;
+    public int experience;
     // 等级数量标签
-    private VisLabel levelLabel;
+    public VisLabel levelLabel;
     // 星级标签
-    private VisLabel starLevelLabel;
+    public VisLabel starLevelLabel;
     // 资源加载管理工具
-    private AssetManager assetManager;
+    public AssetManager assetManager;
     // 特效类型
-    private String effectType;
+    public String effectType;
     // 特效持续时间
-    private float effectDuration;
+    public float effectDuration;
     // 用于获取场地buff
-    private GameScreen gameScreen;
+    public GameScreen gameScreen;
     // 构造函数，用于创建防御塔实例
     public Card(World world, GameScreen gameScreen, int towerId, String cardType, float x, float y, AssetManager assetManager, Stage stage, int experience, int starLevel) {
         this.cardType = cardType;
@@ -213,7 +216,6 @@ public class Card {
                     // 获取每种卡片各自的攻击频率场地buff
                     rateBuff = gameScreen.getRateBuff().get(this.getCardType()+"Rate");
                 }
-
                 // 已达到攻击间隔时间，并且同时攻击数未达到上限，并且敌人未死亡，发起攻击
                 if (timeSinceLastFire >= this.getFireRate()/rateBuff && attckCount < maxAttackCount && !enemy.getDead()) {
                     // 攻击介质应该从防御塔坐标的前方一点射出，会比较自然

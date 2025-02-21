@@ -1,4 +1,4 @@
-package com.lf.entities;
+package com.lf.entities.attackItem;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -6,17 +6,21 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.lf.entities.Enemy;
+import com.lf.entities.card.Card;
 import com.lf.screen.GameScreen;
 
 
 // Arrow类表示游戏中的箭实体
 public class Arrow {
-    private Body body; // 箭的物理刚体
-    private Sprite sprite; // 箭的精灵，用于渲染
-    private Enemy target; // 箭的目标敌人
-    private boolean isHit; // 标记箭是否已经击中敌人
-    private Sound arrowSound; // 箭矢射出的音效
-    private Card card; // 箭矢所属的防御塔
+    public Body body; // 箭的物理刚体
+    public Sprite sprite; // 箭的精灵，用于渲染
+    public Enemy target; // 箭的目标敌人
+    public boolean isHit; // 标记箭是否已经击中敌人
+    public Sound arrowSound; // 箭矢射出的音效
+    public Card card; // 箭矢所属的防御塔
+    // 攻击介质生成的时间
+    public float createTime;
 
     public Arrow(World world, float x, float y, Texture texture, Enemy target, Card card) {
         // 创建刚体定义
@@ -60,6 +64,11 @@ public class Arrow {
         this.arrowSound = Gdx.audio.newSound(Gdx.files.internal("wav/arror_start.wav")); // 加载箭矢出现的音效文件
         // 播放音效
         this.arrowSound.play(0.5f); //表示以 50% 的音量播放音效
+    }
+
+    public Arrow(World world, float x, float y, Texture texture, Enemy target, Card card, float createTime) {
+        this(world, x,y,texture,target,card);
+        this.createTime = createTime;
     }
 
     public void update() {
@@ -116,5 +125,17 @@ public class Arrow {
     // 返回攻击的目标
     public Enemy getTarget() {
         return target;
+    }
+
+    public float getCreateTime() {
+        return createTime;
+    }
+
+    public void setTarget(Enemy target) {
+        this.target = target;
+    }
+
+    public void setCreateTime(float createTime) {
+        this.createTime = createTime;
     }
 }

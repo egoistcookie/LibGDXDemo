@@ -33,3 +33,14 @@ cardTypeConfigs:
     mapTexture: saber
     stuffTexture: saberStuff
     attackTexture: whiteAttack
+  - #
+    cardType: "swordSaint"
+    rarity: SSR
+    attackPower: 5
+    attackRange: 300f
+    maxAttackCount: 3
+    fireRate: 0.5f
+    cardTexture: swordSaint
+    mapTexture: swordSaint
+    stuffTexture: swordSaintStuff
+    attackTexture: arrow

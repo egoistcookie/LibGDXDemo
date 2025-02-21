@@ -85,6 +85,15 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/whiteAttack1.png", Texture.class);
         assetManager.load("tower/whiteAttack2.png", Texture.class);
 
+        // 加载剑仙的背景图片
+        assetManager.load("tower/swordSaint.png", Texture.class);
+        assetManager.load("tower/swordSaintStuff.png", Texture.class);
+        assetManager.load("tower/swordSaint1.png", Texture.class);
+        assetManager.load("tower/swordSaint2.png", Texture.class);
+        assetManager.load("tower/swordSaintOneStar1.png", Texture.class);
+        assetManager.load("tower/swordSaintOneStar2.png", Texture.class);
+        assetManager.load("tower/saintSword.png", Texture.class);
+
         // 加载buff图标
         assetManager.load("buff/swifterArrow.png", Texture.class);
 
