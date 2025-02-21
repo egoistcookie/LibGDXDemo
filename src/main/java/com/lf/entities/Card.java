@@ -168,10 +168,8 @@ public class Card {
                 this.setRarity(cardTypeConfig.getRarity());
                 this.setAttackRange(cardTypeConfig.getAttackRange());
                 this.setMaxAttackCount(cardTypeConfig.getMaxAttackCount());
-                // 攻击力按照星级翻倍
-                this.setAttackPower(cardTypeConfig.getAttackPower()*starLevel);
-                // 攻击频率按照星级减半
-                this.setFireRate(cardTypeConfig.getFireRate()/starLevel);
+                this.setAttackPower(cardTypeConfig.getAttackPower());
+                this.setFireRate(cardTypeConfig.getFireRate());
                 this.setMapTexture(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"1.png", Texture.class));
                 this.setMapTexture2(assetManager.get("tower/"+ cardTypeConfig.getMapTexture() +"2.png", Texture.class));
                 // 使用 Pixmap 加载纹理
@@ -217,7 +215,7 @@ public class Card {
                 }
 
                 // 已达到攻击间隔时间，并且同时攻击数未达到上限，并且敌人未死亡，发起攻击
-                if (timeSinceLastFire >= fireRate/rateBuff && attckCount < maxAttackCount && !enemy.getDead()) {
+                if (timeSinceLastFire >= this.getFireRate()/rateBuff && attckCount < maxAttackCount && !enemy.getDead()) {
                     // 攻击介质应该从防御塔坐标的前方一点射出，会比较自然
                     Arrow arrow = new Arrow(world, body.getPosition().x + 20, body.getPosition().y +10, attackTexture, enemy, this);
                     arrows.add(arrow); // 将箭添加到列表中
@@ -329,10 +327,10 @@ public class Card {
                     stuffes[i] = null;
                     // 星级上升
                     this.starLevel ++;
-                    // 攻击力按照星级翻倍
-                    this.setAttackPower(this.getAttackPower()*starLevel);
-                    // 攻击频率按照星级减半
-                    this.setFireRate(this.getFireRate()/starLevel);
+                    // 攻击力按照星级翻倍 改为在getAttackPower方法里实现
+//                    this.setAttackPower(this.getAttackPower()*starLevel);
+                    // 攻击频率按照星级减半 改为在getFireRate方法里实现
+//                    this.setFireRate(this.getFireRate()/starLevel);
                     // 显示等级
                     showLevel();
                     // 加载音效
@@ -437,7 +435,8 @@ public class Card {
     }
 
     public float getFireRate() {
-        return fireRate;
+        // 以星级增幅
+        return fireRate/starLevel;
     }
 
     public void setFireRate(float fireRate) {
@@ -465,7 +464,8 @@ public class Card {
     }
 
     public int getAttackPower() {
-        return attackPower;
+        // 以星级增幅
+        return attackPower*starLevel;
     }
 
     public void setAttackPower(int attackPower) {

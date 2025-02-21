@@ -385,17 +385,28 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        // 定义你期望的世界宽高比，这里假设为 4:3
+        float desiredAspectRatio = 4f / 3f;
+        // 计算当前窗口的宽高比
+        float currentAspectRatio = (float) width / height;
+        if (currentAspectRatio > desiredAspectRatio) {
+            // 窗口过宽，需要调整宽度以匹配期望的宽高比
+            int newWidth = (int) (height * desiredAspectRatio);
+            viewport.update(newWidth, height, true);
+        } else {
+            // 窗口过高，需要调整高度以匹配期望的宽高比
+            int newHeight = (int) (width / desiredAspectRatio);
+            viewport.update(width, newHeight, true);
+        }
         // 更新相机的视口大小
-        camera.viewportWidth = width;
-        camera.viewportHeight = height;
+        camera.setToOrtho(false, viewport.getWorldWidth(), viewport.getWorldHeight());
+        // 更新背景图片的大小，使其与相机视口大小一致
+        backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
+        // 更新视口的大小
         camera.update();
 
-        backgroundSprite.setSize(width, height);
-
         // 更新游戏用户界面的视口大小
-        gameUI.resize(width, height);
-        // 更新视口的大小
-        viewport.update(width, height);
+//        gameUI.resize(width, height);
     }
 
     @Override
@@ -629,8 +640,6 @@ public class GameScreen implements Screen {
         if(stuffes[i-1] != null){
             Stuff stuff = stuffes[i-1];
             String towerType = stuff.getStuffType();
-            // 加载箭的纹理 默认1号箭矢
-            Texture arrowTexture = assetManager.get("tower/arrow1.png", Texture.class);
             boolean inRange = false;
             for(PolygonMapObject polygonMapObject : this.towerRanges ){
                 //只要x和y坐标有位于其中一个防御塔允许摆放的多边形中，就可以创建新的防御塔对象
