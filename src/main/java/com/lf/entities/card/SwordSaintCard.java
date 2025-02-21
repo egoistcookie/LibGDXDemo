@@ -65,8 +65,6 @@ public class SwordSaintCard extends Card{
             SaintSword saintSword = (SaintSword) arrows.get(i);
             // 仙剑的移动方法交给仙剑自己处理
             saintSword.update(elapsedTimeSeconds,enemies);
-
-            Enemy targetEnemy = saintSword.getTarget();
             //如果攻击已经命中敌人，则销毁攻击介质
             if (saintSword.isHit()){ // || (targetEnemy != null && targetEnemy.getDead()) ) {
                 // 箭已击中敌人，移除箭

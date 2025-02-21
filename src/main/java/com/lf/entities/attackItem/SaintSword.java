@@ -3,6 +3,7 @@ package com.lf.entities.attackItem;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Timer;
 import com.lf.entities.Enemy;
 import com.lf.entities.card.Card;
 import com.lf.screen.GameScreen;
@@ -47,8 +48,14 @@ public class SaintSword extends Arrow{
                 this.setTarget(enemy);
                 // 判断是否已经接触敌人
                 if (!isHit) {
-                    // 有可能在箭矢飞行的过程中敌人就已经dead
-                    // 若把body.setLinearVelocity和sprite.setPosition放在target.getDead()的判断之前，则有一个仙剑插在敌人尸体上的画面
+                    // BUG00002-20250222：若在箭矢飞行的过程中敌人就已经dead，索敌下一个，防止攻击浪费
+                    if(target.getDead()){
+                        // 释放音效资源
+//                        this.arrowSound.dispose();
+                        // 寻找下一个未死亡的敌人
+                        continue;
+                    }
+                    // 若把body.setLinearVelocity和sprite.setPosition放在 continue 的判断之前，则有一个仙剑插在尸体上的画面，直到两秒后敌人从主界面被移除才会去找下一敌人
                     // 计算箭到目标敌人的方向向量
                     Vector2 direction = enemy.getBody().getPosition().sub(body.getPosition());
                     direction.nor(); // 归一化方向向量
@@ -59,12 +66,6 @@ public class SaintSword extends Arrow{
                     // 计算仙剑需要旋转的角度：仙剑位置与敌人位置的向量夹角，加上135度（因为arrow图片本身是一张45度倾斜的箭矢贴图）
                     double angle = Math.atan2(direction.y, direction.x) + 3 * Math.PI / 4; // 加上 135 度（3 * Math.PI / 4 弧度）
                     sprite.setRotation((float) Math.toDegrees(angle));
-                    if(target.getDead()){
-                        // 释放音效资源
-//                        this.arrowSound.dispose();
-                        // 寻找下一个未死亡的敌人
-                        continue;
-                    }
                     // 存在未死亡敌人
                     isExistEnemy = true;
                     // 检查箭是否击中敌人
