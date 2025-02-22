@@ -12,7 +12,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.config.CardTypeConfig;
 import com.lf.core.MyDefenseGame;
 import com.lf.entities.attackItem.Arrow;
-import com.lf.entities.Enemy;
+import com.lf.entities.enemy.Enemy;
 import com.lf.entities.Stuff;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
@@ -41,7 +41,8 @@ public class Card {
     public float attackRange = 100f;
     // 新增：用于记录激光终点（敌人位置）
     public Vector2 laserEndPoint;
-    public List<Arrow> arrows; // 箭矢列表，用于存储发射的箭矢
+    // 攻击介质列表，用于存储已生成的攻击介质
+    public List<Arrow> arrows;
     public World world;
     // 攻击贴图
     public Texture attackTexture;

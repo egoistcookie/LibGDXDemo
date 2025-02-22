@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.lf.entities.attackItem.Arrow;
-import com.lf.entities.Enemy;
+import com.lf.entities.enemy.Enemy;
 import com.lf.entities.attackItem.SaintSword;
 import com.lf.screen.GameScreen;
 

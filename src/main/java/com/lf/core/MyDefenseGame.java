@@ -103,6 +103,9 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/necromancerOneStar2.png", Texture.class);
         assetManager.load("tower/necromancerAttack1.png", Texture.class);
         assetManager.load("tower/necromancerAttack2.png", Texture.class);
+        // 亡灵战士贴图
+        assetManager.load("enemy/ghostWarrior1.png", Texture.class);
+        assetManager.load("enemy/ghostWarrior2.png", Texture.class);
 
         // 加载buff图标
         assetManager.load("buff/swifterArrow.png", Texture.class);
@@ -112,9 +115,9 @@ public class MyDefenseGame extends Game {
         // 加载地图的背景图片
         assetManager.load("map/map3.png", Texture.class);
         // 加载敌人的背景图片
-        assetManager.load("saberOne1.png", Texture.class);
+        assetManager.load("enemy/saberOne1.png", Texture.class);
         // 加载敌人的背景图片
-        assetManager.load("saberOne2.png", Texture.class);
+        assetManager.load("enemy/saberOne2.png", Texture.class);
         // 加载敌人的倒地背景图片
         assetManager.load("enemy/deathing1.png", Texture.class);
         // 加载敌人的倒地背景图片

@@ -34,7 +34,10 @@ import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.*;
 import com.lf.entities.attackItem.Arrow;
 import com.lf.entities.card.Card;
+import com.lf.entities.card.NecromancerCard;
 import com.lf.entities.card.SwordSaintCard;
+import com.lf.entities.enemy.Enemy;
+import com.lf.entities.enemy.GhostWarrior;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.ui.GameUI;
 
@@ -221,7 +224,7 @@ public class GameScreen implements Screen {
                     enemies.add(enemy);
                     enemiesTotol.add(enemy);
                     // 生成双倍敌人，按照order2路线行进
-                    Enemy enemy2 = new Enemy(world, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName);
+                    Enemy enemy2 = new Enemy(world, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName+"-order2");
                     enemies.add(enemy2);
                     enemiesTotol.add(enemy2);
                 }
@@ -329,6 +332,13 @@ public class GameScreen implements Screen {
                 for (Arrow arrow : card.arrows) {
                     arrow.getSprite().draw(batch);
                 }
+                // 亡灵法师，还要渲染她的战士
+                if("necromancer".equals(card.getCardType())){
+                    for (GhostWarrior warrior : ((NecromancerCard)card).ghostWarriores) {
+                        warrior.getSprite().draw(batch);
+                    }
+                }
+
             }
             // 先渲染防御塔，再渲染卡片操作框，使其在防御塔上层显示
             towerSelectionBox.render(batch);
@@ -656,11 +666,16 @@ public class GameScreen implements Screen {
                 if(isPointInPolygon(clickPosition.x,clickPosition.y,polygonMapObject.getPolygon())){
                     inRange = true;
 //                    this.gameUI.subGold(100);
+                    Card card = null;
                     // 创建一个新的防御塔对象，位置为点击位置，tower序号作为id
-                    Card card = new Card(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
-                            stuff.getStuffExp(), stuff.getStuffStarLevel());
                     if("swordSaint".equals(towerType)){
                         card = new SwordSaintCard(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
+                                stuff.getStuffExp(), stuff.getStuffStarLevel());
+                    }else if("necromancer".equals(towerType)){
+                        card = new NecromancerCard(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
+                                stuff.getStuffExp(), stuff.getStuffStarLevel());
+                    }else{
+                        card = new Card(world, this, towerCount++ ,towerType, clickPosition.x, clickPosition.y, assetManager, stage,
                                 stuff.getStuffExp(), stuff.getStuffStarLevel());
                     }
                     // 将新的防御塔添加到防御塔列表中
@@ -912,5 +927,21 @@ public class GameScreen implements Screen {
 
     public void setRateBuff(Map<String, Float> rateBuffMap) {
         this.buffMap = rateBuffMap;
+    }
+
+    public GameUI getGameUI() {
+        return gameUI;
+    }
+
+    public List<Vector2> getPathPoints1() {
+        return pathPoints1;
+    }
+
+    public List<Vector2> getPathPoints2() {
+        return pathPoints2;
+    }
+
+    public void setPathPoints2(List<Vector2> pathPoints2) {
+        this.pathPoints2 = pathPoints2;
     }
 }

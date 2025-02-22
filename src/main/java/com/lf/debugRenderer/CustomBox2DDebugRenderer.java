@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.lf.entities.attackItem.Arrow;
 import com.lf.entities.card.Card;
-import com.lf.entities.Enemy;
+import com.lf.entities.enemy.Enemy;
 
 /**
  * TODO：重写此类只是为了箭矢、防御塔、敌人的刚体无需显示，后期优化项目

@@ -1,4 +1,4 @@
-package com.lf.entities;
+package com.lf.entities.enemy;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -14,39 +14,51 @@ import java.util.List;
 
 // Enemy类表示游戏中的敌人实体
 public class Enemy {
-    private Body body; // 敌人的物理刚体
-    private Sprite sprite; // 敌人的精灵，用于渲染
-    private int health = 5; // 敌人的血量，初始为5
+    public Body body; // 敌人的物理刚体
+    public Sprite sprite; // 敌人的精灵，用于渲染
+    public int health = 5; // 敌人的血量，初始为5
     // 敌人的经验值
-    private int experience;
-    private String rarity = "N"; // 敌人稀有度
-    private String moveTexture; // 敌人贴图
+    public int experience;
+    public String rarity = "N"; // 敌人稀有度
+    public String moveTexture; // 敌人贴图
 
-    private String enemyName;
-    private String enemyType;
-    private Vector2 initialPosition; // 敌人的初始位置
+    public String enemyName;
+    // 对手名称，防止多对一群殴
+    public String oppName;
+    public String enemyType;
+    public Vector2 initialPosition; // 敌人的初始位置
 
-    private Vector2 velocity; // 敌人的移动速度
-    private float velocityFloat; // 敌人的移动速度
-    private Vector2 targetPosition; // 敌人的目标位置，用于移动到指定地点
-    private boolean isMoving; // 标记敌人是否正在移动
-    private List<Vector2> pathPoints;
-    private int currentPathIndex = 0;
+    public Vector2 velocity; // 敌人的移动速度
+    public float velocityFloat; // 敌人的移动速度
+    public Vector2 targetPosition; // 敌人的目标位置，用于移动到指定地点
+    public boolean isMoving; // 标记敌人是否正在移动
+    public List<Vector2> pathPoints;
+    public int currentPathIndex = 0;
     // 游戏用户界面
-    private GameUI gameUI;
+    public GameUI gameUI;
 
     // 新增：存储动画帧的纹理数组
-    private Texture[] animationFrames;
+    public Texture[] animationFrames;
     // 新增：当前动画帧索引
-    private int currentFrameIndex = 0;
+    public int currentFrameIndex = 0;
     // 新增：动画计时器
-    private float animationTimer = 0f;
+    public float animationTimer = 0f;
+    // 新增：攻击计时器
+    public float attackTimer = 0f;
     // 新增：动画帧切换时间间隔
-    private float frameDuration = 0.2f;
+    public float frameDuration = 0.2f;
 
-    private boolean isDead = false;
+    public boolean isDead = false;
+    // 是否被阻挡
+    public boolean isBlock = false;
 
-    private boolean isDisappearing;
+    public boolean isDisappearing;
+    // 现在是否应该朝右
+    public boolean isRight;
+    // 原来是否朝右
+    public boolean isRightOld;
+    // 攻击力
+    private int attackPower;
 
 
     public void setDead(boolean dead) {
@@ -56,18 +68,15 @@ public class Enemy {
         return this.isDead;
     }
 
-    public void setPathPoints(){
-        this.pathPoints = pathPoints;
-    }
-
     public Enemy(World world, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI) {
         this.initialPosition = new Vector2(x, y); // 记录初始位置
         this.targetPosition = null; // 初始化目标位置为null
         this.isMoving = false; // 初始化移动状态为false
+        oppName = "";
         // 根据敌人类型初始化敌人属性：生命值、移动速度、贴图
         initEnemyAttribute(enemyType);
         // 按照moveTexture初始化贴图
-        this.animationFrames = new Texture[]{new Texture(moveTexture+"1.png"), new Texture(moveTexture+"2.png")};
+        this.animationFrames = new Texture[]{new Texture("enemy/"+moveTexture+"1.png"), new Texture("enemy/"+moveTexture+"2.png")};
 
         this.pathPoints = pathPoints;
         isDisappearing = false;
@@ -121,6 +130,8 @@ public class Enemy {
                 this.setRarity(enemyTypeConfig.getRarity());
                 this.setMoveTexture(enemyTypeConfig.getMoveTexture());
                 this.setExperience(enemyTypeConfig.getExperience());
+                this.setFrameDuration(enemyTypeConfig.getFrameDuration());
+                this.setAttackPower(enemyTypeConfig.getAttackPower());
             }
         }
 
@@ -144,6 +155,12 @@ public class Enemy {
      * 敌人的移动逻辑
      */
     public void move() {
+        // 如果被阻挡，则停止移动
+        if(isBlock){
+            body.setLinearVelocity(Vector2.Zero);
+            return;
+        }
+
         if (currentPathIndex < pathPoints.size()) {
             Vector2 targetPoint = pathPoints.get(currentPathIndex);
             Vector2 currentPosition = body.getPosition();
@@ -153,10 +170,17 @@ public class Enemy {
             if (currentPosition.dst(targetPoint) < 1f) {
                 currentPathIndex++;
             }
+            //如果目标x大于当前x，则应朝右
+            isRight = targetPoint.x > currentPosition.x;
+            // 每次变向，都要翻转一次
+            if(isRight != isRightOld){
+                sprite.flip(true, false);//水平翻转
+                isRightOld = isRight;
+            }
         } else {
             // 敌人到达终点
 //            body.setLinearVelocity(Vector2.Zero);
-            // 血量值减少一点
+            // 游戏界面的血量值减少一点
             gameUI.subHealth();
             // 敌人模型消失
 //            body.getWorld().destroyBody(body);
@@ -220,6 +244,8 @@ public class Enemy {
 
     public void takeDamage(int damage) {
         this.health -= damage; // 敌人受到伤害
+        System.out.printf("%s受到了%d点伤害！！！%n",enemyName,damage);
+        System.out.printf("%s剩余生命值：%d！！！%n",enemyName,health);
         if (this.health <= 0) {
             // 敌人死亡，处理死亡逻辑
             this.isDead = true;
@@ -354,5 +380,33 @@ public class Enemy {
 
     public void setAnimationFrames(Texture[] animationFrames) {
         this.animationFrames = animationFrames;
+    }
+
+    public void setPathPoints(){
+        this.pathPoints = pathPoints;
+    }
+
+    public float getFrameDuration() {
+        return frameDuration;
+    }
+
+    public void setFrameDuration(float frameDuration) {
+        this.frameDuration = frameDuration;
+    }
+
+    public int getAttackPower() {
+        return attackPower;
+    }
+
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
+    }
+
+    public boolean isBlock() {
+        return isBlock;
+    }
+
+    public void setBlock(boolean block) {
+        isBlock = block;
     }
 }

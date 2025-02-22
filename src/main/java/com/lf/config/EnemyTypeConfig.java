@@ -14,6 +14,10 @@ public class EnemyTypeConfig {
     private String moveTexture;
     // 经验值
     private int experience;
+    // 动画帧切换时间间隔
+    private float frameDuration;
+    // 攻击力
+    private int attackPower;
 
     public String getEnemyType() {
         return enemyType;
@@ -61,5 +65,21 @@ public class EnemyTypeConfig {
 
     public void setExperience(int experience) {
         this.experience = experience;
+    }
+
+    public float getFrameDuration() {
+        return frameDuration;
+    }
+
+    public void setFrameDuration(float frameDuration) {
+        this.frameDuration = frameDuration;
+    }
+
+    public int getAttackPower() {
+        return attackPower;
+    }
+
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
     }
 }

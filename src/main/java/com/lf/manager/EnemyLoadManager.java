@@ -28,7 +28,7 @@ public class EnemyLoadManager {
         loadEnemyTimeConfig();
         // 加载敌人类型配置文件
         loadEnemyTypeConfig();
-        // 加载敌人类型配置文件
+        // 加载卡片类型配置文件
         loadCardTypeConfig();
     }
 
@@ -105,6 +105,10 @@ public class EnemyLoadManager {
                 enemyTypeConfig.setMoveTexture((String) configMap.get("moveTexture"));
                 // 设置经验值
                 enemyTypeConfig.setExperience((int) configMap.get("experience"));
+                // 设置动画帧切换时间间隔
+                enemyTypeConfig.setFrameDuration(Float.parseFloat(configMap.get("frameDuration")+""));
+                // 设置经验值
+                enemyTypeConfig.setAttackPower((int) configMap.get("attackPower"));
                 // 将敌人加载配置对象添加到列表中
                 enemyTypeConfigs.add(enemyTypeConfig);
             }

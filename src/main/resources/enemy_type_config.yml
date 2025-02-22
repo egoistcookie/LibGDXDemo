@@ -4,20 +4,35 @@ enemyTypeConfigs:
     enemyType: "saberOne"
     rarity: N
     health: 10
+    attackPower: 1
     velocity: 10f
     moveTexture: saberOne
     experience: 5
+    frameDuration: 0.2f
   - # 初级剑客
     enemyType: "enemy2"
     rarity: N
     health: 5
+    attackPower: 2
     velocity: 10f
     moveTexture: enemy2
     experience: 4
+    frameDuration: 0.2f
   - # 初级剑客
     enemyType: "enemy3"
     rarity: N
     health: 5
+    attackPower: 3
     velocity: 10f
     moveTexture: enemy3
     experience: 5
+    frameDuration: 0.2f
+  - # 亡灵战士
+    enemyType: "ghostWarrior"
+    rarity: N
+    health: 20
+    attackPower: 4
+    velocity: 20f
+    moveTexture: ghostWarrior
+    experience: 5
+    frameDuration: 0.2f
