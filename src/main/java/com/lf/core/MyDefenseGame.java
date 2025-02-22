@@ -94,6 +94,16 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/swordSaintOneStar2.png", Texture.class);
         assetManager.load("tower/saintSword.png", Texture.class);
 
+        // 加载死灵法师的背景图片
+        assetManager.load("tower/necromancer.png", Texture.class);
+        assetManager.load("tower/necromancerStuff.png", Texture.class);
+        assetManager.load("tower/necromancer1.png", Texture.class);
+        assetManager.load("tower/necromancer2.png", Texture.class);
+        assetManager.load("tower/necromancerOneStar1.png", Texture.class);
+        assetManager.load("tower/necromancerOneStar2.png", Texture.class);
+        assetManager.load("tower/necromancerAttack1.png", Texture.class);
+        assetManager.load("tower/necromancerAttack2.png", Texture.class);
+
         // 加载buff图标
         assetManager.load("buff/swifterArrow.png", Texture.class);
 

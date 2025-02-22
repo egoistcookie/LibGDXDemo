@@ -101,6 +101,8 @@ public class GameUI {
     private Image saberImage;
     // swordSaint 卡片image
     private Image swordSaintImage;
+    // necromancer 卡片image
+    private Image necromancerImage;
     // 一号特效的Image
     private Image buffImage;
     // 蓝色字体标签style
@@ -201,10 +203,12 @@ public class GameUI {
         yysImage = new Image(assetManager.get("tower/yys.png", Texture.class));
         saberImage = new Image(assetManager.get("tower/saber.png", Texture.class));
         swordSaintImage = new Image(assetManager.get("tower/swordSaint.png", Texture.class));
+        necromancerImage = new Image(assetManager.get("tower/necromancer.png", Texture.class));
         cardImages.put("arrower",arrowerImage);
         cardImages.put("yys",yysImage);
         cardImages.put("saber",saberImage);
         cardImages.put("swordSaint",swordSaintImage);
+        cardImages.put("necromancer",necromancerImage);
         // 创建用来显示卡片的image
         // 初始为透明背景
         showCardImage = new Image(transBackTexture);

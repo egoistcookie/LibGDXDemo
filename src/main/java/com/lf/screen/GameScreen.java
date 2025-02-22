@@ -134,7 +134,7 @@ public class GameScreen implements Screen {
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), true);
         // 初始化三张arrower卡片
-        Stuff firtstStuff = new Stuff("arrower","arrower",1, 1, 1);
+        Stuff firtstStuff = new Stuff("necromancer","necromancer",1, 1, 1);
         stuffes[0] = firtstStuff;
         Stuff stuff2 = new Stuff("yys","yys",1, 1, 1);
         stuffes[1] = stuff2;
