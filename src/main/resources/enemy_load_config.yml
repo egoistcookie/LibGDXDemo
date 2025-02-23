@@ -6,80 +6,80 @@ enemyLoadConfigs:
     enemyName: "Enemy 1.0"
     loadTime: 4.0
   - # 2.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 2.0"
     loadTime: 6.0
   - # 3.0
-    enemyType: saberOne
-    enemyName: "Enemy 3.0"
+    enemyType: ironcladGeneral
+    enemyName: "ironcladGeneral 3.0"
     loadTime: 8.0
   - # 4.0
-    enemyType: saberOne
-    enemyName: "Enemy 4.0"
+    enemyType: minion
+    enemyName: "minion 4.0"
     loadTime: 10.0
   - # 5.0
-    enemyType: saberOne
-    enemyName: "Enemy 5.0"
+    enemyType: minion
+    enemyName: "minion 5.0"
     loadTime: 12.0
   - # 6.0
-    enemyType: saberOne
-    enemyName: "Enemy 6.0"
+    enemyType: ironcladGeneral
+    enemyName: "ironcladGeneral 6.0"
     loadTime: 14.0
   - # 7.0
-    enemyType: saberOne
-    enemyName: "Enemy 7.0"
+    enemyType: archerOne
+    enemyName: "archerOne 7.0"
     loadTime: 16.0
   - # 8.0
-    enemyType: saberOne
-    enemyName: "Enemy 8.0"
+    enemyType: archerOne
+    enemyName: "archerOne 8.0"
     loadTime: 18.0
   - # 9.0
-    enemyType: saberOne
-    enemyName: "Enemy 9.0"
+    enemyType: stoneGuardian
+    enemyName: "stoneGuardian 9.0"
     loadTime: 20.0
   - # 10.0
-    enemyType: saberOne
-    enemyName: "Enemy 10.0"
+    enemyType: stoneGuardian
+    enemyName: "stoneGuardian 10.0"
     loadTime: 22.0
   - # 11.0
-    enemyType: saberOne
-    enemyName: "Enemy 11.0"
+    enemyType: paperPuppet
+    enemyName: "paperPuppet 11.0"
     loadTime: 24.0
   - # 12.0
-    enemyType: saberOne
-    enemyName: "Enemy 12.0"
+    enemyType: paperPuppet
+    enemyName: "paperPuppet 12.0"
     loadTime: 26.0
   - # 13.0
-    enemyType: saberOne
+    enemyType: thunderRoc
     enemyName: "Enemy 13.0"
     loadTime: 28.0
   - # 14.0
-    enemyType: saberOne
+    enemyType: thunderRoc
     enemyName: "Enemy 14.0"
     loadTime: 30.0
   - # 15.0
-    enemyType: saberOne
+    enemyType: Qilin
     enemyName: "Enemy 15.0"
     loadTime: 32.0
   - # 16.0
-    enemyType: saberOne
+    enemyType: Qilin
     enemyName: "Enemy 16.0"
     loadTime: 34.0
   - # 17.0
-    enemyType: saberOne
+    enemyType: foxSpirit
     enemyName: "Enemy 17.0"
     loadTime: 36.0
   - # 18.0
-    enemyType: saberOne
+    enemyType: foxSpirit
     enemyName: "Enemy 18.0"
     loadTime: 38.0
   - # 19.0
-    enemyType: saberOne
-    enemyName: "Enemy 19.0"
+    enemyType: Taotie
+    enemyName: "Taotie 19.0"
     loadTime: 40.0
   - # 20.0
-    enemyType: saberOne
-    enemyName: "Enemy 20.0"
+    enemyType: Taotie
+    enemyName: "Taotie 20.0"
     loadTime: 42.0
   - # 21.0
     enemyType: saberOne

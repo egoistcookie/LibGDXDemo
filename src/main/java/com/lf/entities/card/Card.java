@@ -139,7 +139,9 @@ public class Card {
         // 创建精灵
         sprite = new Sprite(mapTexture);
         // 设置精灵的大小
-        sprite.setSize(mapTexture.getWidth(), mapTexture.getHeight());
+//        sprite.setSize(mapTexture.getWidth(), mapTexture.getHeight());
+        // 卡片大小固定
+        sprite.setSize(40, 70);
         // 设置精灵的原点为中心，方便旋转和定位
         sprite.setOriginCenter();
         // 设置精灵的位置

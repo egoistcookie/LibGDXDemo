@@ -9,24 +9,91 @@ enemyTypeConfigs:
     moveTexture: saberOne
     experience: 5
     frameDuration: 0.2f
-  - # 初级剑客
-    enemyType: "enemy2"
+  - # 小妖喽啰
+    enemyType: "minion"
     rarity: N
     health: 5
     attackPower: 2
-    velocity: 10f
-    moveTexture: enemy2
-    experience: 4
-    frameDuration: 0.2f
-  - # 初级剑客
-    enemyType: "enemy3"
+    velocity: 12f
+    moveTexture: minion
+    experience: 5
+    frameDuration: 0.3f
+  - # 铁甲将军
+    enemyType: "ironcladGeneral"
     rarity: N
-    health: 5
-    attackPower: 3
+    health: 10
+    attackPower: 5
     velocity: 10f
-    moveTexture: enemy3
+    moveTexture: ironcladGeneral
+    experience: 10
+    frameDuration: 0.2f
+  - # 弓箭手一号
+    enemyType: "archerOne"
+    rarity: N
+    health: 10
+    attackPower: 2
+    velocity: 10f
+    moveTexture: archerOne
     experience: 5
     frameDuration: 0.2f
+  - # 石像守卫
+    enemyType: "stoneGuardian"
+    rarity: N
+    health: 100
+    attackPower: 3
+    velocity: 7f
+    moveTexture: stoneGuardian
+    experience: 10
+    frameDuration: 0.5f
+  - # 纸人傀儡
+    enemyType: "paperPuppet"
+    rarity: R
+    health: 10
+    attackPower: 5
+    velocity: 12f
+    moveTexture: paperPuppet
+    experience: 6
+    frameDuration: 0.2f
+  - # 风雷鸟
+    enemyType: "thunderRoc"
+    rarity: R
+    health: 15
+    attackPower: 5
+    velocity: 20f
+    moveTexture: thunderRoc
+    experience: 6
+    frameDuration: 0.2f
+  - # 麒麟
+    enemyType: "Qilin"
+    rarity: SR
+    health: 200
+    attackPower: 20
+    velocity: 15f
+    moveTexture: Qilin
+    experience: 50
+    frameDuration: 0.2f
+  - # 狐妖
+    enemyType: "foxSpirit"
+    rarity: SR
+    health: 100
+    attackPower: 10
+    velocity: 20f
+    moveTexture: foxSpirit
+    experience: 40
+    frameDuration: 0.2f
+  - # 饕餮巨兽
+    enemyType: "Taotie"
+    rarity: SSR
+    health: 500
+    attackPower: 20
+    velocity: 10f
+    moveTexture: Taotie
+    experience: 100
+    frameDuration: 0.5f
+
+
+
+
   - # 亡灵战士
     enemyType: "ghostWarrior"
     rarity: N

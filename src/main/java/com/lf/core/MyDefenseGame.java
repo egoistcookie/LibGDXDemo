@@ -114,10 +114,26 @@ public class MyDefenseGame extends Game {
         assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片
         assetManager.load("map/map3.png", Texture.class);
-        // 加载敌人的背景图片
         assetManager.load("enemy/saberOne1.png", Texture.class);
-        // 加载敌人的背景图片
         assetManager.load("enemy/saberOne2.png", Texture.class);
+        assetManager.load("enemy/minion1.png", Texture.class);
+        assetManager.load("enemy/minion2.png", Texture.class);
+        assetManager.load("enemy/ironcladGeneral1.png", Texture.class);
+        assetManager.load("enemy/ironcladGeneral2.png", Texture.class);
+        assetManager.load("enemy/archerOne1.png", Texture.class);
+        assetManager.load("enemy/archerOne2.png", Texture.class);
+        assetManager.load("enemy/foxSpirit1.png", Texture.class);
+        assetManager.load("enemy/foxSpirit2.png", Texture.class);
+        assetManager.load("enemy/paperPuppet1.png", Texture.class);
+        assetManager.load("enemy/paperPuppet2.png", Texture.class);
+        assetManager.load("enemy/stoneGuardian1.png", Texture.class);
+        assetManager.load("enemy/stoneGuardian2.png", Texture.class);
+        assetManager.load("enemy/Qilin1.png", Texture.class);
+        assetManager.load("enemy/Qilin2.png", Texture.class);
+        assetManager.load("enemy/Taotie1.png", Texture.class);
+        assetManager.load("enemy/Taotie2.png", Texture.class);
+        assetManager.load("enemy/thunderRoc1.png", Texture.class);
+        assetManager.load("enemy/thunderRoc2.png", Texture.class);
         // 加载敌人的倒地背景图片
         assetManager.load("enemy/deathing1.png", Texture.class);
         // 加载敌人的倒地背景图片
