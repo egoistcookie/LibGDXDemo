@@ -81,7 +81,7 @@ public class GhostWarrior extends Enemy{
                     oppName = dstSmallEnemy.enemyName;
                     // 同时为敌人也锁定对手
                     dstSmallEnemy.oppName = enemyName;
-                    System.out.println(enemyName+"绑定对手："+oppName);
+//                    System.out.println(enemyName+"绑定对手："+oppName);
                 }
                 // 与对手相距10像素之内时，视为接触
 //                if(dst < 10f && !(!oppName.isEmpty() && oppName.equals(dstSmallEnemy.enemyName) &&
@@ -116,7 +116,7 @@ public class GhostWarrior extends Enemy{
                     }
                     // 如果战士死亡
                     if(this.isDead){
-                        System.out.println(enemyName +"被"+oppName+"杀死:");
+//                        System.out.println(enemyName +"被"+oppName+"杀死:");
                         // 则放行敌人
                         dstSmallEnemy.setBlock(false);
                         // 敌人的对手置空

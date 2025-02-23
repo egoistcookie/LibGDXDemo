@@ -28,7 +28,9 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
+import com.lf.config.CardTypeConfig;
 import com.lf.config.EnemyLoadConfig;
+import com.lf.constants.EnemyState;
 import com.lf.core.MyDefenseGame;
 import com.lf.debugRenderer.CustomBox2DDebugRenderer;
 import com.lf.entities.*;
@@ -129,20 +131,22 @@ public class GameScreen implements Screen {
         isPaused = false;
         // 创建舞台，使用 ScreenViewport 作为视口
         stage = new Stage(new ScreenViewport());
-        // 创建正交相机，并设置其投影为非正交模式，视口大小为800x600
+        // 创建正交相机，并设置其投影为非正交模式，视口大小为1200x900
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600);
-        // 创建适配视口，初始视口大小为800x600
-        viewport = new FitViewport(800, 600, camera);
+        camera.setToOrtho(false, 1200, 900);
+        // 创建适配视口，初始视口大小为1200x900
+        viewport = new FitViewport(1200, 900, camera);
         // 创建物理世界，重力向量为(0, 0)，不启用休眠
         world = new World(new Vector2(0, 0), true);
         // 初始化三张arrower卡片
-        Stuff firtstStuff = new Stuff("necromancer","necromancer",1, 1, 1);
+        Stuff firtstStuff = new Stuff("blackTortoise","blackTortoise",1, 1, 1);
         stuffes[0] = firtstStuff;
-        Stuff stuff2 = new Stuff("yys","yys",1, 1, 1);
+        Stuff stuff2 = new Stuff("vermilion","vermilion",1, 1, 1);
         stuffes[1] = stuff2;
-        Stuff stuff3 = new Stuff("swordSaint","swordSaint",1, 1, 1);
+        Stuff stuff3 = new Stuff("whiteTiger","whiteTiger",1, 1, 1);
         stuffes[2] = stuff3;
+        Stuff stuff4 = new Stuff("prosperityGirl","prosperityGirl",1, 1, 1);
+        stuffes[3] = stuff4;
         // 创建游戏用户界面
         gameUI = new GameUI(this, stage, game, stuffes);
         // 解析地图中的路径数据
@@ -164,10 +168,8 @@ public class GameScreen implements Screen {
         deathingTexture = new Texture[]{deathingTexture1, deathingTexture2}; ;
         // 初始化场地buff
         buffMap = new HashMap<>();
-        backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
-        backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
         // 加载地图背景
-        backgroundTexture = new Texture(Gdx.files.internal("map/map3.png"));
+        backgroundTexture = assetManager.get("map/map4.png", Texture.class);
         backgroundSprite = new Sprite(backgroundTexture);
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
         // 创建卡片操作框对象
@@ -220,11 +222,11 @@ public class GameScreen implements Screen {
                 // 以enemyName作为唯一标识，来确保敌人不会重复生成
                 if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyName)) {
                     // 生成敌人
-                    Enemy enemy = new Enemy(world, stage, 555f, 570f, enemyType, pathPoints1, gameUI, enemyName);
+                    Enemy enemy = new Enemy(world, stage, 795f, 817f, enemyType, pathPoints1, gameUI, enemyName);
                     enemies.add(enemy);
                     enemiesTotol.add(enemy);
                     // 生成双倍敌人，按照order2路线行进
-                    Enemy enemy2 = new Enemy(world, stage, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName+"-order2");
+                    Enemy enemy2 = new Enemy(world, stage, 774f, 820f, enemyType, pathPoints2, gameUI, enemyName+"-order2");
                     enemies.add(enemy2);
                     enemiesTotol.add(enemy2);
                 }
@@ -246,23 +248,28 @@ public class GameScreen implements Screen {
                 Enemy enemy = iterator.next();
 //                if (enemy != null && !enemy.getDead()) {
                     enemy.update(deltaTime);
-                    if (enemy.getDead()) {
+                    // 倒地或者已达到终点，都需要停止移动，并消散
+                    if (enemy.enemyStatus == EnemyState.FALLEN || enemy.enemyStatus == EnemyState.REACHED_DESTINATION) {
+                        // 倒下，则更换为倒地贴图
+                        if(enemy.enemyStatus == EnemyState.FALLEN){
+                            // 更换为倒地贴图
+                            enemy.setAnimationFrames(deathingTexture);
+                        }
                         // 停止移动
                         enemy.getBody().setActive(false);
-                        // 更换为倒地贴图
-                        enemy.setAnimationFrames(deathingTexture);
+                        // 2秒后消散
                         Timer.schedule(new Timer.Task() {
                             @Override
                             public void run() {
-                                // 敌人死亡，设置一个标志表示该敌人即将消失
-                                if (!enemy.isDisappearing()) {
-                                    enemy.setDisappearing(true);
-                                }
+                            // 敌人死亡，设置一个标志表示该敌人即将消失
+                            if (!enemy.isDisappearing()) {
+                                enemy.setDisappearing(true);
+                            }
                             }
                         }, 2f); // 延迟2秒
                     }
-                    // 2秒后删除
-                    if (enemy.isDisappearing()){
+                    // 2秒后从 enemies 中删除
+                    if (enemy.enemyStatus == EnemyState.DISAPPEARED){
                         world.destroyBody(enemy.getBody());
                         iterator.remove();
                     }
@@ -895,16 +902,28 @@ public class GameScreen implements Screen {
         }
         // 生成1到100的随机数（包含1和100）
         int randomNumber = ThreadLocalRandom.current().nextInt(1, 101);
-        System.out.println("生成的随机数是: " + randomNumber);
-        // 当随机数小于80时，生成最基础的arrower卡片
-        // 大于80，小于95时，生成比较稀有的二级防御单位
-        // 大于95时，生成最稀有的三级防御单位
-        String towerType = "arrower";
+        System.out.println("生成的稀有度随机数是: " + randomNumber);
+        // 先生成一个随机数，选中一个 稀有度-rarity
+        // N-S-SR-SSR 对应概率 60%-20%-15%-5%
+        String rarity = "N";
         if(randomNumber>=95){
-            towerType = "saber";
+            rarity = "SSR";
         }else if (randomNumber>=80){
-            towerType = "yys";
+            rarity = "SR";
+        }else if (randomNumber>=60){
+            rarity = "S";
         }
+        // 获取该rarity的所有卡片
+        List<CardTypeConfig> cardTypes = new ArrayList<>();
+        for (CardTypeConfig cardTypeConfig : enemyLoadManager.getCardTypeConfigs()) {
+            if (rarity.equals(cardTypeConfig.getRarity())){
+                cardTypes.add(cardTypeConfig);
+            }
+        }
+        // 再生成一次随机数，选中一个 towerType
+        int cardTypeNumber = ThreadLocalRandom.current().nextInt(0, cardTypes.size());
+        System.out.println("生成的卡片随机数是: " + cardTypeNumber);
+        String towerType = cardTypes.get(cardTypeNumber).getCardType();
         Stuff newStuff = new Stuff(towerType,towerType,0,1,1);
         // 查找第一个空闲位置
         int index = 0;

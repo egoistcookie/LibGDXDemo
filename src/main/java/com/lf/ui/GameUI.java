@@ -103,6 +103,12 @@ public class GameUI {
     private Image swordSaintImage;
     // necromancer 卡片image
     private Image necromancerImage;
+    // azureDragon 卡片image
+    private Image azureDragonImage;
+    private Image blackTortoiseImage;
+    private Image vermilionImage;
+    private Image whiteTigerImage;
+    private Image prosperityGirlImage;
     // 一号特效的Image
     private Image buffImage;
     // 蓝色字体标签style
@@ -204,6 +210,16 @@ public class GameUI {
         saberImage = new Image(assetManager.get("tower/saber.png", Texture.class));
         swordSaintImage = new Image(assetManager.get("tower/swordSaint.png", Texture.class));
         necromancerImage = new Image(assetManager.get("tower/necromancer.png", Texture.class));
+        azureDragonImage = new Image(assetManager.get("tower/azureDragon.png", Texture.class));
+        blackTortoiseImage = new Image(assetManager.get("tower/blackTortoise.png", Texture.class));
+        whiteTigerImage = new Image(assetManager.get("tower/whiteTiger.png", Texture.class));
+        vermilionImage = new Image(assetManager.get("tower/vermilion.png", Texture.class));
+        prosperityGirlImage = new Image(assetManager.get("tower/prosperityGirl.png", Texture.class));
+        cardImages.put("azureDragon",azureDragonImage);
+        cardImages.put("blackTortoise",blackTortoiseImage);
+        cardImages.put("whiteTiger",whiteTigerImage);
+        cardImages.put("vermilion",vermilionImage);
+        cardImages.put("prosperityGirl",prosperityGirlImage);
         cardImages.put("arrower",arrowerImage);
         cardImages.put("yys",yysImage);
         cardImages.put("saber",saberImage);
@@ -376,6 +392,7 @@ public class GameUI {
                 imageTextures[i] = blackTexture;
             }
             Image image = new Image(imageTextures[i]);
+            image.setSize(80,30);
             stack.add(image);
             // label必须放在image下add才能显示出来
             stack.add(countLabel);

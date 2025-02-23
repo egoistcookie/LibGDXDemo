@@ -47,7 +47,7 @@ public class SaintSword extends Arrow{
                 this.setTarget(enemy);
                 // 判断是否已经接触敌人
                 if (!isHit) {
-                    // BUG00002-20250222：若在箭矢飞行的过程中敌人就已经dead，索敌下一个，防止攻击浪费
+                    // BUG0002-20250222：若在箭矢飞行的过程中敌人就已经dead，索敌下一个，防止攻击浪费
                     if(target.getDead()){
                         // 释放音效资源
 //                        this.arrowSound.dispose();

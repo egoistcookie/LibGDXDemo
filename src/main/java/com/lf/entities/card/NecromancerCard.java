@@ -61,7 +61,6 @@ public class NecromancerCard extends Card{
         if(warriorTimer > warriorIntervaltime && warriorCount < maxWarriorCount){
             // 计时器重置
             warriorTimer = 0;
-            System.out.println("该生成新的战士了");
             // 在亡灵法师下侧坐标生成
             Vector2 masterPosition = super.body.getPosition();
             // 处理路径，沿着敌人行进路线倒序往上走，先去到距离最近的点
@@ -76,7 +75,7 @@ public class NecromancerCard extends Card{
             if(initPathPointsNo ==1){
                 basePathPoints = pathPoints2;
             }
-            System.out.printf("选择%s号线路%n",initPathPointsNo);
+//            System.out.printf("选择%s号线路%n",initPathPointsNo);
             Vector2 dstSmallVector = masterPosition;
             for(int i=0 ; i <basePathPoints.size(); i++){
                 Vector2 vector2 = basePathPoints.get(i);
@@ -95,8 +94,8 @@ public class NecromancerCard extends Card{
                     }
                 }
             }
-            System.out.printf("路径集合PathPoints1中距离法师最近的点为第%d个点%n",dstSmallInt);
-            System.out.println("路径集合PathPoints1中距离法师最近的点为："+dstSmallVector.x+":"+dstSmallVector.y);
+//            System.out.printf("路径集合PathPoints1中距离法师最近的点为第%d个点%n",dstSmallInt);
+//            System.out.println("路径集合PathPoints1中距离法师最近的点为："+dstSmallVector.x+":"+dstSmallVector.y);
             // 顺序倒置，把PathPoints1中剩余的点放入一个新的pathPoints，让战士倒着走这条路径
             List<Vector2> newPathPoints = new ArrayList<>();
             for(int j=dstSmallInt ; j>=0; j--){
@@ -115,7 +114,6 @@ public class NecromancerCard extends Card{
             warrior.update(elapsedTimeSeconds,enemies,this);
             //如果战士已经死亡，则销毁战士
             if (warrior.getDead()){ // || (targetEnemy != null && targetEnemy.getDead()) ) {
-                System.out.println("战士go die");
                 world.destroyBody(warrior.getBody()); // 销毁战士的刚体
                 ghostWarriores.remove(i); // 从列表中移除战士
                 i--; // 调整索引

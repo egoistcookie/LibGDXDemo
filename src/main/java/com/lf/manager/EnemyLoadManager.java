@@ -13,17 +13,18 @@ import java.util.Map;
 // 敌人加载管理器类，负责读取yml文件并管理敌人的加载时序
 public class EnemyLoadManager {
 
-    private List<EnemyLoadConfig> enemyLoadConfigs; // 存储敌人加载信息的列表
-    private List<EnemyTypeConfig> enemyTypeConfigs; // 存储敌人类型信息
-    private List<CardTypeConfig> cardTypeConfigs; // 存储卡片类型信息
-    private double elapsedTime; // 已经过去的时间
+    // 存储敌人加载信息的列表
+    private final List<EnemyLoadConfig> enemyLoadConfigs;
+    // 存储敌人类型信息
+    private final List<EnemyTypeConfig> enemyTypeConfigs;
+    // 存储卡片类型信息
+    private final List<CardTypeConfig> cardTypeConfigs;
 
     // 构造函数，初始化敌人加载配置列表和已过去的时间
     public EnemyLoadManager() {
         this.enemyLoadConfigs = new ArrayList<>();
         this.enemyTypeConfigs = new ArrayList<>();
         this.cardTypeConfigs = new ArrayList<>();
-        this.elapsedTime = 0.0;
         // 加载敌人时间配置文件
         loadEnemyTimeConfig();
         // 加载敌人类型配置文件
@@ -148,21 +149,6 @@ public class EnemyLoadManager {
         }
     }
 
-    // 更新时间的方法，根据已过去的时间判断是否需要加载敌人
-    public List<String> update(double deltaTime) {
-        // 更新已过去的时间
-        elapsedTime += deltaTime;
-        List<String> enemiesToLoad = new ArrayList<>();
-        for (EnemyLoadConfig config : enemyLoadConfigs) {
-            // 判断是否到达加载时间
-            if (elapsedTime >= config.getLoadTime()) {
-                // 将需要加载的敌人类型添加到列表中
-                enemiesToLoad.add(config.getEnemyType());
-            }
-        }
-        return enemiesToLoad;
-    }
-
     public List<EnemyLoadConfig> getEnemyLoadConfigs() {
         return enemyLoadConfigs;
     }
@@ -175,21 +161,6 @@ public class EnemyLoadManager {
         return cardTypeConfigs;
     }
 
-    public void setCardTypeConfigs(List<CardTypeConfig> cardTypeConfigs) {
-        this.cardTypeConfigs = cardTypeConfigs;
-    }
-
     public static void main(String[] args) {
-        // 创建敌人加载管理器对象
-        EnemyLoadManager enemyLoadManager = new EnemyLoadManager();
-        // 模拟游戏循环，每秒更新一次
-        for (int i = 0; i < 20; i++) {
-            // 调用update方法更新时间，传入时间间隔1.0秒
-            List<String> enemiesToLoad = enemyLoadManager.update(1.0);
-            if (!enemiesToLoad.isEmpty()) {
-                // 打印需要加载的敌人类型
-                System.out.println("Time: " + (i + 1) + "s, Enemies to load: " + enemiesToLoad);
-            }
-        }
     }
 }

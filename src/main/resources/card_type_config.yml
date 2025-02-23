@@ -11,7 +11,51 @@ cardTypeConfigs:
     mapTexture: arrower
     stuffTexture: arrowerStuff
     attackTexture: arrow
-  - #
+  - # 白虎战士
+    cardType: "whiteTiger"
+    rarity: N
+    attackPower: 2
+    attackRange: 120f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: whiteTiger
+    mapTexture: whiteTiger
+    stuffTexture: whiteTigerStuff
+    attackTexture: whiteAttack
+  - # 招财童子
+    cardType: "prosperityGirl"
+    rarity: S
+    attackPower: 0
+    attackRange: 1000f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: prosperityGirl
+    mapTexture: prosperityGirl
+    stuffTexture: prosperityGirlStuff
+    attackTexture: whiteAttack
+  - # 玄武法师
+    cardType: "blackTortoise"
+    rarity: S
+    attackPower: 1
+    attackRange: 100f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: blackTortoise
+    mapTexture: blackTortoise
+    stuffTexture: blackTortoiseStuff
+    attackTexture: blackTortoiseAttack
+  - # 朱雀法师
+    cardType: "vermilion"
+    rarity: S
+    attackPower: 1
+    attackRange: 100f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: vermilion
+    mapTexture: vermilion
+    stuffTexture: vermilionStuff
+    attackTexture: vermilionAttack
+  - # 阴阳师
     cardType: "yys"
     rarity: S
     attackPower: 3
@@ -22,7 +66,18 @@ cardTypeConfigs:
     mapTexture: yys
     stuffTexture: yysStuff
     attackTexture: fan
-  - #
+  - # 青龙法师
+    cardType: "azureDragon"
+    rarity: SR
+    attackPower: 3
+    attackRange: 120f
+    maxAttackCount: 2
+    fireRate: 0.5f
+    cardTexture: azureDragon
+    mapTexture: azureDragon
+    stuffTexture: azureDragonStuff
+    attackTexture: dragonAttack
+  - # 剑士
     cardType: "saber"
     rarity: SR
     attackPower: 5
@@ -33,7 +88,7 @@ cardTypeConfigs:
     mapTexture: saber
     stuffTexture: saberStuff
     attackTexture: whiteAttack
-  - #
+  - # 剑仙
     cardType: "swordSaint"
     rarity: SSR
     attackPower: 10
@@ -43,8 +98,8 @@ cardTypeConfigs:
     cardTexture: swordSaint
     mapTexture: swordSaint
     stuffTexture: swordSaintStuff
-    attackTexture: arrow
-  - #
+    attackTexture: saintSword
+  - # 亡灵法师
     cardType: "necromancer"
     rarity: SSR
     attackPower: 5

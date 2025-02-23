@@ -157,13 +157,13 @@ public class Card {
         // 等级标签
         levelLabel = new VisLabel("" + level);
         // 直接设置 goldLabel 的位置 ,显示在防御塔头顶
-        levelLabel.setPosition(x-10,y+20);
+        levelLabel.setPosition(x,y+30);
         stage.addActor(levelLabel);
 
         // 等级标签
         starLevelLabel = new VisLabel(starLevel==1?"*":"**");
         // 直接设置 goldLabel 的位置 ,显示在防御塔头顶，等级上方的位置
-        starLevelLabel.setPosition(x-10,y+30);
+        starLevelLabel.setPosition(x,y+40);
         stage.addActor(starLevelLabel);
 
     }

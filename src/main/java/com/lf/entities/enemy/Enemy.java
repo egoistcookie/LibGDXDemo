@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.lf.constants.EnemyState;
 import com.lf.core.MyDefenseGame;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.config.EnemyTypeConfig;
@@ -18,29 +19,40 @@ import java.util.List;
 
 // Enemy类表示游戏中的敌人实体
 public class Enemy {
-    public Body body; // 敌人的物理刚体
-    public Sprite sprite; // 敌人的精灵，用于渲染
-    public int health = 5; // 敌人的血量，初始为5
+    // 敌人的物理刚体
+    public Body body;
+    // 敌人的精灵，用于渲染
+    public Sprite sprite;
+    // 敌人的血量
+    public int health;
     // 敌人的经验值
     public int experience;
-    public String rarity = "N"; // 敌人稀有度
-    public String moveTexture; // 敌人贴图
-
+    // 敌人稀有度
+    public String rarity;
+    // 敌人贴图
+    public String moveTexture;
+    // 敌人名称
     public String enemyName;
     // 对手名称，防止多对一群殴
     public String oppName;
+    // 敌人类型
     public String enemyType;
-    public Vector2 initialPosition; // 敌人的初始位置
-
-    public Vector2 velocity; // 敌人的移动速度
-    public float velocityFloat; // 敌人的移动速度
-    public Vector2 targetPosition; // 敌人的目标位置，用于移动到指定地点
-    public boolean isMoving; // 标记敌人是否正在移动
+    // 敌人的初始位置
+    public Vector2 initialPosition;
+    // 敌人的移动速度
+    public Vector2 velocity;
+    // 敌人的移动速度
+    public float velocityFloat;
+    // 敌人的目标位置，用于移动到指定地点
+    public Vector2 targetPosition;
+    // 标记敌人是否正在移动
+    public boolean isMoving;
+    // 路径点集合
     public List<Vector2> pathPoints;
+    // 最近经过的路径点
     public int currentPathIndex = 0;
     // 游戏用户界面
     public GameUI gameUI;
-
     // 新增：存储动画帧的纹理数组
     public Texture[] animationFrames;
     // 新增：当前动画帧索引
@@ -51,11 +63,13 @@ public class Enemy {
     public float attackTimer = 0f;
     // 新增：动画帧切换时间间隔
     public float frameDuration = 0.2f;
-
+    // 是否已死亡
     public boolean isDead = false;
     // 是否被阻挡
     public boolean isBlock = false;
-
+    // 敌人状态
+    public EnemyState enemyStatus;
+    // 是否已消散
     public boolean isDisappearing;
     // 现在是否应该朝右
     public boolean isRight;
@@ -66,18 +80,11 @@ public class Enemy {
     // 收到伤害的标签
     public VisLabel takeDamageLabel;
 
-
-    public void setDead(boolean dead) {
-        this.isDead = dead;
-    }
-    public boolean getDead() {
-        return this.isDead;
-    }
-
     public Enemy(World world, Stage stage, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI) {
         this.initialPosition = new Vector2(x, y); // 记录初始位置
         this.targetPosition = null; // 初始化目标位置为null
         this.isMoving = false; // 初始化移动状态为false
+        enemyStatus = EnemyState.INITIAL;
         oppName = "";
         // 根据敌人类型初始化敌人属性：生命值、移动速度、贴图
         initEnemyAttribute(enemyType);
@@ -133,7 +140,7 @@ public class Enemy {
 
     /**
      * 按地人类行为敌人初始化部分属性
-     * @param enemyType
+     * @param enemyType 敌人类型
      */
     private void initEnemyAttribute(String enemyType) {
         // 按类型为属性赋值
@@ -175,7 +182,7 @@ public class Enemy {
             body.setLinearVelocity(Vector2.Zero);
             return;
         }
-
+        // 当前路径点小于路径集合大小，则继续前往下一路径点
         if (currentPathIndex < pathPoints.size()) {
             Vector2 targetPoint = pathPoints.get(currentPathIndex);
             Vector2 currentPosition = body.getPosition();
@@ -193,15 +200,14 @@ public class Enemy {
                 isRightOld = isRight;
             }
         } else {
-            // 敌人到达终点
-//            body.setLinearVelocity(Vector2.Zero);
             // 游戏界面的血量值减少一点
-            gameUI.subHealth();
-            // 敌人模型消失
-//            body.getWorld().destroyBody(body);
+            // BUG0003-20250223：敌人到达终点后不会立即消散，此后不能重复调用subHealth
+            if(!this.isDead){
+                gameUI.subHealth();
+            }
             this.isDead = true;
-//            body.setActive(false);
-//            setDead(true);
+            // 状态设置为已到达终点
+            enemyStatus = EnemyState.REACHED_DESTINATION;
         }
     }
 
@@ -226,19 +232,6 @@ public class Enemy {
         sprite.setRotation((float) Math.toDegrees(angle));
         // 调用移动逻辑
         move();
-
-        // 计算敌人需要旋转的角度：箭矢位置与敌人位置的夹角，加上135度（因为arrow图片本身是一张45度倾斜的箭矢贴图）
-//        if(currentPathIndex < pathPoints.size()){
-//            Vector2 targetPoint = pathPoints.get(currentPathIndex);
-////            Vector2 currentPosition = body.getPosition();
-//            // 针对有明显朝向的敌人，如果目标x坐标大于当前x坐标，则水平翻转一下(只有第一次才需要翻转 待改)
-////        if(targetPoint.x > currentPosition.x){
-////            sprite.flip(true, false);//水平翻转
-////        }
-//            double angle = Math.atan2(targetPoint.y, targetPoint.x) + 4 * Math.PI / 4; // 加上 180 度（4 * Math.PI / 4 弧度）
-//            sprite.setRotation((float) Math.toDegrees(angle));
-////        sprite.setRotation((float) Math.toDegrees(body.getAngle()));
-//        }
     }
 
     public Sprite getSprite() {
@@ -259,28 +252,30 @@ public class Enemy {
 
     public void takeDamage(int damage) {
         this.health -= damage; // 敌人受到伤害
-        System.out.printf("%s受到了%d点伤害！！！%n",enemyName,damage);
-        System.out.printf("%s剩余生命值：%d！！！%n",enemyName,health);
+//        System.out.printf("%s受到了%d点伤害！！！%n",enemyName,damage);
+//        System.out.printf("%s剩余生命值：%d！！！%n",enemyName,health);
         // 直接设置 goldLabel 的位置 ,显示在敌人头顶
-        takeDamageLabel.setText("-" + damage);
-        takeDamageLabel.setPosition(body.getPosition().x-10,body.getPosition().y+20);// 启用富文本支持
-        // 使用Timer在1秒后移除提示窗口
-        Timer.schedule(new Timer.Task() {
+        if(damage > 0){
+            takeDamageLabel.setText("-" + damage);
+            takeDamageLabel.setPosition(body.getPosition().x-10,body.getPosition().y+20);// 启用富文本支持
+            // 使用Timer在1秒后移除提示窗口
+            Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 takeDamageLabel.setText("");
             }
         }, 1f);
+        }
 
         if (this.health <= 0) {
             // 敌人死亡，处理死亡逻辑
             this.isDead = true;
-//             body.setActive(false); // 使刚体失效
-//            body.getWorld().destroyBody(body);
+            // 状态设置为倒下
+            enemyStatus = EnemyState.FALLEN;
             // 敌人死后，为界面增加10个金币
             this.gameUI.addGold(10);
             // 敌人死亡，重新生成
-//            respawn(initialPosition);
+            // respawn(initialPosition);
         }
     }
 
@@ -414,6 +409,10 @@ public class Enemy {
 
     public void setDisappearing(boolean disappearing) {
         isDisappearing = disappearing;
+        if(disappearing){
+            // 状态设置为已消散
+            enemyStatus = EnemyState.DISAPPEARED;
+        }
     }
 
     public void setAnimationFrames(Texture[] animationFrames) {
@@ -446,5 +445,28 @@ public class Enemy {
 
     public void setBlock(boolean block) {
         isBlock = block;
+        if(block){
+            enemyStatus = EnemyState.BLOCKED;
+        }else if(enemyStatus == EnemyState.BLOCKED){
+            // BUG0004-20250223：已经倒地的敌人，不能重新更新回moving状态（可能同时有两次setBlock）
+            enemyStatus = EnemyState.MOVING;
+        }
+        System.out.println(enemyName+":"+block+":enemyStatus:"+enemyStatus);
+    }
+
+    public EnemyState getEnemyStatus() {
+        return enemyStatus;
+    }
+
+    public void setEnemyStatus(EnemyState enemyStatus) {
+        this.enemyStatus = enemyStatus;
+    }
+
+
+    public void setDead(boolean dead) {
+        this.isDead = dead;
+    }
+    public boolean getDead() {
+        return this.isDead;
     }
 }

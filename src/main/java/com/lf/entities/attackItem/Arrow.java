@@ -53,6 +53,8 @@ public class Arrow {
         // 创建精灵
         sprite = new Sprite(texture);
         sprite.setSize(texture.getWidth(), texture.getHeight()); // 设置精灵大小
+        // 攻击介质大小固定
+        sprite.setSize(20, 20); // 设置精灵大小
         sprite.setOriginCenter(); // 设置精灵的原点为中心
 
         this.target = target; // 设置箭的目标敌人
