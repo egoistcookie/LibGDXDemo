@@ -23,11 +23,11 @@ public class NecromancerCard extends Card{
     // 新增：生成战士的计时器
     public float warriorTimer = 0f;
     // 生成战士的间隔时间：默认1秒
-    private float warriorIntervaltime = 1f;
+    private float warriorIntervaltime = 5f;
     // 战士数量
     private int warriorCount;
     // 最大战士数量
-    private int maxWarriorCount;
+    private final int maxWarriorCount;
     // 战士列表，用于存储已生成的战士
     public List<GhostWarrior> ghostWarriores;
     // 战士运动路径集合1
@@ -50,7 +50,7 @@ public class NecromancerCard extends Card{
     public void update(List<Enemy> enemies, float deltaTime) {
 
         // 攻击方式一：传统模式，自行出手攻击
-//        super.update(enemies,deltaTime);
+        super.update(enemies,deltaTime);
 
         // 攻击方式二：召唤战士，战士有其独立的生命历程和攻击方式
         // 计算游戏已经进行的时间（单位：秒）
@@ -103,7 +103,7 @@ public class NecromancerCard extends Card{
                 // 将点添加到列表中
                 newPathPoints.add(basePathPoints.get(j));
             }
-            GhostWarrior warrior = new GhostWarrior(world,dstSmallVector.x,dstSmallVector.y,"ghostWarrior",newPathPoints,gameScreen.getGameUI(),"ghostWarrior "+warriorCount);
+            GhostWarrior warrior = new GhostWarrior(world,stage,dstSmallVector.x,dstSmallVector.y,"ghostWarrior",newPathPoints,gameScreen.getGameUI(),"ghostWarrior "+warriorCount);
             ghostWarriores.add(warrior);
             warriorCount ++ ;
         }
@@ -123,6 +123,22 @@ public class NecromancerCard extends Card{
             }
         }
 
+    }
+
+    // 亡灵法师自定义dispose方法
+    public void dispose() {
+        super.dispose();
+        // 如果回收亡灵法师，其麾下亡灵战士的对手需要释放阻塞状态
+        for(GhostWarrior warrior : ghostWarriores){
+            // 根据名称获取到敌人
+            Enemy enemy = gameScreen.getEnemyByName(warrior.oppName);
+            if(enemy!=null){
+                // 放行敌人
+                enemy.setBlock(false);
+                // 将敌人索敌置空
+                enemy.oppName = "";
+            }
+        }
     }
 
     public static void main(String[] args) {

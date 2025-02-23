@@ -220,11 +220,11 @@ public class GameScreen implements Screen {
                 // 以enemyName作为唯一标识，来确保敌人不会重复生成
                 if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyName)) {
                     // 生成敌人
-                    Enemy enemy = new Enemy(world, 555f, 570f, enemyType, pathPoints1, gameUI, enemyName);
+                    Enemy enemy = new Enemy(world, stage, 555f, 570f, enemyType, pathPoints1, gameUI, enemyName);
                     enemies.add(enemy);
                     enemiesTotol.add(enemy);
                     // 生成双倍敌人，按照order2路线行进
-                    Enemy enemy2 = new Enemy(world, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName+"-order2");
+                    Enemy enemy2 = new Enemy(world, stage, 535f, 570f, enemyType, pathPoints2, gameUI, enemyName+"-order2");
                     enemies.add(enemy2);
                     enemiesTotol.add(enemy2);
                 }
@@ -943,5 +943,21 @@ public class GameScreen implements Screen {
 
     public void setPathPoints2(List<Vector2> pathPoints2) {
         this.pathPoints2 = pathPoints2;
+    }
+
+    /**
+     * 根据enemy名称，从游戏界面获取到对应enemy
+     * @param oppName
+     * @return
+     */
+    public Enemy getEnemyByName(String oppName) {
+        Enemy objEnemy = null;
+        for (Enemy enemy : enemies){
+            if(enemy.getEnemyName().equals(oppName)){
+                objEnemy = enemy;
+            }
+        }
+        return objEnemy;
+
     }
 }

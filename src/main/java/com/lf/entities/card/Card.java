@@ -14,6 +14,7 @@ import com.lf.core.MyDefenseGame;
 import com.lf.entities.attackItem.Arrow;
 import com.lf.entities.enemy.Enemy;
 import com.lf.entities.Stuff;
+import com.lf.entities.enemy.GhostWarrior;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.util.GameUtil;
@@ -88,6 +89,8 @@ public class Card {
     public float effectDuration;
     // 用于获取场地buff
     public GameScreen gameScreen;
+
+    public Stage stage;
     // 构造函数，用于创建防御塔实例
     public Card(World world, GameScreen gameScreen, int towerId, String cardType, float x, float y, AssetManager assetManager, Stage stage, int experience, int starLevel) {
         this.cardType = cardType;
@@ -97,6 +100,7 @@ public class Card {
         // 根据经验值计算等级
         this.level = GameUtil.calcLevel(this.experience);
         this.starLevel = starLevel;
+        this.stage = stage;
         // 根据卡片类型和星级，初始化卡片属性
         initCardAttribute(cardType);
         this.towerId = towerId;

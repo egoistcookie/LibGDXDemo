@@ -91,11 +91,12 @@ public class SaintSword extends Arrow{
         // 仙剑飞回来之后，可能与剑仙保持了更远的距离（0.02左右），但刻意保持一个0.01f，会有一种更cool的指向剑仙的飞剑的闪烁画面
         if(distant <= radius + 0.01f){
             isInRange = true;
-        }else{
-            System.out.println("distant:"+distant);
-            System.out.println("radius:"+radius);
-            System.out.println("isInRange:"+isInRange);
         }
+//        else{
+//            System.out.println("distant:"+distant);
+//            System.out.println("radius:"+radius);
+//            System.out.println("isInRange:"+isInRange);
+//        }
         // 如果剑仙攻击范围内没有敌人，且该仙剑距离剑仙的位置未到半径之内
         // 第二种运动方式：仙剑需飞回剑仙周身之初始轨道
         if(!isExistEnemy && !isInRange){

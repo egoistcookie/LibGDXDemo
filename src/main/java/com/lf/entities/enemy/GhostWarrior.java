@@ -3,6 +3,7 @@ package com.lf.entities.enemy;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lf.entities.card.NecromancerCard;
 import com.lf.screen.GameScreen;
 import com.lf.ui.GameUI;
@@ -15,8 +16,8 @@ import java.util.List;
 public class GhostWarrior extends Enemy{
 
 
-    public GhostWarrior(World world, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
-        super(world, x, y, enemyType, pathPoints, gameUI,enemyName);
+    public GhostWarrior(World world, Stage stage, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
+        super(world, stage,x, y, enemyType, pathPoints, gameUI,enemyName);
         // 死灵战士贴图朝左，需要先翻转一次
         sprite.flip(true, false);//水平翻转
     }
@@ -47,52 +48,49 @@ public class GhostWarrior extends Enemy{
     }
 
     /**
-     * 敌人的移动逻辑
+     * 移动的三种方式：
+     * 一、与敌人相遇，停止移动，贴图改为攻击贴图，每秒造成一次伤害
+     * 二、范围内有敌人，则朝敌人移动
+     * 三、范围内没有敌人，则朝之前的目标地点移动（目标路径为倒序的敌人行进路径）
      */
     public void move(List<Enemy> enemies, NecromancerCard necromancerCard) {
 
         boolean isExistEnemy = false;
-        // 移动的优先级：
-        // 一、范围内有敌人，则朝敌人移动
-        // 二、与敌人相遇，停止移动，贴图改为攻击贴图，每秒造成一次伤害
-        // 三、范围内没有敌人，则朝之前的目标地点移动
 
-        // 第一步：找到距离最近的敌人
+        // 第一步：找到距离最近的敌人（若已有对手，则以对手作为最近敌人）
         Vector2 currentPosition = body.getPosition();
-        // 对手不为空的情况下，永远朝向对手移动
+        // 对手 oppName 不为空的情况下，永远朝向对手移动
         Enemy dstSmallEnemy = getSamllEnemy(enemies,oppName);
-
         if(dstSmallEnemy != null){
             // 获取战士与最近敌人的距离
             Vector2 targetPoint = dstSmallEnemy.getBody().getPosition();
             float dst = currentPosition.dst(targetPoint);
             if (dst < 100f) {
+                // 距离小于100，视为范围内有敌人
                 isExistEnemy = true;
 
-                // 如果作为对手的敌人死亡（可能被其他攻击致死）
+                // 如果作为对手的敌人死亡（可能被其他攻击致死），重置对手名
                 if(oppName.equals(dstSmallEnemy.enemyName) && dstSmallEnemy.isDead){
                     // 又可以去阻拦别的敌人
                     oppName = "";
-                    // 向下一个最近的目标移动
-//                    return;
                 }
 
-                // 先索敌：双向绑定：亡灵战士没有对手的时候，才可以阻挡敌人，且只能锁住没有对手的敌人
+                // 索敌：双向绑定：亡灵战士没有对手的时候，且范围内的该敌人也没有对手时，才可索敌
                 if(oppName.isEmpty() && dstSmallEnemy.oppName.isEmpty()){
                     // 锁定对手
                     oppName = dstSmallEnemy.enemyName;
                     // 同时为敌人也锁定对手
                     dstSmallEnemy.oppName = enemyName;
-
                     System.out.println(enemyName+"绑定对手："+oppName);
                 }
-
                 // 与对手相距10像素之内时，视为接触
-                if(dst < 10f && !(!oppName.isEmpty() && oppName.equals(dstSmallEnemy.enemyName) &&
-                        !dstSmallEnemy.oppName.isEmpty())){
-                    // 何必去追，直接索敌最近单位
-                    System.out.println("距离很近："+oppName+":"+dstSmallEnemy.enemyName);
-                }
+//                if(dst < 10f && !(!oppName.isEmpty() && oppName.equals(dstSmallEnemy.enemyName) &&
+//                        !dstSmallEnemy.oppName.isEmpty())){
+//                    // 何必去追，直接索敌最近单位
+//                    System.out.println("距离很近："+oppName+":"+dstSmallEnemy.enemyName);
+//                }
+                // 移动方式一、与敌人相遇，停止移动，贴图改为攻击贴图，每秒造成一次伤害
+                // 范围近到10像素内，且确认是对手，开始攻击与死亡判断
                 if(dst < 10f && !oppName.isEmpty() && !dstSmallEnemy.oppName.isEmpty() && dstSmallEnemy.oppName.equals(enemyName)){
                     // 阻挡对手
                     dstSmallEnemy.setBlock(true);
@@ -109,137 +107,49 @@ public class GhostWarrior extends Enemy{
                     }
                     // 敌人的攻击计时器也开始运转
                     dstSmallEnemy.attackTimer += deltaTime;
-                    // 战士攻击判定在先，因此即使敌人死了，也可以攻击战士一次，否则太强
+                    // 战士攻击判定在先，因此即使敌人死了，也可以攻击战士一次，否则战士太强
                     if (dstSmallEnemy.attackTimer >= 2*dstSmallEnemy.frameDuration){ // && !enemy.isDead) {
                         // 被敌人攻击
                         this.takeDamage(dstSmallEnemy.getAttackPower());
-                        // 重置计时器
+                        // 重置敌人计时器
                         dstSmallEnemy.attackTimer = 0f;
                     }
-                    // 如果自己先死
+                    // 如果战士死亡
                     if(this.isDead){
+                        System.out.println(enemyName +"被"+oppName+"杀死:");
                         // 则放行敌人
                         dstSmallEnemy.setBlock(false);
+                        // 敌人的对手置空
                         dstSmallEnemy.oppName = "";
                     }
                     // 如果敌人死亡
                     if(dstSmallEnemy.isDead){
                         System.out.println(dstSmallEnemy.enemyName +"被"+dstSmallEnemy.oppName+"杀死:");
-                        // 又可以去阻拦别的敌人
+                        // 战士又可以去阻拦别的敌人
                         oppName = "";
+                        //如果敌人死亡，卡片经验按照 敌人的经验值 增加
+                        necromancerCard.addExperience(dstSmallEnemy.getExperience());
+                        // 等待下一次循环
                         return;
                     }
                 }else{
-
-                    System.out.println(enemyName+"朝："+dstSmallEnemy.enemyName+"移动");
-                    // 对手未死，则朝对手移动
+                    // 移动范围二、范围内有敌人，则朝敌人移动
+                    // 对手在10-100像素之间，则朝对手移动
                     Vector2 direction = targetPoint.cpy().sub(currentPosition).nor();
                     velocity = direction.scl(velocityFloat * GameScreen.getSclRate());
                     body.setLinearVelocity(velocity); // 设置移动速度（可根据需要调整速度值）
-
-                    //如果目标x大于当前x，则应朝右
-                    isRight = targetPoint.x > currentPosition.x;
-                    // 每次变向，都要翻转一次
-                    if(isRight != isRightOld){
-                        sprite.flip(true, false);//水平翻转
-                        isRightOld = isRight;
-                    }
+                    // 判断是否翻转
+                    flip(targetPoint,currentPosition);
                 }
-
             }
         }
-
-
-//        for(Enemy enemy : enemies){
-//            // 目标为敌人
-//            Vector2 targetPoint = enemy.getBody().getPosition();
-//            float dst = currentPosition.dst(targetPoint);
-//            if (dst < 100f) {
-//                isExistEnemy = true;
-//
-//                // 先索敌：双向绑定：亡灵战士没有对手的时候，才可以阻挡敌人，且只能锁住没有对手的敌人
-//                if("".equals(oppName) && "".equals(enemy.oppName)){
-//                    // 锁定对手
-//                    oppName = enemy.enemyName;
-//                    // 同时为敌人也锁定对手
-//                    enemy.oppName = enemyName;
-//                    System.out.println(enemyName+"绑定："+oppName);
-//                }else{
-//                    // 向下一个目标移动
-//                    continue;
-//                }
-//
-//                // 如果作为对手的敌人死亡（可能被其他攻击致死）
-//                if(oppName.equals(enemy.enemyName) && enemy.isDead){
-//                    // 又可以去阻拦别的敌人
-//                    oppName = "";
-//                    // 向下一个目标移动
-//                    continue;
-//                }
-//
-//                // 与对手相距10像素之内时，视为接触
-//                System.out.println(oppName +"对象:"+enemy.enemyName);
-//                System.out.println(enemy.oppName +"对象:"+enemyName);
-//                if(dst < 10f && !oppName.isEmpty() && oppName.equals(enemy.enemyName) &&
-//                        !enemy.oppName.isEmpty()){
-//                    // 阻挡对手
-//                    enemy.setBlock(true);
-//                    // 自己也停止移动
-//                    body.setLinearVelocity(0,0);
-//                    // 开始攻击，战士攻击判定在先
-//                    float deltaTime = Gdx.graphics.getDeltaTime();
-//                    attackTimer += deltaTime;
-//                    // 攻击间隔时间为两倍的动画帧切换时间间隔
-//                    if (attackTimer >= 2*frameDuration && !this.isDead) {
-//                        enemy.takeDamage(this.getAttackPower());
-//                        // 重置计时器
-//                        attackTimer = 0f;
-//                    }
-//                    // 敌人的攻击计时器也开始运转
-//                    enemy.attackTimer += deltaTime;
-//                    // 战士攻击判定在先，因此即使敌人死了，也可以攻击战士一次，否则太强
-//                    if (enemy.attackTimer >= 2*enemy.frameDuration){ // && !enemy.isDead) {
-//                        // 被敌人攻击
-//                        this.takeDamage(enemy.getAttackPower());
-//                        // 重置计时器
-//                        enemy.attackTimer = 0f;
-//                    }
-//                    // 如果自己先死
-//                    if(this.isDead){
-//                        // 则放行敌人
-//                        enemy.setBlock(false);
-//                        enemy.oppName = "";
-//                    }
-//                    // 如果敌人死亡
-//                    if(enemy.isDead){
-//                        // 又可以去阻拦别的敌人
-//                        oppName = "";
-//                    }
-//                    continue;
-//                }else{
-//
-//                    // 对手未死，则朝对手移动
-//                    Vector2 direction = targetPoint.cpy().sub(currentPosition).nor();
-//                    velocity = direction.scl(velocityFloat * GameScreen.getSclRate());
-//                    body.setLinearVelocity(velocity); // 设置移动速度（可根据需要调整速度值）
-//
-//                    //如果目标x大于当前x，则应朝右
-//                    isRight = targetPoint.x > currentPosition.x;
-//                    // 每次变向，都要翻转一次
-//                    if(isRight != isRightOld){
-//                        sprite.flip(true, false);//水平翻转
-//                        isRightOld = isRight;
-//                    }
-//                }
-//            }
-//        }
 
         // 如果范围内存在敌人，就不要再继续往下判断
         if(isExistEnemy){
             return;
         }
 
-        // 范围内没有敌人，则朝之前的目标地点移动
+        // 三、范围内没有敌人，则朝之前的目标地点移动
         if (currentPathIndex < pathPoints.size()) {
             Vector2 targetPoint = pathPoints.get(currentPathIndex);
             Vector2 direction = targetPoint.cpy().sub(currentPosition).nor();
@@ -249,13 +159,8 @@ public class GhostWarrior extends Enemy{
             if (currentPosition.dst(targetPoint) < 1f) {
                 currentPathIndex++;
             }
-            //如果目标x大于当前x，则应朝右
-            isRight = targetPoint.x > currentPosition.x;
-            // 每次变向，都要翻转一次
-            if(isRight != isRightOld){
-                sprite.flip(true, false);//水平翻转
-                isRightOld = isRight;
-            }
+            // 判断是否翻转
+            flip(targetPoint,currentPosition);
         } else {
             // 亡灵战士到达终点就保持静止
             body.setLinearVelocity(0,0);

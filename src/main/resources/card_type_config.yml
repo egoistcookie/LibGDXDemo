@@ -47,8 +47,8 @@ cardTypeConfigs:
   - #
     cardType: "necromancer"
     rarity: SSR
-    attackPower: 10
-    attackRange: 300f
+    attackPower: 5
+    attackRange: 200f
     maxAttackCount: 3
     fireRate: 0.5f
     cardTexture: necromancer

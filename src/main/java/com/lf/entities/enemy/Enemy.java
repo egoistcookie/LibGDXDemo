@@ -1,9 +1,13 @@
 package com.lf.entities.enemy;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Timer;
+import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.core.MyDefenseGame;
 import com.lf.manager.EnemyLoadManager;
 import com.lf.config.EnemyTypeConfig;
@@ -59,6 +63,8 @@ public class Enemy {
     public boolean isRightOld;
     // 攻击力
     private int attackPower;
+    // 收到伤害的标签
+    public VisLabel takeDamageLabel;
 
 
     public void setDead(boolean dead) {
@@ -68,7 +74,7 @@ public class Enemy {
         return this.isDead;
     }
 
-    public Enemy(World world, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI) {
+    public Enemy(World world, Stage stage, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI) {
         this.initialPosition = new Vector2(x, y); // 记录初始位置
         this.targetPosition = null; // 初始化目标位置为null
         this.isMoving = false; // 初始化移动状态为false
@@ -114,6 +120,15 @@ public class Enemy {
         body.setUserData(this);
 
         this.gameUI = gameUI;
+
+        // 伤害标签
+        VisLabel.LabelStyle redLabelStyle = new VisLabel.LabelStyle(gameUI.getSkin().get("default", VisLabel.LabelStyle.class));
+        redLabelStyle.fontColor = Color.RED;
+        takeDamageLabel = new VisLabel("",redLabelStyle);
+        // 直接设置 goldLabel 的位置 ,显示在敌人头顶
+        takeDamageLabel.setPosition(x,y+20);
+        stage.addActor(takeDamageLabel);
+
     }
 
     /**
@@ -137,8 +152,8 @@ public class Enemy {
 
     }
 
-    public Enemy(World world, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
-        this(world,x,y,enemyType,pathPoints,gameUI);
+    public Enemy(World world, Stage stage, float x, float y, String enemyType, List<Vector2> pathPoints, GameUI gameUI, String enemyName) {
+        this(world,stage,x,y,enemyType,pathPoints,gameUI);
         this.enemyName = enemyName;
     }
 
@@ -246,6 +261,17 @@ public class Enemy {
         this.health -= damage; // 敌人受到伤害
         System.out.printf("%s受到了%d点伤害！！！%n",enemyName,damage);
         System.out.printf("%s剩余生命值：%d！！！%n",enemyName,health);
+        // 直接设置 goldLabel 的位置 ,显示在敌人头顶
+        takeDamageLabel.setText("-" + damage);
+        takeDamageLabel.setPosition(body.getPosition().x-10,body.getPosition().y+20);// 启用富文本支持
+        // 使用Timer在1秒后移除提示窗口
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                takeDamageLabel.setText("");
+            }
+        }, 1f);
+
         if (this.health <= 0) {
             // 敌人死亡，处理死亡逻辑
             this.isDead = true;
@@ -291,6 +317,18 @@ public class Enemy {
         currentPathIndex = 0;
         // 敌人死后，为界面增加10个金币
         this.gameUI.addGold(10);
+    }
+
+    // 翻转方法：判断目标与当前位置的x轴大小之差
+    public void flip(Vector2 targetPoint, Vector2 currentPosition) {
+
+        //如果目标x大于当前x，则应朝右
+        isRight = targetPoint.x > currentPosition.x;
+        // 每次变向，都要翻转一次
+        if(isRight != isRightOld){
+            sprite.flip(true, false);//水平翻转
+            isRightOld = isRight;
+        }
     }
 
     public void dispose() {
