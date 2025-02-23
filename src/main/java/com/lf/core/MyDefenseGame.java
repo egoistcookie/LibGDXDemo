@@ -185,6 +185,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("black.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("rollback.png", Texture.class);
+        // 加载星的背景图片
+        assetManager.load("Star1.png", Texture.class);
+        assetManager.load("Star2.png", Texture.class);
+        assetManager.load("Star3.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
         // 升级音效

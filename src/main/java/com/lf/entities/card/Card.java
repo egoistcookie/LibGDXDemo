@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.lf.config.CardTypeConfig;
@@ -89,6 +90,12 @@ public class Card {
     public float effectDuration;
     // 用于获取场地buff
     public GameScreen gameScreen;
+    // 星星背景
+    private Image starImage1;
+    // 星星背景
+    private Image starImage2;
+    // 星星背景
+    private Image starImage3;
 
     public Stage stage;
     // 构造函数，用于创建防御塔实例
@@ -161,10 +168,15 @@ public class Card {
         stage.addActor(levelLabel);
 
         // 等级标签
+        starImage1 = new Image(assetManager.get("Star1.png", Texture.class));
+        starImage2 = new Image(assetManager.get("Star2.png", Texture.class));
+        starImage3 = new Image(assetManager.get("Star3.png", Texture.class));
         starLevelLabel = new VisLabel(starLevel==1?"*":"**");
         // 直接设置 goldLabel 的位置 ,显示在防御塔头顶，等级上方的位置
-        starLevelLabel.setPosition(x,y+40);
-        stage.addActor(starLevelLabel);
+//        starLevelLabel.setPosition(x,y+50);
+        starImage2.setPosition(x,y+50);
+        starImage2.setSize(10,10);
+        stage.addActor(starImage2);
 
     }
 
