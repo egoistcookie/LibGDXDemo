@@ -19,13 +19,6 @@ public class TowerDefenseApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-//        config.setTitle("Tower Defense Game");
-//        config.setWindowedMode(800, 600);
-//        new Lwjgl3Application(new TowerDefenseGame(), config);
-
-        // 创建 Screen 实现类的实例，并传入 ApplicationAdapter 实例
-//        MainMenuScreen screen = new MainMenuScreen(adapter);
 
         // 创建游戏实例
         MyDefenseGame game = new MyDefenseGame();
@@ -35,7 +28,7 @@ public class TowerDefenseApplication implements CommandLineRunner {
         config.setTitle("Tower");
         config.setWindowedMode(1200, 900);
         // 设置最小尺寸和最大尺寸
-        config.setWindowSizeLimits(400,300,1200,900);
+        config.setWindowSizeLimits(1200,900,1200,900);
 
         // 启动 Lwjgl3Application
         new Lwjgl3Application(game, config);
