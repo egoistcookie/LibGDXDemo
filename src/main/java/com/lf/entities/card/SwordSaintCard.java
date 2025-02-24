@@ -56,7 +56,7 @@ public class SwordSaintCard extends Card{
         Random random = new Random();
         int initRadius = random.nextInt(51) + 50;
         // 每次大于生成剑的间隔时间，且生成的仙剑数量少于最大数量，就会生成一柄剑
-        if(swordTimer > swordIntervaltime && swordCount <= maxSwordCount){
+        if(swordTimer > swordIntervaltime && swordCount <= 10*starLevel){
             // 计时器重置
             swordTimer = 0;
             System.out.println("该生成新的剑了");

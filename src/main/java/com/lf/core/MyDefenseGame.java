@@ -62,8 +62,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/arrower2.png", Texture.class);
         assetManager.load("tower/arrowerOneStar1.png", Texture.class);
         assetManager.load("tower/arrowerOneStar2.png", Texture.class);
+        assetManager.load("tower/arrowerOneStar3.png", Texture.class);
         assetManager.load("tower/arrow1.png", Texture.class);
         assetManager.load("tower/arrow2.png", Texture.class);
+        assetManager.load("tower/arrow3.png", Texture.class);
 
         // 加载阴阳师的背景图片
         assetManager.load("tower/yys.png", Texture.class);
@@ -72,8 +74,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/yys2.png", Texture.class);
         assetManager.load("tower/yysOneStar1.png", Texture.class);
         assetManager.load("tower/yysOneStar2.png", Texture.class);
+        assetManager.load("tower/yysOneStar3.png", Texture.class);
         assetManager.load("tower/fan1.png", Texture.class);
         assetManager.load("tower/fan2.png", Texture.class);
+        assetManager.load("tower/fan3.png", Texture.class);
         // 加载青龙-玄武-朱雀-白虎的背景图片
         assetManager.load("tower/azureDragon.png", Texture.class);
         assetManager.load("tower/azureDragonStuff.png", Texture.class);
@@ -81,30 +85,37 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/azureDragon2.png", Texture.class);
         assetManager.load("tower/azureDragonOneStar1.png", Texture.class);
         assetManager.load("tower/azureDragonOneStar2.png", Texture.class);
+        assetManager.load("tower/azureDragonOneStar3.png", Texture.class);
         assetManager.load("tower/dragonAttack1.png", Texture.class);
         assetManager.load("tower/dragonAttack2.png", Texture.class);
+        assetManager.load("tower/dragonAttack3.png", Texture.class);
         assetManager.load("tower/blackTortoise.png", Texture.class);
         assetManager.load("tower/blackTortoiseStuff.png", Texture.class);
         assetManager.load("tower/blackTortoise1.png", Texture.class);
         assetManager.load("tower/blackTortoise2.png", Texture.class);
         assetManager.load("tower/blackTortoiseOneStar1.png", Texture.class);
         assetManager.load("tower/blackTortoiseOneStar2.png", Texture.class);
+        assetManager.load("tower/blackTortoiseOneStar3.png", Texture.class);
         assetManager.load("tower/blackTortoiseAttack1.png", Texture.class);
         assetManager.load("tower/blackTortoiseAttack2.png", Texture.class);
+        assetManager.load("tower/blackTortoiseAttack3.png", Texture.class);
         assetManager.load("tower/vermilion.png", Texture.class);
         assetManager.load("tower/vermilionStuff.png", Texture.class);
         assetManager.load("tower/vermilion1.png", Texture.class);
         assetManager.load("tower/vermilion2.png", Texture.class);
         assetManager.load("tower/vermilionOneStar1.png", Texture.class);
         assetManager.load("tower/vermilionOneStar2.png", Texture.class);
+        assetManager.load("tower/vermilionOneStar3.png", Texture.class);
         assetManager.load("tower/vermilionAttack1.png", Texture.class);
         assetManager.load("tower/vermilionAttack2.png", Texture.class);
+        assetManager.load("tower/vermilionAttack3.png", Texture.class);
         assetManager.load("tower/whiteTiger.png", Texture.class);
         assetManager.load("tower/whiteTigerStuff.png", Texture.class);
         assetManager.load("tower/whiteTiger1.png", Texture.class);
         assetManager.load("tower/whiteTiger2.png", Texture.class);
         assetManager.load("tower/whiteTigerOneStar1.png", Texture.class);
         assetManager.load("tower/whiteTigerOneStar2.png", Texture.class);
+        assetManager.load("tower/whiteTigerOneStar3.png", Texture.class);
         // 加载招财童子的背景图片
         assetManager.load("tower/prosperityGirl.png", Texture.class);
         assetManager.load("tower/prosperityGirlStuff.png", Texture.class);
@@ -112,6 +123,7 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/prosperityGirl2.png", Texture.class);
         assetManager.load("tower/prosperityGirlOneStar1.png", Texture.class);
         assetManager.load("tower/prosperityGirlOneStar2.png", Texture.class);
+        assetManager.load("tower/prosperityGirlOneStar3.png", Texture.class);
 
         // 加载剑士的背景图片
         assetManager.load("tower/saber.png", Texture.class);
@@ -120,8 +132,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/saber2.png", Texture.class);
         assetManager.load("tower/saberOneStar1.png", Texture.class);
         assetManager.load("tower/saberOneStar2.png", Texture.class);
+        assetManager.load("tower/saberOneStar3.png", Texture.class);
         assetManager.load("tower/whiteAttack1.png", Texture.class);
         assetManager.load("tower/whiteAttack2.png", Texture.class);
+        assetManager.load("tower/whiteAttack3.png", Texture.class);
 
         // 加载剑仙的背景图片
         assetManager.load("tower/swordSaint.png", Texture.class);
@@ -130,7 +144,11 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/swordSaint2.png", Texture.class);
         assetManager.load("tower/swordSaintOneStar1.png", Texture.class);
         assetManager.load("tower/swordSaintOneStar2.png", Texture.class);
+        assetManager.load("tower/swordSaintOneStar3.png", Texture.class);
         assetManager.load("tower/saintSword.png", Texture.class);
+        assetManager.load("tower/saintSword1.png", Texture.class);
+        assetManager.load("tower/saintSword2.png", Texture.class);
+        assetManager.load("tower/saintSword3.png", Texture.class);
 
         // 加载死灵法师的背景图片
         assetManager.load("tower/necromancer.png", Texture.class);
@@ -139,8 +157,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("tower/necromancer2.png", Texture.class);
         assetManager.load("tower/necromancerOneStar1.png", Texture.class);
         assetManager.load("tower/necromancerOneStar2.png", Texture.class);
+        assetManager.load("tower/necromancerOneStar3.png", Texture.class);
         assetManager.load("tower/necromancerAttack1.png", Texture.class);
         assetManager.load("tower/necromancerAttack2.png", Texture.class);
+        assetManager.load("tower/necromancerAttack3.png", Texture.class);
         // 亡灵战士贴图
         assetManager.load("enemy/ghostWarrior1.png", Texture.class);
         assetManager.load("enemy/ghostWarrior2.png", Texture.class);

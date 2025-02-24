@@ -164,19 +164,19 @@ public class Card {
         // 等级标签
         levelLabel = new VisLabel("" + level);
         // 直接设置 goldLabel 的位置 ,显示在防御塔头顶
-        levelLabel.setPosition(x,y+30);
+        levelLabel.setPosition(x-5,y+30);
         stage.addActor(levelLabel);
 
         // 等级标签
         starImage1 = new Image(assetManager.get("Star1.png", Texture.class));
         starImage2 = new Image(assetManager.get("Star2.png", Texture.class));
         starImage3 = new Image(assetManager.get("Star3.png", Texture.class));
-        starLevelLabel = new VisLabel(starLevel==1?"*":"**");
+        // 触发一次贴图更新
+        setStarLevel(starLevel);
+//        starLevelLabel = new VisLabel(starLevel==1?"*":"**");
         // 直接设置 goldLabel 的位置 ,显示在防御塔头顶，等级上方的位置
 //        starLevelLabel.setPosition(x,y+50);
-        starImage2.setPosition(x,y+50);
-        starImage2.setSize(10,10);
-        stage.addActor(starImage2);
+        stage.addActor(starImage1);
 
     }
 
@@ -296,7 +296,10 @@ public class Card {
         attackTexture = null;
         // 隐藏标签
         levelLabel.setVisible(false);
-        starLevelLabel.setVisible(false);
+        // 隐藏贴图
+        starImage1.setVisible(false);
+        starImage2.setVisible(false);
+        starImage3.setVisible(false);
     }
 
     /**
@@ -331,7 +334,6 @@ public class Card {
 
     private void showLevel() {
         levelLabel.setText("" + this.level);
-        starLevelLabel.setText(starLevel==1?"*":"**");
     }
 
     // 升星
@@ -339,7 +341,7 @@ public class Card {
         String towerType = this.getCardType();
         for(int i =0 ; i <stuffes.length ; i++){
             // 物品栏中是否有当前类型卡片
-            if(stuffes[i]!=null && stuffes[i].getStuffType().equals(towerType)){
+            if(stuffes[i] != null){// && stuffes[i].getStuffType().equals(towerType)){
                 Stuff stuff = stuffes[i];
                 System.out.println("升星！");
                 // 判断是否同星级且满等级
@@ -348,6 +350,10 @@ public class Card {
                     stuffes[i] = null;
                     // 星级上升
                     this.starLevel ++;
+                    // 经验值清零
+                    this.experience =0;
+                    // 更新星级贴图
+                    setStarLevel(this.starLevel);
                     // 攻击力按照星级翻倍 改为在getAttackPower方法里实现
 //                    this.setAttackPower(this.getAttackPower()*starLevel);
                     // 攻击频率按照星级减半 改为在getFireRate方法里实现
@@ -409,6 +415,19 @@ public class Card {
 
     public void setStarLevel(int starLevel) {
         this.starLevel = starLevel;
+        if(starLevel == 3){
+            starImage1.setSize(30,10);
+            starImage1.setPosition(body.getPosition().x-15,body.getPosition().y+50);
+            starImage1.setDrawable(starImage3.getDrawable());
+        }else if(starLevel == 2){
+            starImage1.setSize(20,10);
+            starImage1.setPosition(body.getPosition().x-10,body.getPosition().y+50);
+            starImage1.setDrawable(starImage2.getDrawable());
+        }else{
+            starImage1.setSize(10,10);
+            starImage1.setPosition(body.getPosition().x-5,body.getPosition().y+50);
+            starImage1.setDrawable(starImage1.getDrawable());
+        }
     }
 
     public void setAttackRange(float attackRange) {

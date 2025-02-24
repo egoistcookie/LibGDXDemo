@@ -474,7 +474,7 @@ public class GameUI {
                 // 计算等级
                 countLabel = new Label(String.valueOf(GameUtil.calcLevel(stuff.getStuffExp())), whiteLabelStyle);
                 // 星级
-                starLabel = new Label(stuff.getStuffStarLevel()==1?"*":"**", whiteLabelStyle);
+                starLabel = new Label(stuff.getStuffStarLevel()==3?"***":stuff.getStuffStarLevel()==2?"**":"*", whiteLabelStyle);
                 // 设置登记标签的对齐方式为右上角
                 countLabel.setAlignment(Align.topRight);
                 // 设置星级标签的对齐方式为左上角

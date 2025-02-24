@@ -7,7 +7,7 @@ enemyTypeConfigs:
     attackPower: 1
     velocity: 10f
     moveTexture: saberOne
-    experience: 5
+    experience: 500
     frameDuration: 0.2f
   - # 小妖喽啰
     enemyType: "minion"
