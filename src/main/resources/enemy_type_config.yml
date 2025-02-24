@@ -7,7 +7,7 @@ enemyTypeConfigs:
     attackPower: 1
     velocity: 10f
     moveTexture: saberOne
-    experience: 500
+    experience: 5
     frameDuration: 0.2f
   - # 小妖喽啰
     enemyType: "minion"
@@ -18,18 +18,9 @@ enemyTypeConfigs:
     moveTexture: minion
     experience: 5
     frameDuration: 0.3f
-  - # 铁甲将军
-    enemyType: "ironcladGeneral"
-    rarity: N
-    health: 10
-    attackPower: 5
-    velocity: 10f
-    moveTexture: ironcladGeneral
-    experience: 10
-    frameDuration: 0.2f
   - # 弓箭手一号
     enemyType: "archerOne"
-    rarity: N
+    rarity: R
     health: 10
     attackPower: 2
     velocity: 10f
@@ -38,7 +29,7 @@ enemyTypeConfigs:
     frameDuration: 0.2f
   - # 石像守卫
     enemyType: "stoneGuardian"
-    rarity: N
+    rarity: R
     health: 100
     attackPower: 3
     velocity: 7f
@@ -62,6 +53,15 @@ enemyTypeConfigs:
     velocity: 20f
     moveTexture: thunderRoc
     experience: 6
+    frameDuration: 0.2f
+  - # 铁甲将军
+    enemyType: "ironcladGeneral"
+    rarity: SR
+    health: 10
+    attackPower: 5
+    velocity: 10f
+    moveTexture: ironcladGeneral
+    experience: 10
     frameDuration: 0.2f
   - # 麒麟
     enemyType: "Qilin"
