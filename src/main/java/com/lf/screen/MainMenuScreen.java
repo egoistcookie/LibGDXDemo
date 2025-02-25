@@ -43,14 +43,12 @@ public class MainMenuScreen implements Screen {
     private TextButton exitButton;
     // 退出游戏事件监听
     private ClickListener exitButtonClickListener;
-    // 敌人加载管理工具
-    private EnemyLoadManager enemyLoadManager;
 
     // 构造函数，接收游戏对象作为参数
     public MainMenuScreen(MyDefenseGame game) {
         this.game = game;
+        System.out.println(game);
         this.assetManager = game.getAssetManager();
-        this.enemyLoadManager = game.getEnemyLoadManager();
     }
 
     @Override
@@ -117,7 +115,7 @@ public class MainMenuScreen implements Screen {
                 // 处理点击事件，例如切换到 EnhanCard
                 removeAllListener();
                 // 点击按钮后切换到游戏界面
-                game.setScreen(new EnhanCard(game));
+                game.setScreen(new BrowCardScreen(game));
             }
         };
         enhanceButton.addListener(enhanceButtonClickListener);

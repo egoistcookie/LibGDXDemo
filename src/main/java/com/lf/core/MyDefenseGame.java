@@ -38,10 +38,11 @@ public class MyDefenseGame extends Game {
         // 设置 BitmapFont 的加载器
         assetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
         // 加载自定义字体
-        FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-        fontParameter.fontFileName = "fonts/xinsongti.fnt"; // 字体文件路径下，需要有fnt和png两文件，都是通过Hiero工具生成
+//        FreetypeFontLoader.FreeTypeFontLoaderParameter fontParameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+//        fontParameter.fontFileName = "fonts/xinsongti.fnt"; // 字体文件路径下，需要有fnt和png两文件，都是通过Hiero工具生成
 //        fontParameter.fontParameters.size = 12; // 字体大小
         assetManager.load("fonts/xinsongti.fnt", BitmapFont.class);
+        assetManager.load("fonts/whiteYouYuan.fnt", BitmapFont.class);
         // 加载提示框的背景图片
         assetManager.load("alertTitle.png", Texture.class);
         // 加载金币的背景图片
@@ -211,8 +212,8 @@ public class MyDefenseGame extends Game {
         assetManager.load("Star3.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
-        assetManager.load("default-scroll.png", Texture.class);
-        assetManager.load("default-scroll-knob.png", Texture.class);
+//        assetManager.load("default-scroll.png", Texture.class);
+//        assetManager.load("default-scroll-knob.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
         // 升级音效
@@ -252,4 +253,7 @@ public class MyDefenseGame extends Game {
     public EnemyLoadManager getEnemyLoadManager() {
         return enemyLoadManager;
     }
+
+
+
 }

@@ -5,6 +5,7 @@ import com.lf.config.EnemyLoadConfig;
 import com.lf.config.EnemyTypeConfig;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +35,25 @@ public class EnemyLoadManager {
     }
 
     // 加载卡片类型配置文件
-    private void loadCardTypeConfig() {
+    public void loadCardTypeConfig() {
         try {
             // 创建Yaml对象
             Yaml yaml = new Yaml();
+            cardTypeConfigs.clear();
             // 打开配置文件的输入流
-            InputStream inputStream = this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("card_type_config.yml");
+            // BUG0005-20250225：getResourceAsStream 读取有缓存，强化卡片时需要动态加载，不能使用缓存，改为从FileReader获取
+            String filePath = System.getProperty("user.dir") + "/src/main/resources/card_type_config.yml";
+            FileReader writer = new FileReader(filePath);
             // 读取配置文件内容
-            Map<String, List<Map<String, Object>>> config = yaml.load(inputStream);
+            Map<String, List<Map<String, Object>>> data = yaml.load(writer);
+            writer.close();
+//            InputStream inputStream = this.getClass()
+//                    .getClassLoader()
+//                    .getResourceAsStream("card_type_config.yml");
+//            // 读取配置文件内容
+//            Map<String, List<Map<String, Object>>> config = yaml.load(inputStream);
             // 获取卡片加载配置列表
-            List<Map<String, Object>> configList = config.get("cardTypeConfigs");
+            List<Map<String, Object>> configList = data.get("cardTypeConfigs");
             for (Map<String, Object> configMap : configList) {
                 // 创建卡片加载配置对象
                 CardTypeConfig cardTypeConfig = new CardTypeConfig();
