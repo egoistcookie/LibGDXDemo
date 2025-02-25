@@ -5,6 +5,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import java.util.List;
 
@@ -53,15 +55,35 @@ public class EnhanCard implements Screen {
         scrollPane.setHeight(Gdx.graphics.getHeight()); // 设置滚动面板高度为屏幕高度
         // 获取ScrollPane的样式
         ScrollPane.ScrollPaneStyle style = scrollPane.getStyle();
-        Image defaultScroll = new Image(assetManager.get("default-scroll-knob.png", Texture.class));
-        Image vScroll = new Image(assetManager.get("default-scroll.png", Texture.class));
+//        Image defaultScroll = new Image(assetManager.get("default-scroll-knob.png", Texture.class));
+//        Image vScroll = new Image(assetManager.get("default-scroll.png", Texture.class));
         // 设置垂直滚动条始终显示
-        style.vScrollKnob = defaultScroll.getDrawable();
-        style.vScroll = vScroll.getDrawable();
-        scrollPane.setForceScroll(false, true); // 只允许垂直滚动
+//        style.vScrollKnob = defaultScroll.getDrawable();
+//        style.vScroll = vScroll.getDrawable();
         scrollPane.setFadeScrollBars(false); // 始终显示滚动条
-        scrollPane.setScrollingDisabled(false, false); // 确保水平和垂直滚动都启用
-        scrollPane.setStyle(style);
+//        scrollPane.setStyle(style);
+        // 确保 scrollPane 可以滚动
+        scrollPane.setScrollingDisabled(false, false);// 确保水平和垂直滚动都启用
+        scrollPane.setForceScroll(false, true);// 只允许垂直滚动
+
+        scrollPane.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("Touch down on scrollPane");
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                System.out.println("Touch dragged on scrollPane");
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("Touch up on scrollPane");
+            }
+        });
+
         stage.addActor(scrollPane);
     }
 
@@ -102,7 +124,7 @@ public class EnhanCard implements Screen {
         // 强制滚动面板重新计算滚动区域
         scrollPane.layout();
 
-        scrollPane.setScrollPercentY(0); // 滚动到顶部
+//        scrollPane.setScrollPercentY(0); // 滚动到顶部
 
         // 清除屏幕
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -111,6 +133,27 @@ public class EnhanCard implements Screen {
         stage.act(delta);
         // 绘制舞台上的元素
         stage.draw();
+
+        // 确保舞台可以处理输入事件
+        Gdx.input.setInputProcessor(stage);
+
+        // 检查触摸事件是否在 scrollPane 范围内
+        if (Gdx.input.isTouched()) {
+            float touchX = Gdx.input.getX();
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY(); // 将 Y 坐标转换为舞台坐标系
+
+            float scrollPaneX = scrollPane.getX();
+            float scrollPaneY = scrollPane.getY();
+            float scrollPaneWidth = scrollPane.getWidth();
+            float scrollPaneHeight = scrollPane.getHeight();
+
+            if (touchX >= scrollPaneX && touchX <= scrollPaneX + scrollPaneWidth &&
+                    touchY >= scrollPaneY && touchY <= scrollPaneY + scrollPaneHeight) {
+                System.out.println("Touch event inside scrollPane");
+            } else {
+                System.out.println("Touch event outside scrollPane");
+            }
+        }
 
     }
 
