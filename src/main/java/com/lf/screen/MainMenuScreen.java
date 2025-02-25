@@ -35,6 +35,8 @@ public class MainMenuScreen implements Screen {
     private TextButton startButton;
     // 强化按钮
     private TextButton enhanceButton;
+    // 强化按钮事件
+    private ClickListener enhanceButtonClickListener;
     // 开始游戏事件监听
     private ClickListener startButtonClickListener;
     // 退出游戏按钮
@@ -108,6 +110,17 @@ public class MainMenuScreen implements Screen {
         table.row();
 //        ImageButton enhanceButton = new ImageButton(drawable);
         enhanceButton = new TextButton("强化防御塔", buttonStyle);
+        // 为按钮添加点击事件监听器
+        enhanceButtonClickListener = new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // 处理点击事件，例如切换到 EnhanCard
+                removeAllListener();
+                // 点击按钮后切换到游戏界面
+                game.setScreen(new EnhanCard(game));
+            }
+        };
+        enhanceButton.addListener(enhanceButtonClickListener);
         // 将按钮添加到表格中
         table.add(enhanceButton).expandX().top().padTop(10).padLeft(200).padRight(200).fillX();
         // 加一个空行
@@ -139,6 +152,7 @@ public class MainMenuScreen implements Screen {
     private void removeAllListener() {
         // 移除startButton的事件监听器
         startButton.removeListener(startButtonClickListener);
+        enhanceButton.removeListener(enhanceButtonClickListener);
         exitButton.removeListener(exitButtonClickListener);
         // 切换到GameScreen的逻辑
         // 这里可以使用游戏的setScreen方法来切换屏幕

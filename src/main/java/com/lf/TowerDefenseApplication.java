@@ -28,7 +28,7 @@ public class TowerDefenseApplication implements CommandLineRunner {
         config.setTitle("Tower");
         config.setWindowedMode(1200, 900);
         // 设置最小尺寸和最大尺寸
-        config.setWindowSizeLimits(1200,900,1200,900);
+        config.setWindowSizeLimits(800,600,1200,900);
 
         // 启动 Lwjgl3Application
         new Lwjgl3Application(game, config);

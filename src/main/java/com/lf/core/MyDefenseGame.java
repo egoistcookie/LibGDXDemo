@@ -211,6 +211,10 @@ public class MyDefenseGame extends Game {
         assetManager.load("Star3.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
+        assetManager.load("default-scroll.png", Texture.class);
+        assetManager.load("default-scroll-knob.png", Texture.class);
+        // 加载回收图标的背景图片
+        assetManager.load("super.png", Texture.class);
         // 升级音效
         assetManager.load("wav/levelUp.mp3", Sound.class);
         // 升星音效
