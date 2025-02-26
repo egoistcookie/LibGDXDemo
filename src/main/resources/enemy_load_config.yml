@@ -74,7 +74,7 @@ enemyLoadConfigs:
     enemyName: "Enemy 18.0"
     loadTime: 38.0
   - # 19.0
-    enemyType: Taotie
+    enemyType: ironcladGeneral
     enemyName: "Taotie 19.0"
     loadTime: 40.0
   - # 20.0
@@ -86,7 +86,7 @@ enemyLoadConfigs:
     enemyName: "Enemy 21.0"
     loadTime: 44.0
   - # 22.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 22.0"
     loadTime: 46.0
   - # 23.0
@@ -94,7 +94,7 @@ enemyLoadConfigs:
     enemyName: "Enemy 23.0"
     loadTime: 48.0
   - # 24.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 24.0"
     loadTime: 50.0
   - # 25.0
@@ -102,7 +102,7 @@ enemyLoadConfigs:
     enemyName: "Enemy 25.0"
     loadTime: 52.0
   - # 26.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 26.0"
     loadTime: 54.0
   - # 27.0
@@ -110,129 +110,109 @@ enemyLoadConfigs:
     enemyName: "Enemy 27.0"
     loadTime: 56.0
   - # 28.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 28.0"
     loadTime: 58.0
   - # 29.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 29.0"
     loadTime: 60.0
   - # 30.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 30.0"
     loadTime: 62.0
   - # 31.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 31.0"
     loadTime: 64.0
   - # 32.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 32.0"
     loadTime: 66.0
   - # 33.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 33.0"
     loadTime: 68.0
   - # 34.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 34.0"
     loadTime: 70.0
   - # 35.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 35.0"
     loadTime: 72.0
   - # 36.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 36.0"
     loadTime: 74.0
   - # 37.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 37.0"
     loadTime: 76.0
   - # 38.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 38.0"
     loadTime: 78.0
   - # 39.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 39.0"
     loadTime: 80.0
   - # 40.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 40.0"
     loadTime: 82.0
   - # 41.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 41.0"
     loadTime: 84.0
   - # 42.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 42.0"
     loadTime: 86.0
   - # 43.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 43.0"
     loadTime: 88.0
   - # 44.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 44.0"
     loadTime: 90.0
   - # 45.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 45.0"
     loadTime: 92.0
   - # 46.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 46.0"
     loadTime: 94.0
   - # 47.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 47.0"
     loadTime: 96.0
   - # 48.0
-    enemyType: saberOne
+    enemyType: ironcladGeneral
     enemyName: "Enemy 48.0"
     loadTime: 98.0
   - # 49.0
-    enemyType: saberOne
+    enemyType: Taotie
     enemyName: "Enemy 49.0"
     loadTime: 100.0
   - # 50.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 50.0"
     loadTime: 102.0
   - # 51.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 51.0"
     loadTime: 104.0
   - # 52.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 52.0"
     loadTime: 106.0
   - # 53.0
-    enemyType: saberOne
+    enemyType: minion
     enemyName: "Enemy 53.0"
     loadTime: 108.0
-  - # 54.0
-    enemyType: saberOne
-    enemyName: "Enemy 54.0"
-    loadTime: 110.0
-  - # 55.0
-    enemyType: saberOne
-    enemyName: "Enemy 55.0"
-    loadTime: 112.0
-  - # 56.0
-    enemyType: saberOne
-    enemyName: "Enemy 56.0"
-    loadTime: 114.0
-  - # 57.0
-    enemyType: saberOne
-    enemyName: "Enemy 57.0"
-    loadTime: 116.0
-  - # 58.0
-    enemyType: saberOne
-    enemyName: "Enemy 58.0"
-    loadTime: 118.0
   - # 59.0
     enemyType: saberOne
     enemyName: "Enemy 59.0"
@@ -437,3 +417,23 @@ enemyLoadConfigs:
     enemyType: saberOne
     enemyName: "Enemy 109.0"
     loadTime: 220.0
+  - # 54.0
+    enemyType: saberOne
+    enemyName: "Enemy 54.0"
+    loadTime: 222.0
+  - # 55.0
+    enemyType: saberOne
+    enemyName: "Enemy 55.0"
+    loadTime: 223.0
+  - # 56.0
+    enemyType: saberOne
+    enemyName: "Enemy 56.0"
+    loadTime: 224.0
+  - # 57.0
+    enemyType: saberOne
+    enemyName: "Enemy 57.0"
+    loadTime: 226.0
+  - # 58.0
+    enemyType: saberOne
+    enemyName: "Enemy 58.0"
+    loadTime: 228.0

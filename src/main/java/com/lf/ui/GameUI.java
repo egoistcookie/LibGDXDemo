@@ -79,6 +79,8 @@ public class GameUI {
     private BitmapFont whiteFont;
     // 自定义字体-包含中文
     private BitmapFont customFont;
+    // 自定义字体-白色底色
+    private BitmapFont whiteCustomFont;
     // 黑色背景图
     private Texture blackTexture;
     // 透明背景图
@@ -109,10 +111,22 @@ public class GameUI {
     private Image vermilionImage;
     private Image whiteTigerImage;
     private Image prosperityGirlImage;
-    // 一号特效的Image
+    // 倒计时label
+    private VisLabel countdownLabel;
+    // 游戏已进行时间
+    private float gameRunTime;
+    // 倒计时出现的间隔时间
+    private final float durationTime = 120f;
+    // 上次倒计时出现的时间
+    private float lastCountTime = 0f;
+    // 绿色标签风格
+    private VisLabel.LabelStyle greenLbelStyle;
+    // buff特效image
     private Image buffImage;
     // 蓝色字体标签style
     private Label.LabelStyle blueLabelStyle;
+    // 蓝色字体标签style
+    private Label.LabelStyle whiteCustomLabelStyle;
     // 悬浮框管理器
     private TooltipManager tooltipManager;
     // 急湍甚箭
@@ -145,12 +159,16 @@ public class GameUI {
         whiteFont = new BitmapFont();
         // 加载自定义字体
         customFont = this.assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+        whiteCustomFont = this.assetManager.get("fonts/whiteYouYuan.fnt", BitmapFont.class);
+        whiteCustomFont.getData().setScale(0.6f);
         // 白色字体样式
         whiteLabelStyle = new Label.LabelStyle(whiteFont, Color.WHITE);
         // 字体大小倍率（以Hiero中生成的字体大小为基准）
         customFont.getData().setScale(0.6f);
         // 蓝色字体样式
         blueLabelStyle = new Label.LabelStyle(customFont, Color.BLUE);
+        // 白色幼圆字体样式
+        whiteCustomLabelStyle = new Label.LabelStyle(whiteCustomFont, Color.WHITE);
         // 黑色背景图
         blackTexture = assetManager.get("black.png", Texture.class);
 
@@ -257,8 +275,21 @@ public class GameUI {
                 goldLabel.getY());
         gameObjectTable.addActor(healthIcon);
 
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = whiteCustomFont;
+        buttonStyle.fontColor = Color.WHITE;
+        Texture textureUp = this.assetManager.get("white.png", Texture.class);// 这里一个白色的纹理文件
+        Texture textureDown = this.assetManager.get("black.png", Texture.class);// 这里一个黑色的纹理文件
+        Drawable borderedDrawableUp = new TextureRegionDrawable(new TextureRegion(textureUp));
+        Drawable borderedDrawableDown = new TextureRegionDrawable(new TextureRegion(textureDown));
+        borderedDrawableUp.setMinWidth(120); // 设置最小宽度
+        borderedDrawableUp.setMinHeight(40); // 设置最小高度
+        borderedDrawableDown.setMinWidth(120); // 设置最小宽度
+        borderedDrawableDown.setMinHeight(40); // 设置最小高度
+        buttonStyle.up = borderedDrawableDown; // 设置按钮正常状态下的背景
+        buttonStyle.down = borderedDrawableDown; // 设置按钮正常状态下的背景
         // 创建暂停按钮
-        pauseButton = new TextButton("Pause", skin);
+        pauseButton = new TextButton("暂停", buttonStyle);
         pauseButton.setSize(100, 30);
         // 计算按钮的位置，使其位于右下角
         float buttonX = screenWidth - pauseButton.getWidth();
@@ -276,7 +307,7 @@ public class GameUI {
         initStuffTable();
 
         // 创建抽卡按钮，位于物品栏左侧
-        getButton = new TextButton("Get", skin);
+        getButton = new TextButton("抽卡", buttonStyle);
         getButton.setSize(50, 28);
         // 计算按钮的位置，使其位于右下角
         float buttonGX = screenWidth - stuffTable.getWidth() - getButton.getWidth() - 20;
@@ -291,7 +322,7 @@ public class GameUI {
         buttonTable.addActor(getButton);
 
         // 创建恢复按钮
-        resumeButton = new TextButton("Resume", skin);
+        resumeButton = new TextButton("恢复", buttonStyle);
         resumeButton.setSize(100, 30);
         // 计算按钮的位置，使其位于右下角
         float resumeButtonX = screenWidth - pauseButton.getWidth() - resumeButton.getWidth() - 10;
@@ -306,7 +337,7 @@ public class GameUI {
         buttonTable.addActor(resumeButton);
 
         // 创建加快按钮
-        TextButton quicklyButton = new TextButton("quickly", skin);
+        TextButton quicklyButton = new TextButton("加速", buttonStyle);
         quicklyButton.setSize(100, 30);
         // 计算按钮的位置，使其位于右下角
         float buttonQx = screenWidth - pauseButton.getWidth() - resumeButton.getWidth() - quicklyButton.getWidth() - 15;
@@ -321,7 +352,7 @@ public class GameUI {
         buttonTable.addActor(quicklyButton);
 
         // 创建减慢按钮
-        TextButton slowlyButton = new TextButton("slowly", skin);
+        TextButton slowlyButton = new TextButton("减速", buttonStyle);
         slowlyButton.setSize(100, 30);
         // 计算按钮的位置，使其位于右下角
         float buttonSx = screenWidth - slowlyButton.getWidth() - slowlyButton.getWidth() - quicklyButton.getWidth() - slowlyButton.getWidth() - 20;
@@ -336,7 +367,7 @@ public class GameUI {
         buttonTable.addActor(slowlyButton);
 
         // 创建退出按钮
-        TextButton returnButton = new TextButton("return", skin);
+        TextButton returnButton = new TextButton("返回", buttonStyle);
         returnButton.setSize(100, 30);
         // 计算按钮的位置，使其位于左下角
         float buttonRx = 10;
@@ -350,6 +381,16 @@ public class GameUI {
             }
         });
         buttonTable.addActor(returnButton);
+
+        // 倒计时提示框放在最后add，会显示在其他label的顶层
+        // 倒计时提示框 位于屏幕中线距离y轴顶点200的位置
+        greenLbelStyle = new VisLabel.LabelStyle();
+        greenLbelStyle.font = whiteCustomFont;
+        greenLbelStyle.fontColor = Color.RED;
+        countdownLabel = new VisLabel("下一波即将刷新 倒计时：秒", greenLbelStyle);
+        countdownLabel.setPosition((float) screenWidth /2 - countdownLabel.getWidth()/2,
+                goldLabel.getY() - countdownLabel.getHeight() - 20);
+        gameObjectTable.addActor(countdownLabel);
 
         // 将游戏对象区域和按钮区域添加到舞台
         this.stage.addActor(gameObjectTable);
@@ -415,10 +456,12 @@ public class GameUI {
      * 渲染方法，用于更新和绘制舞台中的所有演员。
      * 该方法通常在游戏的渲染循环中被调用。
      */
-    public void render() {
+    public void render(float elapsedTimeSeconds) {
 
         // 绘制物品栏
         stuffTableRender();
+        // 绘制倒计时
+        countdownRender(elapsedTimeSeconds);
         // 开始绘制
         batch.begin();
         // 调用stage的act方法，更新舞台中所有演员的状态，例如处理输入、动画等
@@ -449,6 +492,25 @@ public class GameUI {
         }
         // 结束绘制
         batch.end();
+    }
+
+    /**
+     * 绘制倒计时
+     * @param elapsedTimeSeconds 游戏进行时间
+     */
+    private void countdownRender(float elapsedTimeSeconds) {
+        gameRunTime = elapsedTimeSeconds;
+        // 如果游戏运行时间与上一次出现倒计时提示的差值达到了间隔时间+10，则出现倒计时，持续时间10秒
+        if(gameRunTime - lastCountTime >= durationTime-10){
+            float countTime = lastCountTime + durationTime - gameRunTime;
+            countdownLabel.setText("下一波即将刷新 倒计时" + Math.round(countTime) + "秒");
+        }else{
+            countdownLabel.setText("");
+        }
+        // 如果游戏运行时间与上一次出现倒计时提示的差值，达到了倒计时的间隔时间，则重新开始计时
+        if(gameRunTime - lastCountTime >= durationTime){
+            lastCountTime = gameRunTime;
+        }
     }
 
     /**

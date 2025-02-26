@@ -380,7 +380,7 @@ public class GameScreen implements Screen {
             debugRenderer.render(world, camera.combined);
         }
         // 渲染游戏用户界面：按钮需要另外渲染，不可与游戏对象放在一起渲染
-        gameUI.render();
+        gameUI.render(elapsedTimeSeconds);
     }
 
     // 判断card是否初次加载，如果是初次加载则显示卡片
