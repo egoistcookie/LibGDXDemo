@@ -451,7 +451,6 @@ public class Enemy {
             // BUG0004-20250223：已经倒地的敌人，不能重新更新回moving状态（可能同时有两次setBlock）
             enemyStatus = EnemyState.MOVING;
         }
-        System.out.println(enemyName+":"+block+":enemyStatus:"+enemyStatus);
     }
 
     public EnemyState getEnemyStatus() {

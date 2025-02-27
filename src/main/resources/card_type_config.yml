@@ -1,30 +1,31 @@
 cardTypeConfigs:
-- {cardType: arrower, rarity: N, attackPower: 1, attackRange: 100f, maxAttackCount: 2,
+- {cardType: arrower, rarity: N, cardLevel: 1, attackPower: 1, attackRange: 100f, maxAttackCount: 2,
   fireRate: 0.5f, cardTexture: arrower, mapTexture: arrower, stuffTexture: arrowerStuff,
-  attackTexture: arrow}
-- {cardType: whiteTiger, rarity: N, attackPower: 3, attackRange: 120f, maxAttackCount: 2,
+  attackTexture: arrow, killCount: 7}
+- {cardType: whiteTiger, rarity: N, cardLevel: 1, attackPower: 3, attackRange: 120f, maxAttackCount: 2,
   fireRate: 0.5f, cardTexture: whiteTiger, mapTexture: whiteTiger, stuffTexture: whiteTigerStuff,
-  attackTexture: whiteAttack}
-- {cardType: prosperityGirl, rarity: S, attackPower: 0, attackRange: 1000f, maxAttackCount: 2,
+  attackTexture: whiteAttack, killCount: 11}
+- {cardType: prosperityGirl, rarity: S, cardLevel: 1, attackPower: 0, attackRange: 1000f, maxAttackCount: 2,
   fireRate: 0.5f, cardTexture: prosperityGirl, mapTexture: prosperityGirl, stuffTexture: prosperityGirlStuff,
-  attackTexture: whiteAttack}
-- {cardType: blackTortoise, rarity: S, attackPower: 1, attackRange: 100f, maxAttackCount: 2,
+  attackTexture: whiteAttack, killCount: 0}
+- {cardType: blackTortoise, rarity: S, cardLevel: 1, attackPower: 1, attackRange: 100f, maxAttackCount: 2,
   fireRate: 0.5f, cardTexture: blackTortoise, mapTexture: blackTortoise, stuffTexture: blackTortoiseStuff,
-  attackTexture: blackTortoiseAttack}
-- {cardType: vermilion, rarity: S, attackPower: 1, attackRange: 100f, maxAttackCount: 2,
+  attackTexture: blackTortoiseAttack, killCount: 0}
+- {cardType: vermilion, rarity: S, cardLevel: 1, attackPower: 1, attackRange: 100f, maxAttackCount: 2,
   fireRate: 0.5f, cardTexture: vermilion, mapTexture: vermilion, stuffTexture: vermilionStuff,
-  attackTexture: vermilionAttack}
-- {cardType: yys, rarity: S, attackPower: 4, attackRange: 120f, maxAttackCount: 2,
-  fireRate: 0.5f, cardTexture: yys, mapTexture: yys, stuffTexture: yysStuff, attackTexture: fan}
-- {cardType: azureDragon, rarity: SR, attackPower: 3, attackRange: 120f, maxAttackCount: 2,
+  attackTexture: vermilionAttack, killCount: 2}
+- {cardType: yys, rarity: S, cardLevel: 1, attackPower: 4, attackRange: 120f, maxAttackCount: 2,
+  fireRate: 0.5f, cardTexture: yys, mapTexture: yys, stuffTexture: yysStuff, attackTexture: fan,
+  killCount: 2}
+- {cardType: azureDragon, rarity: SR, cardLevel: 1, attackPower: 3, attackRange: 120f, maxAttackCount: 2,
   fireRate: 0.5f, cardTexture: azureDragon, mapTexture: azureDragon, stuffTexture: azureDragonStuff,
-  attackTexture: dragonAttack}
-- {cardType: saber, rarity: SR, attackPower: 5, attackRange: 120f, maxAttackCount: 3,
+  attackTexture: dragonAttack, killCount: 0}
+- {cardType: saber, rarity: SR, cardLevel: 1, attackPower: 5, attackRange: 120f, maxAttackCount: 3,
   fireRate: 0.5f, cardTexture: saber, mapTexture: saber, stuffTexture: saberStuff,
-  attackTexture: whiteAttack}
-- {cardType: swordSaint, rarity: SSR, attackPower: 10, attackRange: 300f, maxAttackCount: 3,
+  attackTexture: whiteAttack, killCount: 0}
+- {cardType: swordSaint, rarity: SSR, cardLevel: 1, attackPower: 10, attackRange: 300f, maxAttackCount: 3,
   fireRate: 0.5f, cardTexture: swordSaint, mapTexture: swordSaint, stuffTexture: swordSaintStuff,
-  attackTexture: saintSword}
-- {cardType: necromancer, rarity: SSR, attackPower: 6, attackRange: 200f, maxAttackCount: 3,
+  attackTexture: saintSword, killCount: 0}
+- {cardType: necromancer, rarity: SSR, cardLevel: 1, attackPower: 6, attackRange: 200f, maxAttackCount: 3,
   fireRate: 0.5f, cardTexture: necromancer, mapTexture: necromancer, stuffTexture: necromancerStuff,
-  attackTexture: necromancerAttack}
+  attackTexture: necromancerAttack, killCount: 0}

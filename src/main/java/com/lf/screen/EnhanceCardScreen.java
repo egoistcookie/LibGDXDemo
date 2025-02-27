@@ -119,27 +119,29 @@ public class EnhanceCardScreen implements Screen {
         // 攻击力
         Label cardTypeLabel = new Label("名称:" + cardTypeConfig.getCardType(), labelStyle);
         Label rarityLabel = new Label("稀有度:" + cardTypeConfig.getRarity(), labelStyle);
+        Label cardLevelLabel = new Label("卡片等级:" + cardTypeConfig.getCardLevel(), labelStyle);
         Label powerLabel = new Label("攻击力:" + cardTypeConfig.getAttackPower(), labelStyle);
         Label fireRateLabel = new Label("攻击频率:" + cardTypeConfig.getFireRate(), labelStyle);
         Label attackRangeLabel = new Label("攻击范围:" + cardTypeConfig.getAttackRange(), labelStyle);
         Label maxAttackCount = new Label("最大攻击数:" + cardTypeConfig.getMaxAttackCount(), labelStyle);
+        Label killCountLabel = new Label("杀敌数:" + cardTypeConfig.getKillCount(), labelStyle);
 
         Table attruibuteTable = new Table();
         attruibuteTable.add(cardTypeLabel);
         attruibuteTable.row();
+        attruibuteTable.add(rarityLabel).padTop(10);
         attruibuteTable.row();
+        attruibuteTable.add(cardLevelLabel).padTop(10);
         attruibuteTable.row();
+        attruibuteTable.add(powerLabel).padTop(10);;
         attruibuteTable.row();
-
-        attruibuteTable.add(rarityLabel);
+        attruibuteTable.add(fireRateLabel).padTop(10);;
         attruibuteTable.row();
-        attruibuteTable.add(powerLabel);
+        attruibuteTable.add(attackRangeLabel).padTop(10);;
         attruibuteTable.row();
-        attruibuteTable.add(fireRateLabel);
+        attruibuteTable.add(maxAttackCount).padTop(10);;
         attruibuteTable.row();
-        attruibuteTable.add(attackRangeLabel);
-        attruibuteTable.row();
-        attruibuteTable.add(maxAttackCount);
+        attruibuteTable.add(killCountLabel).padTop(10);;
         attruibuteTable.row();
         // 增加按钮
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
@@ -199,6 +201,14 @@ public class EnhanceCardScreen implements Screen {
     // 强化卡片
     private void enhanceCard() {
 
+        // 判断杀敌数和等级是否匹配，没杀敌100可升一级
+        int killCount = cardTypeConfig.getKillCount();
+        if(killCount/100 > cardTypeConfig.getCardLevel()){
+            System.out.println("可升级");
+        }else{
+            System.out.println("不可升级，练练再来");
+            return;
+        }
         // 更新card_type_config.yml
         try {
             // 读取 YAML 文件
@@ -220,6 +230,9 @@ public class EnhanceCardScreen implements Screen {
                     // 更新 attackPower
                     int attackPower = (int) config.get("attackPower");
                     config.put("attackPower", attackPower + 1); // attackPower + 1
+                    // 更新 卡片等级
+                    int cardLevel = (int) config.get("cardLevel");
+                    config.put("cardLevel", cardLevel + 1);
                     // 当前页面的值需要同步更新
                     cardTypeConfig.setAttackPower(attackPower + 1);
                     System.out.println("Updated " + cardTypeConfig.getCardType() + "'s attackPower to " + (attackPower + 1));

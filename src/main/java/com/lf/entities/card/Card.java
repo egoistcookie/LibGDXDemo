@@ -22,6 +22,7 @@ import com.lf.util.GameUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // Tower类表示游戏中的防御塔实体
 public class Card {
@@ -309,6 +310,16 @@ public class Card {
     public void addExperience(int addExperience) {
         this.experience += addExperience;
 //        System.out.println("经验值增加后："+this.experience);
+        // 获取杀敌数
+        Map<String, Integer> killCountList = gameScreen.getKillCountList();
+        if(killCountList.get(this.cardType) == null){
+            killCountList.put(this.cardType,1);
+        }else{
+            int killCount = killCountList.get(this.cardType);
+            killCount ++;
+            killCountList.put(this.cardType,killCount);
+            System.out.println(this.cardType+"杀敌数："+killCount);
+        }
         int oldLevel = this.level;
         // 计算等级
         this.level = GameUtil.calcLevel(this.experience);

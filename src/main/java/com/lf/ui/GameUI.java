@@ -24,8 +24,13 @@ import com.lf.manager.EnemyLoadManager;
 import com.lf.screen.GameScreen;
 import com.lf.screen.MainMenuScreen;
 import com.lf.util.GameUtil;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * GameUI类用于管理游戏的用户界面。
@@ -569,6 +574,8 @@ public class GameUI {
             @Override
             protected void result(Object object) {
                 if ("yes".equals(object)) {
+                    // 先保存杀敌数
+                    saveKillCount();
                     // 用户选择“是”，游戏返回主界面
                     game.setScreen(new MainMenuScreen(game));
                 }else{
@@ -599,6 +606,43 @@ public class GameUI {
 //        buttonTable.add(dialog);
         // 显示对话框
         dialog.show(stage);
+    }
+
+    // 保存杀敌数到配置文件
+    private void saveKillCount() {
+
+        Map<String, Integer> killCountMap = gameScreen.getKillCountList();
+        // 更新card_type_config.yml
+        try {
+            // 读取 YAML 文件
+            Yaml yaml = new Yaml();
+            String filePath = System.getProperty("user.dir") + "/src/main/resources/card_type_config.yml"; // 写入到用户目录
+            FileReader reader = new FileReader(filePath);
+            // 读取配置文件内容
+            Map<String, java.util.List<Map<String, Object>>> data = yaml.load(reader);
+            reader.close();
+            // 获取 cardTypeConfigs 列表
+            java.util.List<Map<String, Object>> cardTypeConfigsRead = (java.util.List<Map<String, Object>>) data.get("cardTypeConfigs");
+            // 遍历列表，找到目标 cardType
+            for (Map<String, Object> config : cardTypeConfigsRead) {
+                String cardType = (String) config.get("cardType");
+                if (killCountMap.get(cardType) != null) {
+                    // 更新 attackPower
+                    int killCount = killCountMap.get(cardType);
+                    config.put("killCount", killCount); // attackPower + 1
+                    System.out.println("Updated " + config.get("cardType") + "'s killCount to " + killCount);
+                }
+            }
+            // 将更新后的内容写入外部文件
+            System.out.println(filePath);
+            FileWriter writer = new FileWriter(filePath);
+            yaml.dump(data, writer);
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("YAML file updated successfully!");
+
     }
 
     /**

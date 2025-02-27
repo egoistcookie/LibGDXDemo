@@ -61,6 +61,8 @@ public class EnemyLoadManager {
                 cardTypeConfig.setCardType((String) configMap.get("cardType"));
                 // 设置稀有度
                 cardTypeConfig.setRarity((String) configMap.get("rarity"));
+                // 设置卡片等级
+                cardTypeConfig.setCardLevel((int) configMap.get("cardLevel"));
                 // 设置最大攻击数
                 cardTypeConfig.setAttackPower((int) configMap.get("attackPower"));
                 // 设置攻击范围
@@ -77,6 +79,8 @@ public class EnemyLoadManager {
                 cardTypeConfig.setAttackTexture((String) configMap.get("attackTexture"));
                 // 设置物品栏中贴图
                 cardTypeConfig.setStuffTexture((String) configMap.get("stuffTexture"));
+                // 设置杀敌数
+                cardTypeConfig.setKillCount((int) configMap.get("killCount"));
                 // 将敌人加载配置对象添加到列表中
                 cardTypeConfigs.add(cardTypeConfig);
             }

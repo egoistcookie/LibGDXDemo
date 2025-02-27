@@ -119,6 +119,8 @@ public class GameScreen implements Screen {
     private float time;
     // 场地buff集合
     private Map<String, Float> buffMap;
+    // 杀敌数集合
+    private Map<String, Integer> killCountList;
 
     // 构造函数，接收游戏对象作为参数
     public GameScreen(MyDefenseGame game) {
@@ -168,6 +170,11 @@ public class GameScreen implements Screen {
         deathingTexture = new Texture[]{deathingTexture1, deathingTexture2}; ;
         // 初始化场地buff
         buffMap = new HashMap<>();
+        // 以配置文件内容，初始化杀敌数集合
+        killCountList = new HashMap<>();
+        for (CardTypeConfig cardLoadConfig : enemyLoadManager.getCardTypeConfigs()) {
+            killCountList.put(cardLoadConfig.getCardType(),cardLoadConfig.getKillCount());
+        }
         // 加载地图背景
         backgroundTexture = assetManager.get("map/map4.png", Texture.class);
         backgroundSprite = new Sprite(backgroundTexture);
@@ -978,5 +985,13 @@ public class GameScreen implements Screen {
         }
         return objEnemy;
 
+    }
+
+    public Map<String, Integer> getKillCountList() {
+        return killCountList;
+    }
+
+    public void setKillCountList(Map<String, Integer> killCountList) {
+        this.killCountList = killCountList;
     }
 }

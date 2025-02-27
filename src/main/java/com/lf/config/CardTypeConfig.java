@@ -6,6 +6,8 @@ public class CardTypeConfig {
     private String cardType;
     // 稀有度
     private String rarity;
+    // 卡片等级
+    private int cardLevel;
     // 攻击力
     private int attackPower;
     // 攻击范围
@@ -22,6 +24,8 @@ public class CardTypeConfig {
     private String mapTexture;
     // 攻击贴图
     private String attackTexture;
+    // 杀敌数
+    private int killCount;
 
     public String getCardType() {
         return cardType;
@@ -101,5 +105,21 @@ public class CardTypeConfig {
 
     public void setAttackPower(int attackPower) {
         this.attackPower = attackPower;
+    }
+
+    public int getKillCount() {
+        return killCount;
+    }
+
+    public void setKillCount(int killCount) {
+        this.killCount = killCount;
+    }
+
+    public int getCardLevel() {
+        return cardLevel;
+    }
+
+    public void setCardLevel(int cardLevel) {
+        this.cardLevel = cardLevel;
     }
 }
