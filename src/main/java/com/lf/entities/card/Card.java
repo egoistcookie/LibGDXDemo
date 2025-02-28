@@ -225,29 +225,34 @@ public class Card {
         Vector2 towerPosition = body.getPosition();
         // 是否攻击范围内有敌人
         boolean hasRangeEnemy = false;
-        // 遍历敌人列表，检查是否有敌人进入攻击范围
-        for (Enemy enemy : enemies) {
-            if (body.getPosition().dst(enemy.getBody().getPosition()) < attackRange) {
-
-                // 获取场地buff
-                float rateBuff = 1f;
-                // 攻击频率buff
-                if(!gameScreen.getRateBuff().isEmpty() && gameScreen.getRateBuff().get(this.getCardType()+"Rate")!=null){
-                    // 获取每种卡片各自的攻击频率场地buff
-                    rateBuff = gameScreen.getRateBuff().get(this.getCardType()+"Rate");
-                }
-                // 已达到攻击间隔时间，并且同时攻击数未达到上限，并且敌人未死亡，发起攻击
-                if (timeSinceLastFire >= this.getFireRate()/rateBuff && attckCount < maxAttackCount && !enemy.getDead()) {
-                    // 攻击介质应该从防御塔坐标的前方一点射出，会比较自然
-                    Arrow arrow = new Arrow(world, body.getPosition().x + 20, body.getPosition().y +10, attackTexture, enemy, this);
-                    arrows.add(arrow); // 将箭添加到列表中
-                    timeSinceLastFire = 0;
-                    // 同时攻击数+1
-                    attckCount ++;
+        // 同时攻击数重置
+        attckCount = 0;
+        // 获取场地buff
+        float rateBuff = 1f;
+        // 攻击频率buff
+        if (!gameScreen.getRateBuff().isEmpty() && gameScreen.getRateBuff().get(this.getCardType() + "Rate") != null) {
+            // 获取每种卡片各自的攻击频率场地buff
+            rateBuff = gameScreen.getRateBuff().get(this.getCardType() + "Rate");
+        }
+        // BUG0006：最大攻击数属性无效，优化卡片攻击算法
+        // 已达到攻击间隔时间，发起攻击
+        if (timeSinceLastFire >= this.getFireRate() / rateBuff) {
+            // 遍历敌人列表，检查是否有敌人进入攻击范围
+            for (Enemy enemy : enemies) {
+                if (body.getPosition().dst(enemy.getBody().getPosition()) < attackRange && !enemy.getDead()) {
                     // 敌人进入攻击范围再开始动作
                     hasRangeEnemy = true;
+                    // 视最大攻击数，决定同时攻击几个敌人
+                    if (attckCount < maxAttackCount) {
+                        // 同时攻击数+1
+                        attckCount++;
+                        // 攻击介质应该从防御塔坐标的前方一点射出，会比较自然
+                        Arrow arrow = new Arrow(world, body.getPosition().x + 20, body.getPosition().y + 10, attackTexture, enemy, this);
+                        arrows.add(arrow); // 将箭添加到列表中
+                    }
                 }
             }
+            timeSinceLastFire = 0;
         }
         // 敌人进入攻击范围再开始动作
         if(hasRangeEnemy){

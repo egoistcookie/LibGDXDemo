@@ -201,7 +201,7 @@ public class EnhanceCardScreen implements Screen {
     // 强化卡片
     private void enhanceCard() {
 
-        // 判断杀敌数和等级是否匹配，没杀敌100可升一级
+        // 判断杀敌数和等级是否匹配，每杀敌100可升一级
         int killCount = cardTypeConfig.getKillCount();
         if(killCount/100 > cardTypeConfig.getCardLevel()){
             System.out.println("可升级");
@@ -213,17 +213,13 @@ public class EnhanceCardScreen implements Screen {
         try {
             // 读取 YAML 文件
             Yaml yaml = new Yaml();
-            // getResourceAsStream 有缓存
-//            InputStream inputStream = this.getClass()
-//                    .getClassLoader()
-//                    .getResourceAsStream("card_type_config.yml");
             String filePath = System.getProperty("user.dir") + "/src/main/resources/card_type_config.yml"; // 写入到用户目录
             FileReader reader = new FileReader(filePath);
             // 读取配置文件内容
             Map<String, List<Map<String, Object>>> data = yaml.load(reader);
             reader.close();
             // 获取 cardTypeConfigs 列表
-            List<Map<String, Object>> cardTypeConfigsRead = (List<Map<String, Object>>) data.get("cardTypeConfigs");
+            List<Map<String, Object>> cardTypeConfigsRead = data.get("cardTypeConfigs");
             // 遍历列表，找到目标 cardType
             for (Map<String, Object> config : cardTypeConfigsRead) {
                 if (cardTypeConfig.getCardType().equals(config.get("cardType"))) {
