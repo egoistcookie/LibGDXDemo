@@ -17,15 +17,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Timer;
 import com.kotcrab.vis.ui.VisUI;
 import com.lf.config.CardTypeConfig;
 import com.lf.core.MyDefenseGame;
 import com.lf.manager.EnemyLoadManager;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
-import java.util.Map;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class EnhanceCardScreen implements Screen {
 
@@ -203,9 +207,10 @@ public class EnhanceCardScreen implements Screen {
 
         // 判断杀敌数和等级是否匹配，每杀敌100可升一级
         int killCount = cardTypeConfig.getKillCount();
-        if(killCount/100 > cardTypeConfig.getCardLevel()){
+        if(killCount/100 > cardTypeConfig.getCardLevel()-1){
             System.out.println("可升级");
         }else{
+            showAlertInfo("不可升级 练练再来",0,0);
             System.out.println("不可升级，练练再来");
             return;
         }
@@ -223,15 +228,39 @@ public class EnhanceCardScreen implements Screen {
             // 遍历列表，找到目标 cardType
             for (Map<String, Object> config : cardTypeConfigsRead) {
                 if (cardTypeConfig.getCardType().equals(config.get("cardType"))) {
-                    // 更新 attackPower
-                    int attackPower = (int) config.get("attackPower");
-                    config.put("attackPower", attackPower + 1); // attackPower + 1
+                    // 生成随机数，随机提升攻击力、攻击范围、攻击速度、最大攻击数，概率分别为60%/20%/15%/5%
+                    int randomNumber = ThreadLocalRandom.current().nextInt(1, 101);
+                    System.out.println("生成的提升随机数是: " + randomNumber);
+                    if(randomNumber >= 95){
+                        // 更新 最大攻击数
+                        int maxAttackCount = (int) config.get("maxAttackCount");
+                        config.put("maxAttackCount", maxAttackCount + 1);
+                        // 当前页面的值需要同步更新
+                        cardTypeConfig.setMaxAttackCount(maxAttackCount + 1);
+                    }else if(randomNumber >= 80){
+                        // 更新 攻击速度
+                        float fireRate = Float.parseFloat(config.get("fireRate")+"");
+                        config.put("fireRate", fireRate*0.9f);
+                        // 当前页面的值需要同步更新
+                        cardTypeConfig.setFireRate(fireRate*0.9f);
+                    }else if(randomNumber >= 60){
+                        // 更新 攻击范围
+                        float attackRange = Float.parseFloat(config.get("attackRange")+"");
+                        config.put("attackRange", attackRange + 10);
+                        // 当前页面的值需要同步更新
+                        cardTypeConfig.setAttackRange(attackRange + 10);
+                    }else{
+                        // 更新 攻击力
+                        int attackPower = (int) config.get("attackPower");
+                        config.put("attackPower", attackPower + 1);
+                        // 当前页面的值需要同步更新
+                        cardTypeConfig.setAttackPower(attackPower + 1);
+                    }
                     // 更新 卡片等级
                     int cardLevel = (int) config.get("cardLevel");
                     config.put("cardLevel", cardLevel + 1);
-                    // 当前页面的值需要同步更新
-                    cardTypeConfig.setAttackPower(attackPower + 1);
-                    System.out.println("Updated " + cardTypeConfig.getCardType() + "'s attackPower to " + (attackPower + 1));
+                    cardTypeConfig.setCardLevel(cardLevel + 1);
+                    System.out.println("Updated " + cardTypeConfig.getCardType() + "'s cardLevel to " + (cardLevel + 1));
                     break;
                 }
             }
@@ -260,6 +289,54 @@ public class EnhanceCardScreen implements Screen {
             // 切回选择卡片界面
             game.setScreen(new BrowCardScreen(game));
         }
+    }
+
+
+    /**
+     * 提示弹窗
+     * @param alertInfo 提示信息
+     * @param x X轴位置
+     * @param y Y轴位置
+     */
+    public void showAlertInfo(String alertInfo, float x, float y) {
+        // 获取加载的中文字体（直接从assetManager获取字体，体感showAlertInfo提速1秒）
+        BitmapFont customFont = assetManager.get("fonts/xinsongti.fnt", BitmapFont.class);
+        // 字体大小倍率
+        customFont.getData().setScale(0.5f);
+        // 创建LabelStyle时使用缩放后的字体
+        Label.LabelStyle labelStyle = new Label.LabelStyle(customFont, Color.BLACK);
+        // 创建一个Label对象，用于显示提示文本，初始文本为空字符串
+        Label hintLabel = new Label(alertInfo, labelStyle);
+
+        // 加载背景图片
+        Texture backgroundTexture = assetManager.get("alertTitle.png", Texture.class);
+        System.out.println("backgroundTexture.getWidth():"+backgroundTexture.getWidth());
+        TextureRegion backgroundRegion = new TextureRegion(backgroundTexture);
+        // 创建一个Table作为提示框容器
+        Table dialogTable = new Table();
+        dialogTable.setBackground(new TextureRegionDrawable(backgroundRegion));
+        dialogTable.add(hintLabel).pad(0); // 添加一些内边距
+        // 调整提示框的大小以适应文字长度
+        dialogTable.pack();
+
+        if(x == 0){
+            x = (float) Gdx.graphics.getWidth() / 2 - hintLabel.getWidth() / 2 - (float) backgroundTexture.getWidth() / 4;//还要减去图片留白部分的宽度
+        }
+        if(y == 0){
+            y = (float) Gdx.graphics.getHeight() / 2 - hintLabel.getHeight() / 2;
+        }
+        // 直接设置 label 的位置
+        dialogTable.setPosition(x , y);
+        // 将窗口添加到舞台
+        stage.addActor(dialogTable);
+        // 使用Timer在1秒后移除提示窗口
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                dialogTable.remove();
+            }
+        }, 1f);
+
     }
 
 
