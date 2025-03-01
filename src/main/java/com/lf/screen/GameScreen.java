@@ -207,6 +207,16 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * 带关卡编号的构造方法
+     * @param game 游戏本体
+     * @param mapNo 关卡编号
+     */
+    public GameScreen(MyDefenseGame game , int mapNo) {
+        this(game);
+        System.out.println(mapNo);
+    }
+
     @Override
     public void show() {
         // 设置输入处理器为舞台

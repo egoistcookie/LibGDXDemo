@@ -34,7 +34,6 @@ public class BrowCardScreen implements Screen {
     // 构造方法
     public BrowCardScreen(MyDefenseGame game) {
         this.game = game;
-        System.out.println(game);
         this.assetManager = game.getAssetManager();
         this.enemyLoadManager = game.getEnemyLoadManager();
         // 获取VisUI库的默认皮肤

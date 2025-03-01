@@ -172,6 +172,9 @@ public class MyDefenseGame extends Game {
         // 加载一级箭塔的背景图片
         assetManager.load("arrowTower.png", Texture.class);
         // 加载地图的背景图片
+        assetManager.load("map/map1.png", Texture.class);
+        assetManager.load("map/map2.png", Texture.class);
+        assetManager.load("map/map3.png", Texture.class);
         assetManager.load("map/map4.png", Texture.class);
         // 加载敌人贴图
         assetManager.load("enemy/saberOne1.png", Texture.class);
@@ -212,8 +215,8 @@ public class MyDefenseGame extends Game {
         assetManager.load("Star3.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
-//        assetManager.load("default-scroll.png", Texture.class);
-//        assetManager.load("default-scroll-knob.png", Texture.class);
+        assetManager.load("default-scroll.png", Texture.class);
+        assetManager.load("default-scroll-knob.png", Texture.class);
         // 加载回收图标的背景图片
         assetManager.load("super.png", Texture.class);
         // 升级音效

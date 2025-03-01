@@ -97,8 +97,8 @@ public class MainMenuScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 // 处理点击事件，例如切换到GameScreen
                 removeAllListener();
-                // 点击按钮后切换到游戏界面
-                game.setScreen(new GameScreen(game));
+                // 点击按钮后切换到关卡选择界面
+                game.setScreen(new SelectLevelScreen(game));
             }
         };
         startButton.addListener(startButtonClickListener);
