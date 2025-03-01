@@ -771,7 +771,7 @@ public class GameUI {
                     // 重新开始游戏的逻辑
                     // restartGame();
 //                    gameScreen.resume();
-                    game.setScreen(new GameScreen(game));
+                    game.setScreen(new GameScreen(game,1));
                 }
             }
         });

@@ -1,19 +1,19 @@
 cardTypeConfigs:
 - {cardType: arrower, rarity: N, cardLevel: 1, attackPower: 1, attackRange: 100f,
   maxAttackCount: 1, fireRate: 0.5f, cardTexture: arrower, mapTexture: arrower, stuffTexture: arrowerStuff,
-  attackTexture: arrow, killCount: 7}
+  attackTexture: arrow, killCount: 8}
 - {cardType: whiteTiger, rarity: N, cardLevel: 2, attackPower: 2, attackRange: 100f,
   maxAttackCount: 1, fireRate: 0.5, cardTexture: whiteTiger, mapTexture: whiteTiger,
-  stuffTexture: whiteTigerStuff, attackTexture: whiteAttack, killCount: 106}
+  stuffTexture: whiteTigerStuff, attackTexture: whiteAttack, killCount: 111}
 - {cardType: prosperityGirl, rarity: S, cardLevel: 1, attackPower: 0, attackRange: 1000f,
   maxAttackCount: 1, fireRate: 0.5f, cardTexture: prosperityGirl, mapTexture: prosperityGirl,
   stuffTexture: prosperityGirlStuff, attackTexture: whiteAttack, killCount: 0}
 - {cardType: blackTortoise, rarity: S, cardLevel: 1, attackPower: 1, attackRange: 100f,
   maxAttackCount: 1, fireRate: 0.5f, cardTexture: blackTortoise, mapTexture: blackTortoise,
-  stuffTexture: blackTortoiseStuff, attackTexture: blackTortoiseAttack, killCount: 33}
+  stuffTexture: blackTortoiseStuff, attackTexture: blackTortoiseAttack, killCount: 35}
 - {cardType: vermilion, rarity: S, cardLevel: 1, attackPower: 1, attackRange: 100f,
   maxAttackCount: 1, fireRate: 0.5f, cardTexture: vermilion, mapTexture: vermilion,
-  stuffTexture: vermilionStuff, attackTexture: vermilionAttack, killCount: 18}
+  stuffTexture: vermilionStuff, attackTexture: vermilionAttack, killCount: 22}
 - {cardType: yys, rarity: S, cardLevel: 1, attackPower: 4, attackRange: 120f, maxAttackCount: 1,
   fireRate: 0.5f, cardTexture: yys, mapTexture: yys, stuffTexture: yysStuff, attackTexture: fan,
   killCount: 2}
@@ -22,7 +22,7 @@ cardTypeConfigs:
   stuffTexture: azureDragonStuff, attackTexture: dragonAttack, killCount: 0}
 - {cardType: saber, rarity: SR, cardLevel: 1, attackPower: 5, attackRange: 120f, maxAttackCount: 1,
   fireRate: 0.5f, cardTexture: saber, mapTexture: saber, stuffTexture: saberStuff,
-  attackTexture: whiteAttack, killCount: 0}
+  attackTexture: whiteAttack, killCount: 15}
 - {cardType: swordSaint, rarity: SSR, cardLevel: 1, attackPower: 10, attackRange: 300f,
   maxAttackCount: 3, fireRate: 0.5f, cardTexture: swordSaint, mapTexture: swordSaint,
   stuffTexture: swordSaintStuff, attackTexture: saintSword, killCount: 0}

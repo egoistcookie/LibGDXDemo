@@ -6,7 +6,7 @@
  <objectgroup id="7" name="path">
   <object id="1" x="795.115" y="83.0623">
    <properties>
-    <property name="order" value="3"/>
+    <property name="order" value="1"/>
    </properties>
    <point/>
   </object>
@@ -60,7 +60,7 @@
   </object>
   <object id="10" x="435.694" y="871.474">
    <properties>
-    <property name="order" value="1"/>
+    <property name="order" value="3"/>
    </properties>
    <point/>
   </object>
