@@ -94,6 +94,10 @@ public class GameScreen implements Screen {
     private List<Vector2> pathPoints1; // 使用 Vector2 存储点的坐标
     // 敌人运动路径集合2
     private List<Vector2> pathPoints2; // 使用 Vector2 存储点的坐标
+    // 线路1的初始位置
+    private Vector2 firstVector1;
+    // 线路2的初始位置
+    private Vector2 firstVector2;
     // 防御塔摆放范围
     private List<PolygonMapObject> towerRanges; // 防御塔可以摆放的位置，可能有多个多边形
     // 用于控制是否继续渲染的标志变量
@@ -110,7 +114,6 @@ public class GameScreen implements Screen {
     private float elapsedTimeSeconds;
     // 记录物品栏中物品集合
     private Stuff[] stuffes = new Stuff[6];
-
     // 控制游戏进行倍速
     private static float sclRate = 1f;
     private ShaderProgram shaderProgram;
@@ -121,12 +124,20 @@ public class GameScreen implements Screen {
     private Map<String, Float> buffMap;
     // 杀敌数集合
     private Map<String, Integer> killCountList;
+    // 地图编号
+    private Integer mapNo;
 
-    // 构造函数，接收游戏对象作为参数
-    public GameScreen(MyDefenseGame game) {
+    /**
+     * 带关卡编号的构造方法
+     * @param game 接收游戏对象作为参数
+     * @param mapNo 关卡编号
+     */
+    public GameScreen(MyDefenseGame game , int mapNo) {
         towerCount =0;
         this.assetManager = game.getAssetManager();
         this.enemyLoadManager = game.getEnemyLoadManager();
+        this.mapNo = mapNo;
+        System.out.println(mapNo);
         // 在游戏屏幕初始化时记录开始时间
         elapsedTimeSeconds = 0f;
         // 初始化暂停标志
@@ -176,7 +187,7 @@ public class GameScreen implements Screen {
             killCountList.put(cardLoadConfig.getCardType(),cardLoadConfig.getKillCount());
         }
         // 加载地图背景
-        backgroundTexture = assetManager.get("map/map4.png", Texture.class);
+        backgroundTexture = assetManager.get("map/map"+mapNo+".png", Texture.class);
         backgroundSprite = new Sprite(backgroundTexture);
         backgroundSprite.setSize(camera.viewportWidth, camera.viewportHeight);
         // 创建卡片操作框对象
@@ -207,16 +218,6 @@ public class GameScreen implements Screen {
         }
     }
 
-    /**
-     * 带关卡编号的构造方法
-     * @param game 游戏本体
-     * @param mapNo 关卡编号
-     */
-    public GameScreen(MyDefenseGame game , int mapNo) {
-        this(game);
-        System.out.println(mapNo);
-    }
-
     @Override
     public void show() {
         // 设置输入处理器为舞台
@@ -239,11 +240,11 @@ public class GameScreen implements Screen {
                 // 以enemyName作为唯一标识，来确保敌人不会重复生成
                 if (seconds >= loadTime && !isEnemyAlreadySpawned(enemyName)) {
                     // 生成敌人
-                    Enemy enemy = new Enemy(world, stage, 795f, 817f, enemyType, pathPoints1, gameUI, enemyName);
+                    Enemy enemy = new Enemy(world, stage, firstVector1.x, firstVector1.y, enemyType, pathPoints1, gameUI, enemyName);
                     enemies.add(enemy);
                     enemiesTotol.add(enemy);
                     // 生成双倍敌人，按照order2路线行进
-                    Enemy enemy2 = new Enemy(world, stage, 774f, 820f, enemyType, pathPoints2, gameUI, enemyName+"-order2");
+                    Enemy enemy2 = new Enemy(world, stage, firstVector2.x, firstVector2.y, enemyType, pathPoints2, gameUI, enemyName+"-order2");
                     enemies.add(enemy2);
                     enemiesTotol.add(enemy2);
                 }
@@ -773,7 +774,7 @@ public class GameScreen implements Screen {
     }
     private void parseMapPath() {
         // 加载 TMX 地图文件
-        map = new TmxMapLoader().load("map/冰天雪地1.tmx");
+        map = new TmxMapLoader().load("map/map"+mapNo+".tmx");
 
         // 初始化路径点列表
         pathPoints1 = new ArrayList<>();
@@ -795,6 +796,11 @@ public class GameScreen implements Screen {
                 // 获取点的 x 和 y 坐标
                 float x = object.getProperties().get("x", Float.class);
                 float y = object.getProperties().get("y", Float.class);
+                // 记录首节点，作为刷怪初始位置
+                int orderValue = Integer.parseInt(object.getProperties().get("order")+"");
+                if(orderValue == 1){
+                    firstVector1 = new Vector2(x, y);
+                }
                 // 将点的坐标和 order 值存储到 Vector2 中
                 Vector2 point = new Vector2(x, y);
                 // 将点添加到列表中
@@ -805,6 +811,11 @@ public class GameScreen implements Screen {
                 // 获取点的 x 和 y 坐标
                 float x = object.getProperties().get("x", Float.class);
                 float y = object.getProperties().get("y", Float.class);
+                // 记录首节点，作为刷怪初始位置
+                int orderValue = Integer.parseInt(object.getProperties().get("order2")+"");
+                if(orderValue == 1){
+                    firstVector2 = new Vector2(x, y);
+                }
                 // 将点的坐标和 order 值存储到 Vector2 中
                 Vector2 point = new Vector2(x, y);
                 // 将点添加到列表中
@@ -1003,5 +1014,9 @@ public class GameScreen implements Screen {
 
     public void setKillCountList(Map<String, Integer> killCountList) {
         this.killCountList = killCountList;
+    }
+
+    public Integer getMapNo() {
+        return mapNo;
     }
 }
