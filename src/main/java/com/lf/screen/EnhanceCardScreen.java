@@ -27,6 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -374,4 +375,66 @@ public class EnhanceCardScreen implements Screen {
     public void dispose() {
 
     }
+
+    public static void main(String[] args) {
+
+        // 创建第一个链表表示数字 342
+        LinkedList<Integer> l1 = new LinkedList<>();
+        l1.add(2);
+        l1.add(4);
+        l1.add(3);
+
+        // 创建第二个链表表示数字 4465
+        LinkedList<Integer> l2 = new LinkedList<>();
+        l2.add(5);
+        l2.add(6);
+        l2.add(4);
+        l2.add(4);
+
+        LinkedList<Integer> result = addTwoNumbers(l1, l2);
+
+        // 打印结果链表
+        for (int num : result) {
+            System.out.print(num + " ");
+        }
+
+    }
+
+    /**
+     * 两数之和
+     * @param l1 非空链表1，表示非负整数，每位数字按照逆序存储
+     * @param l2 非空链表2，表示非负整数，每位数字按照逆序存储
+     * @return 表示和的链表
+     */
+    public static LinkedList<Integer> addTwoNumbers(LinkedList<Integer> l1, LinkedList<Integer> l2) {
+        LinkedList<Integer> result = new LinkedList<>();
+        int carry = 0;
+//        int i = 0;
+//        // 同时遍历两个链表
+//        while (i < l1.size() || i < l2.size()) {
+//            int num1 = (i < l1.size()) ? l1.get(i) : 0;
+//            int num2 = (i < l2.size()) ? l2.get(i) : 0;
+//            int sum = num1 + num2 + carry;
+//            carry = sum / 10;
+//            result.add(sum % 10);
+//            i++;
+//        }
+
+        for (int i=0; i<l1.size() || i<l2.size() ;i++){
+            int num1 = (i < l1.size()) ? l1.get(i) : 0;
+            int num2 = (i < l2.size()) ? l2.get(i) : 0;
+            int sum = num1+num2+carry;
+            carry = sum / 10;
+            result.add(sum%10);
+        }
+
+        // 处理最后可能的进位
+        if (carry > 0) {
+            result.add(carry);
+        }
+
+        return result;
+    }
+
+
 }
